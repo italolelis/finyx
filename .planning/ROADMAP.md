@@ -34,7 +34,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 01-01-PLAN.md — Rename project from immo-cc to finyx-cc (directories, files, references, installer)
 - [x] 01-02-PLAN.md — Create profile.json schema template and legal disclaimer template
-- [ ] 01-03-PLAN.md — Build /finyx:profile interview command and wire disclaimer + gating into all commands
+- [x] 01-03-PLAN.md — Build /finyx:profile interview command and wire disclaimer + gating into all commands
 
 ### Phase 2: Tax Advisors
 **Goal**: Users receive country-appropriate tax guidance — Abgeltungssteuer mechanics and Sparerpauschbetrag tracking for Germany; IR obligations, DARF calculation, and FII exemption rules for Brazil — with all reference docs stamped with tax year metadata

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-foundation-profile/01-01-PLAN.md
-last_updated: "2026-04-06T10:52:48.188Z"
+stopped_at: "Checkpoint: Task 3 human-verify in 01-foundation-profile/01-03-PLAN.md"
+last_updated: "2026-04-06T11:00:56.555Z"
 last_activity: 2026-04-06
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 01 P02 | 5 | 2 tasks | 2 files |
 | Phase 01-foundation-profile P01 | 4min | 1 tasks | 28 files |
+| Phase 01-foundation-profile P03 | 10min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,9 @@ Recent decisions affecting current work:
 - [Phase 01]: disclaimer.md is standalone Markdown reference doc included via @path in all advisory commands
 - [Phase 01-foundation-profile]: Hard cut rename immo-cc -> finyx-cc with no coexistence period (D-01 through D-05)
 - [Phase 01-foundation-profile]: init.md deleted (not moved) — replaced by finyx:profile in Plan 03
+- [Phase 01-foundation-profile]: /finyx:profile uses AskUserQuestion for structured fields, inline prompts for freeform; cross_border auto-derived from residence/nationality mismatch or multi-country income
+- [Phase 01-foundation-profile]: investor.* block preserved in profile.json for backward compat with existing RE commands that read investor.marginalRate
+- [Phase 01-foundation-profile]: Profile gate pattern: all commands check .finyx/profile.json, disclaimer.md injected into execution_context of all advisory commands
 
 ### Pending Todos
 
@@ -83,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-06T10:52:48.185Z
-Stopped at: Completed 01-foundation-profile/01-01-PLAN.md
+Last session: 2026-04-06T11:00:47.855Z
+Stopped at: Checkpoint: Task 3 human-verify in 01-foundation-profile/01-03-PLAN.md
 Resume file: None
