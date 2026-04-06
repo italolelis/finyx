@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Finyx is an open-source personal finance advisor built as a collection of Claude Code slash-commands and specialist AI agents. It covers tax optimization (Germany + Brazil), investment portfolio management with live market data, broker comparison, pension planning (Riester/Rürup/bAV + PGBL/VGBL/INSS), and real estate investment analysis. Users interact through `/fin:*` commands while specialist agents handle domain-specific analysis backed by a shared financial profile.
+Finyx is an open-source personal finance advisor built as a collection of Claude Code slash-commands and specialist AI agents. It covers tax optimization (Germany + Brazil), investment portfolio management with live market data, broker comparison, pension planning (Riester/Rürup/bAV + PGBL/VGBL/INSS), real estate investment analysis, and a unified financial insights dashboard. Users interact through `/fin:*` commands while specialist agents handle domain-specific analysis backed by a shared financial profile.
 
 ## Core Value
 
@@ -30,16 +30,20 @@ A single AI-powered financial advisor that knows your full financial picture —
 - ✓ Cross-border/expat detection with jurisdiction flags — v1.0
 - ✓ Tax year metadata on all reference docs with staleness detection — v1.0
 
+- ✓ `/fin:insights` command — unified financial health report from profile + advisor data — v1.1
+- ✓ Income allocation analysis (needs/wants/savings/investments/debt vs country-adjusted benchmarks) — v1.1
+- ✓ Tax efficiency scoring (Sparerpauschbetrag, Vorabpauschale, DARF, PGBL per country with € gaps) — v1.1
+- ✓ Net worth snapshot (assets vs liabilities from profile data) — v1.1
+- ✓ Goal pace tracking ("at current rate, target X reached in Y months") — v1.1
+- ✓ Top-5 actionable recommendations ranked by € annual impact — v1.1
+- ✓ Cross-advisor intelligence (pension ↔ tax ↔ investment links) — v1.1
+- ✓ Country-aware benchmarks and traffic-light scoring reference docs — v1.1
+- ✓ Data completeness gate before insights analysis — v1.1
+- ✓ Emergency fund check (6-month threshold for cross-border users) — v1.1
+
 ### Active
 
-#### v1.1 — Financial Insights Dashboard
-- [ ] `/fin:insights` command — unified financial health report from existing profile + advisor data
-- [ ] Income allocation analysis (needs/wants/savings/investments/debt breakdown with benchmarks)
-- [ ] Tax efficiency scoring (unused allowances, optimization gaps across DE + BR)
-- [ ] Net worth snapshot with forward projection based on current savings/investment rate
-- [ ] Goal pace tracking ("at current rate, target X reached in Y months")
-- [ ] Top-N actionable recommendations ranked by financial impact
-- [ ] Cross-advisor intelligence (pension gap affects tax, investment allocation affects risk)
+(Next milestone — define via `/gsd:new-milestone`)
 
 ### Out of Scope
 
@@ -52,24 +56,12 @@ A single AI-powered financial advisor that knows your full financial picture —
 - Financial product affiliate links — destroys advisory trust
 - Budget tracking / expense categorization — different product, dilutes focus
 
-## Current Milestone: v1.1 Financial Insights Dashboard
-
-**Goal:** Generate actionable financial insights and recommendations by cross-referencing all existing advisor outputs and profile data.
-
-**Target features:**
-- `/fin:insights` command — unified financial health report
-- Income allocation analysis with benchmarks
-- Tax efficiency scoring across DE + BR
-- Net worth snapshot with forward projection
-- Goal pace tracking
-- Ranked actionable recommendations
-- Cross-advisor intelligence
-
 ## Context
 
-Shipped v1.0 with ~19,600 LOC across 102 files. v1.1 Phase 8 complete — `/fin:insights` orchestrator command created, all 3 phases shipped.
+Shipped v1.1 with 6 new files (+6,351 lines) on top of v1.0 (~19,600 LOC, 102 files).
 Tech stack: Claude Code slash-commands (Markdown prompts), Node.js installer, zero runtime dependencies.
-5 specialist commands: `/finyx:profile`, `/finyx:tax`, `/finyx:invest`, `/finyx:broker`, `/finyx:pension`.
+6 specialist commands: `/finyx:profile`, `/finyx:tax`, `/finyx:invest`, `/finyx:broker`, `/finyx:pension`, `/finyx:insights`.
+3 specialist insight agents: allocation, tax-scoring, projection.
 3 legacy real estate agents preserved under finyx namespace.
 Country support: Germany + Brazil with shared profile and per-country reference docs.
 Distributed via npm as `finyx-cc`.
@@ -96,6 +88,11 @@ Distributed via npm as `finyx-cc`.
 | Hard cut rename (no coexistence) | Clean migration, simpler codebase | ✓ Good |
 | Unconditional country doc loading | Minimal overhead, simplifies command gating logic | ✓ Good |
 | VWCE as primary core ETF recommendation | Broadest diversification in single fund | ✓ Good |
+| Net-after-mandatory income as benchmark denominator | Gross-based 50/30/20 is wrong for DE (~45% mandatory deductions) | ✓ Good |
+| Traffic light + € gap display | Combines at-a-glance scan with actionable specifics | ✓ Good |
+| Per-country scoring only (never combined) | Cross-jurisdiction combined scores are misleading | ✓ Good |
+| Claude inference for cross-advisor links | Fits Markdown-prompt architecture, zero maintenance vs rule engine | ✓ Good |
+| Profile-only data sourcing for insights | Agents read profile.json, never invoke other commands | ✓ Good |
 
 ## Evolution
 
@@ -115,4 +112,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-07 after Phase 8 completion — v1.1 milestone complete*
+*Last updated: 2026-04-07 after v1.1 milestone*
