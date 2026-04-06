@@ -9,8 +9,8 @@ Requirements for the Financial Insights Dashboard milestone. Each maps to roadma
 
 ### Allocation & Budgeting
 
-- [ ] **ALLOC-01**: User can see income allocation breakdown (needs/wants/savings/investments/debt) vs country-adjusted benchmarks computed on net income
-- [ ] **ALLOC-02**: User can see emergency fund status flagged when savings < 3-6 months of expenses
+- [x] **ALLOC-01**: User can see income allocation breakdown (needs/wants/savings/investments/debt) vs country-adjusted benchmarks computed on net income
+- [x] **ALLOC-02**: User can see emergency fund status flagged when savings < 3-6 months of expenses
 
 ### Tax Efficiency
 
@@ -63,8 +63,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ALLOC-01 | Phase 7 | Pending |
-| ALLOC-02 | Phase 7 | Pending |
+| ALLOC-01 | Phase 7 | Complete |
+| ALLOC-02 | Phase 7 | Complete |
 | TAX-01 | Phase 7 | Pending |
 | TAX-02 | Phase 7 | Pending |
 | TAX-03 | Phase 7 | Pending |

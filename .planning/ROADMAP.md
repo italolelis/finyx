@@ -49,11 +49,11 @@ Plans:
   2. Tax-scoring agent produces per-country efficiency gaps in € for DE (Sparerpauschbetrag unused amount, Vorabpauschale readiness) and BR (IR optimization gaps), scored separately — never combined
   3. Projection agent produces net worth snapshot (assets vs liabilities) and goal pace indicator ("at current rate, target X reached in Y months")
   4. Each agent reads `.finyx/profile.json` directly and emits a structured output consumable by the orchestrator
-**Plans:** 3 plans
+**Plans:** 2/3 plans executed
 Plans:
-- [ ] 07-01-PLAN.md — Allocation specialist agent (ALLOC-01, ALLOC-02)
+- [x] 07-01-PLAN.md — Allocation specialist agent (ALLOC-01, ALLOC-02)
 - [ ] 07-02-PLAN.md — Tax-scoring specialist agent (TAX-01, TAX-02, TAX-03)
-- [ ] 07-03-PLAN.md — Projection specialist agent (PROJ-01, PROJ-02)
+- [x] 07-03-PLAN.md — Projection specialist agent (PROJ-01, PROJ-02)
 
 ### Phase 8: Orchestrator Command
 **Goal**: `/fin:insights` delivers a unified financial health report with ranked recommendations, cross-advisor intelligence, and legal disclaimers
@@ -77,5 +77,5 @@ Plans:
 | 4. Pension Planning | v1.0 | 2/2 | Complete | 2026-04-06 |
 | 5. Profile Schema Sync | v1.0 | 1/1 | Complete | 2026-04-06 |
 | 6. Reference Foundation | v1.1 | 1/1 | Complete   | 2026-04-06 |
-| 7. Specialist Agents | v1.1 | 0/3 | Planning complete | - |
+| 7. Specialist Agents | v1.1 | 2/3 | In Progress|  |
 | 8. Orchestrator Command | v1.1 | 0/? | Not started | - |
