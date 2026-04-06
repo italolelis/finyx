@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Tax Advisors** - German and Brazilian tax advisory covering capital gains, fund taxation, and compliance obligations (completed 2026-04-06)
 - [x] **Phase 3: Investment + Broker** - Portfolio analysis, ETF recommendations, live market data, and broker comparison for DE/EU/BR (completed 2026-04-06)
 - [x] **Phase 4: Pension Planning** - German (Riester/Rürup/bAV) and Brazilian (PGBL/VGBL/INSS) pension analysis with cross-country projection (completed 2026-04-06)
-- [ ] **Phase 5: Profile Schema Sync** - Close v1.0 audit gaps: sync profile.md embedded schema, fix completion banner, add update.md disclaimer
+- [x] **Phase 5: Profile Schema Sync** - Close v1.0 audit gaps: sync profile.md embedded schema, fix completion banner, add update.md disclaimer (completed 2026-04-06)
 
 ## Phase Details
 
@@ -94,10 +94,10 @@ Plans:
   1. Profile created by /finyx:profile includes all fields from finyx/templates/profile.json (brokers[], _holdings_schema, pension block)
   2. Completion banner lists all available commands (/finyx:tax, /finyx:invest, /finyx:broker, /finyx:pension)
   3. update.md explicitly appends disclaimer to output
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 05-01-PLAN.md — Sync profile.md schema, fix banner, add update.md disclaimer append
+- [x] 05-01-PLAN.md — Sync profile.md schema, fix banner, add update.md disclaimer append
 
 ## Progress
 
@@ -110,4 +110,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Tax Advisors | 3/3 | Complete   | 2026-04-06 |
 | 3. Investment + Broker | 3/3 | Complete   | 2026-04-06 |
 | 4. Pension Planning | 2/2 | Complete   | 2026-04-06 |
-| 5. Profile Schema Sync | 0/1 | Not started | - |
+| 5. Profile Schema Sync | 1/1 | Complete   | 2026-04-06 |

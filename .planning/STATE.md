@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 04-pension-planning-02-PLAN.md
-last_updated: "2026-04-06T19:11:44.837Z"
+stopped_at: Completed 05-profile-schema-sync-01-PLAN.md
+last_updated: "2026-04-06T19:37:28.146Z"
 last_activity: 2026-04-06
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 12
-  completed_plans: 12
+  total_phases: 5
+  completed_phases: 5
+  total_plans: 13
+  completed_plans: 13
   percent: 0
 ---
 
@@ -21,12 +21,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-06)
 
 **Core value:** A single AI-powered financial advisor that knows your full financial picture and gives integrated, country-aware advice
-**Current focus:** Phase 04 — pension-planning
+**Current focus:** Phase 05 — profile-schema-sync
 
 ## Current Position
 
-Phase: 04
-Plan: Not started
+Phase: 05 (profile-schema-sync) — EXECUTING
+Plan: 1 of 1
 Status: Phase complete — ready for verification
 Last activity: 2026-04-06
 
@@ -63,6 +63,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03-investment-broker P02 | 309s | 1 tasks | 1 files |
 | Phase 04-pension-planning P01 | 196s | 2 tasks | 3 files |
 | Phase 04-pension-planning P02 | 374s | 2 tasks | 2 files |
+| Phase 05-profile-schema-sync P01 | 240 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -97,6 +98,8 @@ Recent decisions affecting current work:
 - [Phase 04-pension-planning]: Law 14.803/24 deferral: BR regime choice advisory changes from 'choose upfront' to 'defer unless committed >10yr'
 - [Phase 04-pension-planning]: Riester children birth years collected at runtime via AskUserQuestion — not pre-stored to avoid breaking existing profile schemas
 - [Phase 04-pension-planning]: Phase 5 cross-country projection gated strictly on cross_border flag — not just dual-country active status
+- [Phase 05]: profile.md Phase 5 JSON template must stay in sync with finyx/templates/profile.json — it is the write-time instantiation of the canonical schema
+- [Phase 05]: Disclaimer append is Step 7 in update.md, consistent with profile.md line 487 pattern
 
 ### Pending Todos
 
@@ -110,6 +113,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-06T19:08:37.770Z
-Stopped at: Completed 04-pension-planning-02-PLAN.md
+Last session: 2026-04-06T19:37:28.143Z
+Stopped at: Completed 05-profile-schema-sync-01-PLAN.md
 Resume file: None
