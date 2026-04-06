@@ -101,6 +101,10 @@ What's New in v[NEW]:
 Run /finyx:help to see available commands.
 ```
 
+## Step 7: Disclaimer
+
+Append the legal disclaimer from the loaded disclaimer.md reference at the end of this output.
+
 </process>
 
 <error_handling>
