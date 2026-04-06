@@ -13,7 +13,20 @@ Update FINYX to the latest version from npm and display changelog.
 
 </objective>
 
+<execution_context>
+
+@~/.claude/finyx/references/disclaimer.md
+@.finyx/profile.json
+
+</execution_context>
+
 <process>
+
+## Step 0: Check Profile Exists
+
+```bash
+[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+```
 
 ## Step 1: Check Current Version
 

@@ -136,8 +136,10 @@ Choose this if: [One sentence explaining when alternative is better]
 
 <execution_context>
 
+@~/.claude/finyx/references/disclaimer.md
 @~/.claude/finyx/templates/briefing.md
 @~/.claude/finyx/references/methodology.md
+@.finyx/profile.json
 
 </execution_context>
 
@@ -145,8 +147,13 @@ Choose this if: [One sentence explaining when alternative is better]
 
 ## Phase 1: Load All Data
 
+**Check profile exists:**
+```bash
+[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+```
+
 **Load investor profile:**
-Read `.finyx/config.json`
+Read `.finyx/profile.json`
 
 **Load location research:**
 Read all `.finyx/research/locations/*.md`
@@ -440,6 +447,8 @@ Contents:
 
   /finyx:stress-test  For additional scenarios
 ```
+
+Append the legal disclaimer from the loaded disclaimer.md reference at the end of all advisory output.
 
 </process>
 

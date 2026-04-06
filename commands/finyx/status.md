@@ -19,30 +19,37 @@ This is the "where am I?" command for orientation.
 
 </objective>
 
+<execution_context>
+
+@~/.claude/finyx/references/disclaimer.md
+@.finyx/profile.json
+
+</execution_context>
+
 <process>
 
 ## Step 1: Check Project Exists
 
 ```bash
-[ -f .finyx/config.json ] || echo "NO_PROJECT"
+[ -f .finyx/profile.json ] || { echo "NO_PROFILE"; }
 ```
 
-**If NO_PROJECT:**
+**If NO_PROFILE:**
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- FINYX ► NO PROJECT FOUND
+ FINYX ► NO PROFILE FOUND
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-No FINYX project in current directory.
+No Finyx financial profile found in current directory.
 
-To start: /finyx:init
+To start: /finyx:profile
 ```
 Exit.
 
 ## Step 2: Read State Files
 
 Read:
-- `.finyx/config.json` - Investor profile
+- `.finyx/profile.json` - Financial profile
 - `.finyx/STATE.md` - Current state
 
 ## Step 3: Scan Locations
@@ -117,5 +124,7 @@ Logic:
 5. If multiple locations filtered → "/finyx:compare"
 6. If compared but no report → "/finyx:report"
 7. If report exists → "Ready to decide. Review report or /finyx:stress-test"
+
+Append the legal disclaimer from the loaded disclaimer.md reference at the end of all advisory output.
 
 </process>

@@ -21,7 +21,20 @@ Research current mortgage interest rates in Germany:
 
 </objective>
 
+<execution_context>
+
+@~/.claude/finyx/references/disclaimer.md
+@.finyx/profile.json
+
+</execution_context>
+
 <process>
+
+## Phase 0: Pre-flight Check
+
+```bash
+[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+```
 
 ## Phase 1: Web Research
 
@@ -191,5 +204,7 @@ Create `.finyx/research/market/RATES-[DATE].md`:
    Quote Interhyp, Dr. Klein, and your bank before accepting
    developer's rate. Your profile should qualify for top rates.
 ```
+
+Append the legal disclaimer from the loaded disclaimer.md reference at the end of all advisory output.
 
 </process>

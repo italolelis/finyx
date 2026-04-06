@@ -24,12 +24,24 @@ Apply investor's criteria to analyzed units and create a filtered shortlist:
 
 </objective>
 
+<execution_context>
+
+@~/.claude/finyx/references/disclaimer.md
+@.finyx/profile.json
+
+</execution_context>
+
 <process>
 
 ## Phase 1: Load Data
 
-**Load config:**
-Read `.finyx/config.json` for criteria:
+**Check profile exists:**
+```bash
+[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+```
+
+**Load profile:**
+Read `.finyx/profile.json` for criteria:
 - `criteria.minYield`
 - `criteria.maxPrice`
 - `criteria.minSize` / `criteria.maxSize`
@@ -194,6 +206,8 @@ Shortlist:
    /finyx:filter [other-location]  Filter another location
    /finyx:compare                  Compare all shortlists
 ```
+
+Append the legal disclaimer from the loaded disclaimer.md reference at the end of all advisory output.
 
 </process>
 

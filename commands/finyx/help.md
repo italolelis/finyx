@@ -26,18 +26,18 @@ workflows, consistent methodology, and professional reporting.
 
 ```
 ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
-│  INIT   │───▶│  SCOUT  │───▶│ ANALYZE │───▶│ FILTER  │───▶│ COMPARE │───▶│ REPORT  │
+│ PROFILE │───▶│  SCOUT  │───▶│ ANALYZE │───▶│ FILTER  │───▶│ COMPARE │───▶│ REPORT  │
 └─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘
      │              │              │              │              │              │
-  Profile       Research       Calculate       Apply        Side-by-side    Advisor
-  + Setup       Location       Metrics       Criteria      Comparison      Briefing
+ Financial      Research       Calculate       Apply        Side-by-side    Advisor
+  Profile       Location       Metrics       Criteria      Comparison      Briefing
 ```
 
 ## Quick Start
 
 ```bash
-# 1. Initialize project with investor profile
-/finyx:init
+# 1. Complete your financial profile (required first step)
+/finyx:profile
 
 # 2. Add property documents to properties/[location]/
 #    (price lists, exposés, calculation docs)
@@ -67,7 +67,7 @@ workflows, consistent methodology, and professional reporting.
 
 | Command | Description |
 |---------|-------------|
-| `/finyx:init` | Initialize project with investor profile |
+| `/finyx:profile` | Complete financial profile — must run first |
 | `/finyx:status` | Show current state and next action |
 | `/finyx:update` | Update FINYX to the latest version |
 | `/finyx:help` | This reference |
@@ -100,19 +100,19 @@ workflows, consistent methodology, and professional reporting.
 
 ## Command Details
 
-### `/finyx:init`
+### `/finyx:profile`
 
-Initialize a new investment project through interactive flow.
+Complete a financial profile interview through interactive flow. This is the mandatory first step — no other Finyx command runs without a completed profile.
 
 **Gathers:**
-- Country and tax class
-- Income and marginal tax rate
-- Liquid assets and commitments
-- Investment horizon and financing preference
-- Criteria (min yield, max price, size range, parking)
+- Residence country and nationality (cross-border detection)
+- German tax class, church tax, income, and marginal rate (if Germany relevant)
+- Brazilian IR regime and income (if Brazil relevant)
+- Family status, risk tolerance, investment horizon, goals
+- Liquid assets and monthly commitments
 
 **Creates:**
-- `.finyx/config.json` — Investor profile
+- `.finyx/profile.json` — Financial profile
 - `.finyx/STATE.md` — Analysis state tracking
 - `properties/` — Folder for property documents
 - `FINYX.md` — Project summary
@@ -296,7 +296,7 @@ project/
 │   └── [location]/            # Property documents (price lists, exposés)
 │
 └── .finyx/
-    ├── config.json            # Investor profile and criteria
+    ├── profile.json           # Financial profile and criteria (created by /finyx:profile)
     ├── STATE.md               # Workflow state tracking
     │
     ├── research/

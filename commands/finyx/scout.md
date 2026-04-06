@@ -29,9 +29,11 @@ Research a location for real estate investment, gathering critical data:
 
 <execution_context>
 
+@~/.claude/finyx/references/disclaimer.md
 @~/.claude/finyx/references/erbpacht-detection.md
 @~/.claude/finyx/references/transport-assessment.md
 @~/.claude/finyx/templates/location-research.md
+@.finyx/profile.json
 
 </execution_context>
 
@@ -39,12 +41,10 @@ Research a location for real estate investment, gathering critical data:
 
 ## Phase 1: Validation
 
-**Check project exists:**
+**Check profile exists:**
 ```bash
-[ -f .finyx/config.json ] || echo "NO_PROJECT"
+[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
 ```
-
-If NO_PROJECT: "Run /finyx:init first to create project."
 
 **Parse location argument:**
 Extract location name from command (e.g., "kassel" from "/finyx:scout kassel")
@@ -302,6 +302,8 @@ Add location to STATE.md:
 📋 Next:
    [CONTEXTUAL - either analyze or exclude recommendation]
 ```
+
+Append the legal disclaimer from the loaded disclaimer.md reference at the end of all advisory output.
 
 </process>
 

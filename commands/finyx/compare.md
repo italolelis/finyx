@@ -22,9 +22,21 @@ Create comprehensive side-by-side comparison of all shortlisted properties:
 
 </objective>
 
+<execution_context>
+
+@~/.claude/finyx/references/disclaimer.md
+@.finyx/profile.json
+
+</execution_context>
+
 <process>
 
 ## Phase 1: Gather Shortlists
+
+**Check profile exists:**
+```bash
+[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+```
 
 **Find all shortlist files:**
 ```bash
@@ -40,7 +52,7 @@ find .finyx/analysis -name "SHORTLIST.md" 2>/dev/null
 
 ## Phase 2: Load Investor Profile
 
-Read `.finyx/config.json` for:
+Read `.finyx/profile.json` for:
 - Liquid assets (for buffer calculation)
 - Criteria (for highlighting matches)
 - Preferences (parking, floor, etc.)
@@ -218,5 +230,7 @@ Update state to reflect comparison done:
 ### Phase: COMPARED
 ### Last Action: Side-by-side comparison of [N] shortlisted units
 ```
+
+Append the legal disclaimer from the loaded disclaimer.md reference at the end of all advisory output.
 
 </process>

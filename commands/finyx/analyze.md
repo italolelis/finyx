@@ -28,8 +28,10 @@ Analyze all properties in a location folder:
 
 <execution_context>
 
+@~/.claude/finyx/references/disclaimer.md
 @~/.claude/finyx/references/methodology.md
 @~/.claude/finyx/references/germany/tax-rules.md
+@.finyx/profile.json
 
 </execution_context>
 
@@ -37,14 +39,14 @@ Analyze all properties in a location folder:
 
 ## Phase 1: Validation
 
-**Check project and location:**
+**Check profile and location:**
 ```bash
-[ -f .finyx/config.json ] || echo "NO_PROJECT"
+[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
 [ -d "properties/$LOCATION" ] || echo "NO_LOCATION"
 ```
 
-**Load investor config:**
-Read `.finyx/config.json` to get:
+**Load investor profile:**
+Read `.finyx/profile.json` to get:
 - `investor.marginalRate` — For tax benefit calculations
 - `investor.country` — For country-specific rules
 - `criteria.*` — For later filtering
@@ -331,6 +333,8 @@ Units with Parking: [COUNT]
 
 📋 Next: /finyx:filter [location] to apply criteria
 ```
+
+Append the legal disclaimer from the loaded disclaimer.md reference at the end of all advisory output.
 
 </process>
 
