@@ -67,7 +67,7 @@ A single AI-powered financial advisor that knows your full financial picture —
 
 ## Context
 
-Shipped v1.0 with ~19,600 LOC across 102 files. Phase 7 complete — 3 specialist agents (allocation, tax-scoring, projection) created.
+Shipped v1.0 with ~19,600 LOC across 102 files. v1.1 Phase 8 complete — `/fin:insights` orchestrator command created, all 3 phases shipped.
 Tech stack: Claude Code slash-commands (Markdown prompts), Node.js installer, zero runtime dependencies.
 5 specialist commands: `/finyx:profile`, `/finyx:tax`, `/finyx:invest`, `/finyx:broker`, `/finyx:pension`.
 3 legacy real estate agents preserved under finyx namespace.
@@ -115,4 +115,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-07 after Phase 7 completion*
+*Last updated: 2026-04-07 after Phase 8 completion — v1.1 milestone complete*
