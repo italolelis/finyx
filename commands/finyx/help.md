@@ -59,6 +59,14 @@ Portfolio
      │
   Broker
 Comparison
+     │
+     v
++---------+
+| PENSION |
++---------+
+     │
+ Retirement
+ Planning
 ```
 
 ## Quick Start
@@ -75,6 +83,9 @@ Comparison
 
 # 1d. Compare brokers and get a profile-based recommendation (optional, any time after profile)
 /finyx:broker
+
+# 1e. Get pension planning and retirement projection (optional, any time after profile)
+/finyx:pension
 
 # 2. Add property documents to properties/[location]/
 #    (price lists, exposés, calculation docs)
@@ -121,6 +132,12 @@ Comparison
 |---------|-------------|
 | `/finyx:invest` | Portfolio analysis, ETF recommendations, rebalancing, and live market data |
 | `/finyx:broker` | Broker fee comparison and profile-based recommendation for German and Brazilian brokers |
+
+### Pension Advisory
+
+| Command | Description |
+|---------|-------------|
+| `/finyx:pension` | Pension advisor — Riester/Ruerup/bAV (DE) and PGBL/VGBL (BR) guidance with cross-country projection |
 
 ### Research
 
@@ -217,6 +234,27 @@ Compare broker fees and get a profile-based broker recommendation.
 - Brazilian broker fee comparison (NuInvest, XP Investimentos, BTG Pactual)
 - Profile-based recommendation considering trading frequency, investment strategy, and tax simplicity preference
 - Tax reporting quality: German brokers (automatic Abgeltungssteuer withholding, Freistellungsauftrag, Jahressteuerbescheinigung) vs foreign brokers (manual Anlage KAP + Anlage KAP-INV)
+
+**Requires:** Completed financial profile (run `/finyx:profile` first)
+
+---
+
+### `/finyx:pension`
+
+Get personalized pension planning guidance based on your financial profile.
+
+**Routes by country (auto-detected from profile):**
+- Germany active → Riester vs Rürup vs bAV comparison, Zulagen calculation, Sonderausgabenabzug estimate
+- Brazil active → PGBL vs VGBL decision guide, progressive vs regressive IR regime comparison
+- Cross-border → Both country sections plus combined retirement projection
+
+**Covers:**
+- Riester eligibility and Zulagen calculation (Grundzulage + Kinderzulage)
+- Rürup Sonderausgabenabzug estimate based on income and marginal rate
+- bAV Entgeltumwandlung tax and social security savings (with GRV tradeoff note)
+- PGBL 12% income threshold and declaração completa requirement
+- Progressive vs regressive regime with Law 14.803/24 deferral option
+- Cross-country retirement projection (DE statutory + private + BR INSS, inflation-adjusted)
 
 **Requires:** Completed financial profile (run `/finyx:profile` first)
 
