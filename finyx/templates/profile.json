@@ -1,0 +1,95 @@
+{
+  "$schema": "https://finyx.dev/schemas/profile.schema.json",
+  "version": "1.0.0",
+  "created": "ISO_DATE",
+  "updated": "ISO_DATE",
+
+  "identity": {
+    "residence_country": null,
+    "nationality": null,
+    "income_countries": [],
+    "has_income_in_multiple_countries": false,
+    "cross_border": false,
+    "family_status": null,
+    "children": 0
+  },
+
+  "countries": {
+    "germany": {
+      "tax_class": null,
+      "church_tax": false,
+      "gross_income": 0,
+      "marginal_rate": 0
+    },
+    "brazil": {
+      "ir_regime": null,
+      "gross_income": 0,
+      "cpf": null
+    }
+  },
+
+  "goals": {
+    "risk_tolerance": null,
+    "investment_horizon": 0,
+    "primary_goals": []
+  },
+
+  "project": {
+    "name": "",
+    "propertiesFolder": "properties",
+    "outputFolder": ".finyx/output",
+    "language": "en"
+  },
+
+  "investor": {
+    "country": "",
+    "taxClass": "",
+    "churchTax": false,
+    "children": 0,
+    "income": {
+      "primary": 0,
+      "spouse": 0,
+      "total": 0
+    },
+    "marginalRate": 0,
+    "liquidAssets": 0,
+    "monthlyCommitments": 0
+  },
+
+  "strategy": {
+    "type": "neubau-rent-sell",
+    "horizon": 10,
+    "financing": {
+      "ltv": 100,
+      "fixedPeriod": 10
+    },
+    "management": "professional",
+    "exitPlan": "sell-tax-free"
+  },
+
+  "criteria": {
+    "propertyType": "2-bedroom apartment",
+    "bedrooms": [2],
+    "minYield": 2.8,
+    "maxPrice": 450000,
+    "minSize": 45,
+    "maxSize": 80,
+    "parkingRequired": false,
+    "parkingPreferred": true,
+    "excludeErbpacht": true,
+    "excludeGroundFloor": false,
+    "topFloorPreferred": false,
+    "newConstructionOnly": true
+  },
+
+  "assumptions": {
+    "appreciation": 2.0,
+    "rentIncrease": 0,
+    "vacancy": 0,
+    "verwaltungPerSqm": 1.0,
+    "rucklagePerSqm": 0.6,
+    "saleCosts": 7.0,
+    "constructionPeriod": 18,
+    "constructionDraw": 50
+  }
+}
