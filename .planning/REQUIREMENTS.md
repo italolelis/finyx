@@ -1,0 +1,86 @@
+# Requirements: Finyx v1.1
+
+**Defined:** 2026-04-06
+**Core Value:** A single AI-powered financial advisor that knows your full financial picture and gives integrated, country-aware advice
+
+## v1.1 Requirements
+
+Requirements for the Financial Insights Dashboard milestone. Each maps to roadmap phases.
+
+### Allocation & Budgeting
+
+- [ ] **ALLOC-01**: User can see income allocation breakdown (needs/wants/savings/investments/debt) vs country-adjusted benchmarks computed on net income
+- [ ] **ALLOC-02**: User can see emergency fund status flagged when savings < 3-6 months of expenses
+
+### Tax Efficiency
+
+- [ ] **TAX-01**: User can see Sparerpauschbetrag usage across all brokers with unused € amount highlighted
+- [ ] **TAX-02**: User can see per-country tax efficiency gaps (DE and BR scored separately) with € annual impact
+- [ ] **TAX-03**: User can see Vorabpauschale readiness check for upcoming debit sufficiency
+
+### Projections & Goals
+
+- [ ] **PROJ-01**: User can see net worth snapshot (assets vs liabilities summary from profile data)
+- [ ] **PROJ-02**: User can see goal pace tracking ("at current rate, target X reached in Y months")
+
+### Recommendations
+
+- [ ] **REC-01**: User can see top-5 actionable recommendations ranked by € annual impact
+- [ ] **REC-02**: User can see cross-advisor intelligence linking insights across domains (tax ↔ pension ↔ investment)
+
+### Infrastructure
+
+- [ ] **INFRA-01**: `/fin:insights` command exists with data-completeness gate (flags missing profile sections)
+- [ ] **INFRA-02**: Reference docs for country-aware benchmarks and scoring rules exist
+- [ ] **INFRA-03**: All insights output includes legal disclaimer via shared disclaimer.md
+
+## v1.2 Requirements
+
+Deferred to future release. Tracked but not in current roadmap.
+
+### Projections
+
+- **PROJ-03**: User can see net worth forward projection with conservative/base/optimistic scenarios
+- **PROJ-04**: User can see savings rate indicator as % of net income vs target
+
+### Tax
+
+- **TAX-04**: User can see year-end tax action checklist (DE + BR)
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Budget tracking / expense data collection | Different product, dilutes advisory focus |
+| Single combined financial health score | Gamification trap, hides component reality |
+| Combined cross-jurisdiction tax score | Misleading for cross-border users, obscures which jurisdiction has gaps |
+| Historical trend tracking | Requires persistent data store, defer to v2+ |
+| Automated portfolio rebalancing | Advisory only, legal liability |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| ALLOC-01 | — | Pending |
+| ALLOC-02 | — | Pending |
+| TAX-01 | — | Pending |
+| TAX-02 | — | Pending |
+| TAX-03 | — | Pending |
+| PROJ-01 | — | Pending |
+| PROJ-02 | — | Pending |
+| REC-01 | — | Pending |
+| REC-02 | — | Pending |
+| INFRA-01 | — | Pending |
+| INFRA-02 | — | Pending |
+| INFRA-03 | — | Pending |
+
+**Coverage:**
+- v1.1 requirements: 12 total
+- Mapped to phases: 0
+- Unmapped: 12 ⚠️
+
+---
+*Requirements defined: 2026-04-06*
+*Last updated: 2026-04-06 after initial definition*
