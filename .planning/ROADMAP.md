@@ -16,6 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Tax Advisors** - German and Brazilian tax advisory covering capital gains, fund taxation, and compliance obligations (completed 2026-04-06)
 - [x] **Phase 3: Investment + Broker** - Portfolio analysis, ETF recommendations, live market data, and broker comparison for DE/EU/BR (completed 2026-04-06)
 - [x] **Phase 4: Pension Planning** - German (Riester/Rürup/bAV) and Brazilian (PGBL/VGBL/INSS) pension analysis with cross-country projection (completed 2026-04-06)
+- [ ] **Phase 5: Profile Schema Sync** - Close v1.0 audit gaps: sync profile.md embedded schema, fix completion banner, add update.md disclaimer
 
 ## Phase Details
 
@@ -84,10 +85,21 @@ Plans:
 - [x] 04-01-PLAN.md — DE + BR pension reference docs and profile.json pension block extension
 - [x] 04-02-PLAN.md — /finyx:pension command + help.md registration
 
+### Phase 5: Profile Schema Sync
+**Goal**: Sync profile.md embedded JSON schema with finyx/templates/profile.json, fix completion banner, and add disclaimer append to update.md — closing all v1.0 audit gaps
+**Depends on**: Phase 4
+**Requirements**: PROF-04, PROF-05, INVEST-01, INVEST-04, PENSION-01, PENSION-06
+**Gap Closure**: Closes gaps from v1.0 audit
+**Success Criteria** (what must be TRUE):
+  1. Profile created by /finyx:profile includes all fields from finyx/templates/profile.json (brokers[], _holdings_schema, pension block)
+  2. Completion banner lists all available commands (/finyx:tax, /finyx:invest, /finyx:broker, /finyx:pension)
+  3. update.md explicitly appends disclaimer to output
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -95,3 +107,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | 2. Tax Advisors | 3/3 | Complete   | 2026-04-06 |
 | 3. Investment + Broker | 3/3 | Complete   | 2026-04-06 |
 | 4. Pension Planning | 2/2 | Complete   | 2026-04-06 |
+| 5. Profile Schema Sync | 0/? | Not started | - |
