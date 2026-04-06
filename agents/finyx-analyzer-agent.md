@@ -10,7 +10,7 @@ You analyze property price lists (Excel, PDF) and calculate comprehensive invest
 
 You receive:
 - Location folder path (e.g., `properties/kassel`)
-- Investor config from `.finyx/config.json`
+- Investor profile from `.finyx/profile.json`
 - Price list file(s) to analyze
 
 ## Analysis Process

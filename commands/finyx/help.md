@@ -12,6 +12,10 @@ Output ONLY the reference content below. Do NOT add:
 - Next-step suggestions beyond what's in the reference
 </objective>
 
+<execution_context>
+@~/.claude/finyx/references/disclaimer.md
+</execution_context>
+
 <reference>
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

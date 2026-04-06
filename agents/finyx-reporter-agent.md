@@ -9,7 +9,7 @@ You compile all analysis data into a professional briefing document suitable for
 ## Input Context
 
 You receive:
-- Investor profile from `.finyx/config.json`
+- Investor profile from `.finyx/profile.json`
 - Location research from `.finyx/research/locations/`
 - Market research from `.finyx/research/market/`
 - Shortlists from `.finyx/analysis/*/SHORTLIST.md`
