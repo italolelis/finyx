@@ -9,11 +9,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### User Financial Profile
 
-- [ ] **PROF-01**: User can complete interactive financial interview covering income, tax class, family status, goals, and risk tolerance
-- [ ] **PROF-02**: Profile supports Germany and Brazil as country contexts simultaneously
-- [ ] **PROF-03**: System detects cross-border/expat situations (e.g., living in DE, investing in BR) and flags jurisdiction implications
+- [x] **PROF-01**: User can complete interactive financial interview covering income, tax class, family status, goals, and risk tolerance
+- [x] **PROF-02**: Profile supports Germany and Brazil as country contexts simultaneously
+- [x] **PROF-03**: System detects cross-border/expat situations (e.g., living in DE, investing in BR) and flags jurisdiction implications
 - [x] **PROF-04**: Profile stored as structured `.finyx/profile.json` accessible by all specialist agents
-- [ ] **PROF-05**: Legal disclaimer displayed on all advisory outputs
+- [x] **PROF-05**: Legal disclaimer displayed on all advisory outputs
 
 ### German Tax Advisor
 
@@ -26,12 +26,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Brazilian Tax Advisor
 
-- [ ] **BRTAX-01**: User receives IR filing guidance specific to their investment types (stocks, FIIs, CDB, LCI/LCA, previdencia)
-- [ ] **BRTAX-02**: User receives DARF calculation for monthly stock/FII gains with deadline reminders
-- [ ] **BRTAX-03**: User receives come-cotas explanation with timing impact on their fund holdings
-- [ ] **BRTAX-04**: User receives FII dividend tax exemption rules and declaration requirements
-- [ ] **BRTAX-05**: Brazilian tax reference docs reflect Law 15,270/2025 changes (effective 2026-01-01)
-- [ ] **BRTAX-06**: All Brazilian tax reference docs include `tax_year` metadata for staleness detection
+- [x] **BRTAX-01**: User receives IR filing guidance specific to their investment types (stocks, FIIs, CDB, LCI/LCA, previdencia)
+- [x] **BRTAX-02**: User receives DARF calculation for monthly stock/FII gains with deadline reminders
+- [x] **BRTAX-03**: User receives come-cotas explanation with timing impact on their fund holdings
+- [x] **BRTAX-04**: User receives FII dividend tax exemption rules and declaration requirements
+- [x] **BRTAX-05**: Brazilian tax reference docs reflect Law 15,270/2025 changes (effective 2026-01-01)
+- [x] **BRTAX-06**: All Brazilian tax reference docs include `tax_year` metadata for staleness detection
 
 ### Investment Advisor
 
@@ -113,11 +113,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PROF-01 | Phase 1 | Pending |
-| PROF-02 | Phase 1 | Pending |
-| PROF-03 | Phase 1 | Pending |
+| PROF-01 | Phase 1 | Complete |
+| PROF-02 | Phase 1 | Complete |
+| PROF-03 | Phase 1 | Complete |
 | PROF-04 | Phase 1 | Complete |
-| PROF-05 | Phase 1 | Pending |
+| PROF-05 | Phase 1 | Complete |
 | FOUND-01 | Phase 1 | Complete |
 | FOUND-02 | Phase 1 | Complete |
 | FOUND-03 | Phase 1 | Complete |
@@ -129,12 +129,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DETAX-04 | Phase 2 | Pending |
 | DETAX-05 | Phase 2 | Pending |
 | DETAX-06 | Phase 2 | Pending |
-| BRTAX-01 | Phase 2 | Pending |
-| BRTAX-02 | Phase 2 | Pending |
-| BRTAX-03 | Phase 2 | Pending |
-| BRTAX-04 | Phase 2 | Pending |
-| BRTAX-05 | Phase 2 | Pending |
-| BRTAX-06 | Phase 2 | Pending |
+| BRTAX-01 | Phase 2 | Complete |
+| BRTAX-02 | Phase 2 | Complete |
+| BRTAX-03 | Phase 2 | Complete |
+| BRTAX-04 | Phase 2 | Complete |
+| BRTAX-05 | Phase 2 | Complete |
+| BRTAX-06 | Phase 2 | Complete |
 | INVEST-01 | Phase 3 | Pending |
 | INVEST-02 | Phase 3 | Pending |
 | INVEST-03 | Phase 3 | Pending |
