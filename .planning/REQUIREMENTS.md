@@ -17,12 +17,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### German Tax Advisor
 
-- [ ] **DETAX-01**: User receives explanation of German tax classes (Steuerklassen I-VI) with recommendation based on their profile
-- [ ] **DETAX-02**: User can track Sparerpauschbetrag usage against the 1,000/2,000 EUR exemption
-- [ ] **DETAX-03**: User receives Vorabpauschale calculation for their accumulating ETFs using current Basiszins
-- [ ] **DETAX-04**: User receives Teilfreistellung rates by fund type (equity 30%, mixed 15%, real estate 60%)
-- [ ] **DETAX-05**: User receives Abgeltungssteuer breakdown (25% + Soli + KiSt) contextualized to their marginal rate
-- [ ] **DETAX-06**: All German tax reference docs include `tax_year` metadata for staleness detection
+- [x] **DETAX-01**: User receives explanation of German tax classes (Steuerklassen I-VI) with recommendation based on their profile
+- [x] **DETAX-02**: User can track Sparerpauschbetrag usage against the 1,000/2,000 EUR exemption
+- [x] **DETAX-03**: User receives Vorabpauschale calculation for their accumulating ETFs using current Basiszins
+- [x] **DETAX-04**: User receives Teilfreistellung rates by fund type (equity 30%, mixed 15%, real estate 60%)
+- [x] **DETAX-05**: User receives Abgeltungssteuer breakdown (25% + Soli + KiSt) contextualized to their marginal rate
+- [x] **DETAX-06**: All German tax reference docs include `tax_year` metadata for staleness detection
 
 ### Brazilian Tax Advisor
 
@@ -123,12 +123,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUND-03 | Phase 1 | Complete |
 | FOUND-04 | Phase 1 | Complete |
 | FOUND-05 | Phase 1 | Complete |
-| DETAX-01 | Phase 2 | Pending |
-| DETAX-02 | Phase 2 | Pending |
-| DETAX-03 | Phase 2 | Pending |
-| DETAX-04 | Phase 2 | Pending |
-| DETAX-05 | Phase 2 | Pending |
-| DETAX-06 | Phase 2 | Pending |
+| DETAX-01 | Phase 2 | Complete |
+| DETAX-02 | Phase 2 | Complete |
+| DETAX-03 | Phase 2 | Complete |
+| DETAX-04 | Phase 2 | Complete |
+| DETAX-05 | Phase 2 | Complete |
+| DETAX-06 | Phase 2 | Complete |
 | BRTAX-01 | Phase 2 | Complete |
 | BRTAX-02 | Phase 2 | Complete |
 | BRTAX-03 | Phase 2 | Complete |
