@@ -48,6 +48,14 @@
     "primary_goals": []
   },
 
+  "pension": {
+    "de_rentenpunkte": null,
+    "expected_real_return_de": 1.5,
+    "br_inss_status": null,
+    "expected_real_return_br": 2.0,
+    "target_retirement_age": null
+  },
+
   "project": {
     "name": "",
     "propertiesFolder": "properties",
