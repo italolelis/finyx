@@ -284,6 +284,18 @@ mkdir -p properties
   "created": "[ISO_DATE]",
   "updated": "[ISO_DATE]",
 
+  "_holdings_schema": {
+    "description": "Each broker in countries.{country}.brokers[] can contain a holdings[] array",
+    "holding_fields": {
+      "ticker": "Exchange ticker symbol (e.g., VWCE, BOVA11)",
+      "isin": "ISIN if available (e.g., IE00BK5BQT80), null for B3 assets",
+      "shares": "Number of shares/units held (decimal)",
+      "cost_basis": "Average cost per share in local currency",
+      "asset_class": "One of: equity-etf, bond-etf, reit-etf, stock, fii, fixed-income",
+      "geography": "One of: global, us, europe, emerging-markets, brazil, germany"
+    }
+  },
+
   "identity": {
     "residence_country": "[residence_country]",
     "nationality": "[nationality]",
@@ -299,12 +311,14 @@ mkdir -p properties
       "tax_class": "[de_tax_class or null]",
       "church_tax": [de_church_tax or false],
       "gross_income": [de_gross_income or 0],
-      "marginal_rate": [de_marginal_rate or 0]
+      "marginal_rate": [de_marginal_rate or 0],
+      "brokers": []
     },
     "brazil": {
       "ir_regime": "[br_ir_regime or null]",
       "gross_income": [br_gross_income or 0],
-      "cpf": "[br_cpf or null]"
+      "cpf": "[br_cpf or null]",
+      "brokers": []
     }
   },
 
@@ -312,6 +326,14 @@ mkdir -p properties
     "risk_tolerance": "[risk_tolerance]",
     "investment_horizon": [investment_horizon_years],
     "primary_goals": [primary_goals_array]
+  },
+
+  "pension": {
+    "de_rentenpunkte": null,
+    "expected_real_return_de": 1.5,
+    "br_inss_status": null,
+    "expected_real_return_br": 2.0,
+    "target_retirement_age": null
   },
 
   "project": {
@@ -478,10 +500,13 @@ Real estate analysis:
   5. Run /finyx:compare to compare shortlisted options
   6. Run /finyx:report to generate advisor briefing
 
-Other advisors (coming in future releases):
+Financial advisors (ready to use):
   /finyx:tax     — Tax optimization advisor
   /finyx:invest  — Investment portfolio advisor
+  /finyx:broker  — Broker comparison advisor
   /finyx:pension — Pension planning advisor
+
+Run /finyx:help for all available commands.
 ```
 
 Append the legal disclaimer from the loaded disclaimer.md reference at the end of this output.
