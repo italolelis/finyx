@@ -29,12 +29,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. System flags cross-border/expat situations and surfaces jurisdiction implications during the interview
   4. Profile is written to `.finyx/profile.json` and all specialist agents can read it as their shared context source
   5. Every advisory output includes a legal disclaimer automatically sourced from the shared disclaimer template
-**Plans:** 2/3 plans executed
+**Plans:** 4 plans (3 executed + 1 gap closure)
 
 Plans:
 - [x] 01-01-PLAN.md — Rename project from immo-cc to finyx-cc (directories, files, references, installer)
 - [x] 01-02-PLAN.md — Create profile.json schema template and legal disclaimer template
 - [x] 01-03-PLAN.md — Build /finyx:profile interview command and wire disclaimer + gating into all commands
+- [ ] 01-04-PLAN.md — Gap closure: add disclaimer to help.md, fix agent profile path references
 
 ### Phase 2: Tax Advisors
 **Goal**: Users receive country-appropriate tax guidance — Abgeltungssteuer mechanics and Sparerpauschbetrag tracking for Germany; IR obligations, DARF calculation, and FII exemption rules for Brazil — with all reference docs stamped with tax year metadata
@@ -77,7 +78,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation + Profile | 2/3 | In Progress|  |
+| 1. Foundation + Profile | 3/4 | In Progress|  |
 | 2. Tax Advisors | 0/? | Not started | - |
 | 3. Investment + Broker | 0/? | Not started | - |
 | 4. Pension Planning | 0/? | Not started | - |
