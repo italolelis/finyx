@@ -31,7 +31,7 @@ Requirements for the Financial Insights Dashboard milestone. Each maps to roadma
 ### Infrastructure
 
 - [ ] **INFRA-01**: `/fin:insights` command exists with data-completeness gate (flags missing profile sections)
-- [ ] **INFRA-02**: Reference docs for country-aware benchmarks and scoring rules exist
+- [x] **INFRA-02**: Reference docs for country-aware benchmarks and scoring rules exist
 - [ ] **INFRA-03**: All insights output includes legal disclaimer via shared disclaimer.md
 
 ## v1.2 Requirements
@@ -73,7 +73,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | REC-01 | Phase 8 | Pending |
 | REC-02 | Phase 8 | Pending |
 | INFRA-01 | Phase 8 | Pending |
-| INFRA-02 | Phase 6 | Pending |
+| INFRA-02 | Phase 6 | Complete |
 | INFRA-03 | Phase 8 | Pending |
 
 **Coverage:**
