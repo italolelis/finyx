@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
-status: verifying
-stopped_at: Completed 05-profile-schema-sync-01-PLAN.md
-last_updated: "2026-04-06T19:38:58.328Z"
+milestone_name: MVP
+status: shipped
+stopped_at: Milestone v1.0 complete
+last_updated: "2026-04-06"
 last_activity: 2026-04-06
 progress:
   total_phases: 5
   completed_phases: 5
   total_plans: 13
   completed_plans: 13
-  percent: 0
+  percent: 100
 ---
 
 # Project State
@@ -21,98 +21,50 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-06)
 
 **Core value:** A single AI-powered financial advisor that knows your full financial picture and gives integrated, country-aware advice
-**Current focus:** Phase 05 — profile-schema-sync
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 05
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: v1.0 complete
+Plan: —
+Status: Milestone shipped — ready for `/gsd:new-milestone`
 Last activity: 2026-04-06
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0
-- Average duration: —
-- Total execution time: —
+- Total plans completed: 13
+- Timeline: 65 days (2026-02-01 → 2026-04-06)
 
 **By Phase:**
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| - | - | - | - |
-
-**Recent Trend:**
-
-- Last 5 plans: —
-- Trend: —
-
-*Updated after each plan completion*
-| Phase 01 P02 | 5 | 2 tasks | 2 files |
-| Phase 01-foundation-profile P01 | 4min | 1 tasks | 28 files |
-| Phase 01-foundation-profile P03 | 10min | 2 tasks | 11 files |
-| Phase 02 P02 | 2min | 1 tasks | 1 files |
-| Phase 02-tax-advisors P01 | 7min | 2 tasks | 2 files |
-| Phase 02-tax-advisors P03 | 212s | 2 tasks | 2 files |
-| Phase 03-investment-broker P01 | 2min | 2 tasks | 3 files |
-| Phase 03-investment-broker P03 | 145s | 2 tasks | 2 files |
-| Phase 03-investment-broker P02 | 309s | 1 tasks | 1 files |
-| Phase 04-pension-planning P01 | 196s | 2 tasks | 3 files |
-| Phase 04-pension-planning P02 | 374s | 2 tasks | 2 files |
-| Phase 05-profile-schema-sync P01 | 240 | 2 tasks | 2 files |
+| Phase | Plans | Duration |
+|-------|-------|----------|
+| 01 Foundation + Profile | 4 | — |
+| 02 Tax Advisors | 3 | — |
+| 03 Investment + Broker | 3 | — |
+| 04 Pension Planning | 2 | — |
+| 05 Profile Schema Sync | 1 | — |
 
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-- Rename to Finyx (Phase 1): rebrand package, commands, agents, docs
-- Germany before Brazil (Phase 2): simpler rules, existing IMMO tax content to reuse
-- Advisory only, no execution: legal disclaimers mandatory on all outputs
-- APIs + web search: Finnhub (EU/US), brapi.dev (B3/FIIs), Bundesbank SDMX (Basiszins)
-- [Phase 01]: profile.json merges identity/countries/goals into IMMO schema with full backward compatibility
-- [Phase 01]: disclaimer.md is standalone Markdown reference doc included via @path in all advisory commands
-- [Phase 01-foundation-profile]: Hard cut rename immo-cc -> finyx-cc with no coexistence period (D-01 through D-05)
-- [Phase 01-foundation-profile]: init.md deleted (not moved) — replaced by finyx:profile in Plan 03
-- [Phase 01-foundation-profile]: /finyx:profile uses AskUserQuestion for structured fields, inline prompts for freeform; cross_border auto-derived from residence/nationality mismatch or multi-country income
-- [Phase 01-foundation-profile]: investor.* block preserved in profile.json for backward compat with existing RE commands that read investor.marginalRate
-- [Phase 01-foundation-profile]: Profile gate pattern: all commands check .finyx/profile.json, disclaimer.md injected into execution_context of all advisory commands
-- [Phase 02]: Law 15,270/2025 included in BR tax reference with Receita Federal uncertainty disclaimer (D-12)
-- [Phase 02]: INSS expat treatment deferred to Phase 4 — out of scope for Phase 2 (D-12)
-- [Phase 02-tax-advisors]: German investment tax content sourced from fin-tax skill (D-07) — verified Abgeltungssteuer 26.375%, Basiszins 2025 2.29%/2026 3.20%, Sparerpauschbetrag 1000/2000 EUR since 2023
-- [Phase 02-tax-advisors]: Load both country reference docs unconditionally in execution_context — minimal overhead, simplifies process phase gating
-- [Phase 02-tax-advisors]: finyx:tax broker data collection via AskUserQuestion with Write offer — stateless Sparerpauschbetrag per D-08
-- [Phase 03-investment-broker]: Germany broker doc covers 4 German brokers + Trading212/IBKR tax contrast for BROKER-04 compliance
-- [Phase 03-investment-broker]: _holdings_schema added as top-level JSON key (no comment syntax in JSON) to document holdings[] structure per broker
-- [Phase 03-investment-broker]: No Write tool in broker.md — pure advisory output, no file creation needed
-- [Phase 03-investment-broker]: node -e for cross-platform date arithmetic in staleness check — avoids GNU vs macOS date flag incompatibility
-- [Phase 03-investment-broker]: VWCE as primary core ETF recommendation across all risk profiles — broadest diversification in single fund
-- [Phase 03-investment-broker]: .XETRA suffix required for European ETFs on Finnhub (e.g., VWCE.XETRA) — documented in invest.md Phase 7
-- [Phase 04-pension-planning]: Ruerup Hoechstbeitrag 2025 uses verified statutory figure 29344 EUR single (not D-11's 2024 value of 27566 EUR)
-- [Phase 04-pension-planning]: Law 14.803/24 deferral: BR regime choice advisory changes from 'choose upfront' to 'defer unless committed >10yr'
-- [Phase 04-pension-planning]: Riester children birth years collected at runtime via AskUserQuestion — not pre-stored to avoid breaking existing profile schemas
-- [Phase 04-pension-planning]: Phase 5 cross-country projection gated strictly on cross_border flag — not just dual-country active status
-- [Phase 05]: profile.md Phase 5 JSON template must stay in sync with finyx/templates/profile.json — it is the write-time instantiation of the canonical schema
-- [Phase 05]: Disclaimer append is Step 7 in update.md, consistent with profile.md line 487 pattern
+All v1.0 decisions logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
-- INSS expat treatment (Phase 4): How a Brazilian in Germany contributes to / exits BR social security is unresolved. Needs targeted research before building the Brazilian pension agent.
-- Vorabpauschale 2026 Basiszins: BMF publishes the 2026 rate in early 2026; reference docs must be updated as soon as available.
-- Law 15,270/2025 FII interaction: dividend withholding + FII exemption edge cases need Receita Federal source confirmation before Phase 2 ships.
+None — v1.0 shipped.
 
 ## Session Continuity
 
-Last session: 2026-04-06T19:37:28.143Z
-Stopped at: Completed 05-profile-schema-sync-01-PLAN.md
+Last session: 2026-04-06
+Stopped at: Milestone v1.0 completed
 Resume file: None
