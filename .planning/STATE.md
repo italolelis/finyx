@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 04-pension-planning-01-PLAN.md
-last_updated: "2026-04-06T19:00:41.989Z"
+status: verifying
+stopped_at: Completed 04-pension-planning-02-PLAN.md
+last_updated: "2026-04-06T19:08:37.774Z"
 last_activity: 2026-04-06
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 12
-  completed_plans: 11
+  completed_plans: 12
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-06)
 
 Phase: 04 (pension-planning) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-06
 
 Progress: [░░░░░░░░░░] 0%
@@ -62,6 +62,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03-investment-broker P03 | 145s | 2 tasks | 2 files |
 | Phase 03-investment-broker P02 | 309s | 1 tasks | 1 files |
 | Phase 04-pension-planning P01 | 196s | 2 tasks | 3 files |
+| Phase 04-pension-planning P02 | 374s | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,8 @@ Recent decisions affecting current work:
 - [Phase 03-investment-broker]: .XETRA suffix required for European ETFs on Finnhub (e.g., VWCE.XETRA) — documented in invest.md Phase 7
 - [Phase 04-pension-planning]: Ruerup Hoechstbeitrag 2025 uses verified statutory figure 29344 EUR single (not D-11's 2024 value of 27566 EUR)
 - [Phase 04-pension-planning]: Law 14.803/24 deferral: BR regime choice advisory changes from 'choose upfront' to 'defer unless committed >10yr'
+- [Phase 04-pension-planning]: Riester children birth years collected at runtime via AskUserQuestion — not pre-stored to avoid breaking existing profile schemas
+- [Phase 04-pension-planning]: Phase 5 cross-country projection gated strictly on cross_border flag — not just dual-country active status
 
 ### Pending Todos
 
@@ -107,6 +110,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-06T19:00:41.986Z
-Stopped at: Completed 04-pension-planning-01-PLAN.md
+Last session: 2026-04-06T19:08:37.770Z
+Stopped at: Completed 04-pension-planning-02-PLAN.md
 Resume file: None

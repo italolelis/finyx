@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 1: Foundation + Profile** - Rename to Finyx, establish shared memory, and build the financial profile that gates all specialist commands
 - [x] **Phase 2: Tax Advisors** - German and Brazilian tax advisory covering capital gains, fund taxation, and compliance obligations (completed 2026-04-06)
 - [x] **Phase 3: Investment + Broker** - Portfolio analysis, ETF recommendations, live market data, and broker comparison for DE/EU/BR (completed 2026-04-06)
-- [ ] **Phase 4: Pension Planning** - German (Riester/Rürup/bAV) and Brazilian (PGBL/VGBL/INSS) pension analysis with cross-country projection
+- [x] **Phase 4: Pension Planning** - German (Riester/Rürup/bAV) and Brazilian (PGBL/VGBL/INSS) pension analysis with cross-country projection (completed 2026-04-06)
 
 ## Phase Details
 
@@ -78,11 +78,11 @@ Plans:
   1. German user receives a Riester vs Rürup vs bAV comparison with a Zulagen calculation (Grundzulage + Kinderzulage) and a Rürup Sonderausgabenabzug estimate based on their income and marginal rate
   2. Brazilian user receives a PGBL vs VGBL decision guide based on their IR regime and 12% income threshold, plus a progressive vs regressive regime comparison with time horizon examples
   3. User with obligations in both countries receives a combined cross-country pension projection merging German statutory + private + Brazilian INSS
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 04-01-PLAN.md — DE + BR pension reference docs and profile.json pension block extension
-- [ ] 04-02-PLAN.md — /finyx:pension command + help.md registration
+- [x] 04-02-PLAN.md — /finyx:pension command + help.md registration
 
 ## Progress
 
@@ -94,4 +94,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | 1. Foundation + Profile | 4/4 | Complete |  |
 | 2. Tax Advisors | 3/3 | Complete   | 2026-04-06 |
 | 3. Investment + Broker | 3/3 | Complete   | 2026-04-06 |
-| 4. Pension Planning | 1/2 | In Progress|  |
+| 4. Pension Planning | 2/2 | Complete   | 2026-04-06 |
