@@ -37,7 +37,10 @@ Phase 6: Benchmarks & Scoring Reference Docs, Phase 7: Insight Specialist Agents
   2. Document defines the four calculation paths: single employee, family employee, self-employed, Beamter redirect
   3. Document includes GKV cost formula, PKV risk-tier estimation approach, and long-term projection methodology
   4. Staleness detection metadata (tax_year, valid_until) present per project convention
-**Plans**: TBD
+**Plans:** 1 plan
+
+Plans:
+- [ ] 09-01-PLAN.md — Create health-insurance.md reference document with all 2026 constants and formulas
 
 ### Phase 10: Specialist Agents
 **Goal**: Two specialist agents exist — a deterministic calculation agent and a live-research agent — ready to be orchestrated by the insurance command
@@ -78,7 +81,7 @@ Phase 6: Benchmarks & Scoring Reference Docs, Phase 7: Insight Specialist Agents
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 9. Reference Foundation | v1.2 | 0/TBD | Not started | - |
+| 9. Reference Foundation | v1.2 | 0/1 | Planning | - |
 | 10. Specialist Agents | v1.2 | 0/TBD | Not started | - |
 | 11. Command + Integration | v1.2 | 0/TBD | Not started | - |
 | 12. Cross-Advisor Integration | v1.2 | 0/TBD | Not started | - |
