@@ -82,10 +82,10 @@ Plans:
   1. `.finyx/profile.json` schema extended with an insurance section (type, monthly cost, employer share)
   2. `/finyx:insights` picks up insurance costs in net worth and allocation analysis when insurance section is populated
   3. `/finyx:tax` reflects PKV Basisabsicherung deduction when insurance type is PKV
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 12-01-PLAN.md — Wire insurance data into profile template, insights allocation, and tax PKV deduction
+- [x] 12-01-PLAN.md — Wire insurance data into profile template, insights allocation, and tax PKV deduction
 
 ## Progress
 
@@ -94,4 +94,4 @@ Plans:
 | 9. Reference Foundation | v1.2 | 0/1 | Planning | - |
 | 10. Specialist Agents | v1.2 | 2/2 | Complete    | 2026-04-08 |
 | 11. Command + Integration | v1.2 | 1/1 | Complete    | 2026-04-08 |
-| 12. Cross-Advisor Integration | v1.2 | 0/1 | Planning | - |
+| 12. Cross-Advisor Integration | v1.2 | 1/1 | Complete   | 2026-04-08 |

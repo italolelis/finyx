@@ -24,7 +24,7 @@ Requirements for the Health Insurance Advisor milestone. Each maps to roadmap ph
 
 - [x] **EDGE-01**: User can see expat considerations (Anwartschaft, EU portability, non-EU gaps)
 - [x] **EDGE-02**: User sees prominent age-55 lock-in warning (§6 Abs. 3a SGB V)
-- [ ] **EDGE-03**: Insurance costs feed into `/finyx:insights` and `/finyx:tax` via profile schema extension
+- [x] **EDGE-03**: Insurance costs feed into `/finyx:insights` and `/finyx:tax` via profile schema extension
 
 ### Infrastructure
 
@@ -70,7 +70,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ADV-03 | Phase 10 | Complete |
 | EDGE-01 | Phase 11 | Complete |
 | EDGE-02 | Phase 11 | Complete |
-| EDGE-03 | Phase 12 | Pending |
+| EDGE-03 | Phase 12 | Complete |
 | INFRA-01 | Phase 10 | Complete |
 | INFRA-02 | Phase 9 | Complete |
 | INFRA-03 | Phase 11 | Complete |
