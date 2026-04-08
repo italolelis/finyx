@@ -64,6 +64,9 @@ This command writes ONLY to `.finyx/insights-config.json` (allocation mapping pe
 - `investor.monthlyCommitments` (must be > 0)
 - `investor.income.total` OR `countries.germany.gross_income` (at least one must be > 0)
 
+**Optional fields — Insurance integration:**
+- `insurance.type` and `insurance.monthly_cost` — if populated, insurance costs are included in allocation analysis as a "needs" line item. If absent or null: skip silently (no error, no warning).
+
 **Cross-border gate (Pitfall 6):** When checking Brazil fields, only require `countries.brazil.ir_regime` and `countries.brazil.gross_income` if BOTH `identity.cross_border == true` AND `countries.brazil.gross_income > 0`. Do NOT require Brazil fields if `identity.cross_border == false` or if Brazil income is zero or absent.
 
 **If ANY required field is missing, null, or zero (beyond the cross-border gate above):**
@@ -130,6 +133,11 @@ Profile data is at `.finyx/profile.json`. Reference docs are at `~/.claude/finyx
 
 [If .finyx/insights-config.json exists with allocation_mapping:]
 An existing allocation mapping is already confirmed and stored in `.finyx/insights-config.json` under the `allocation_mapping` key. Read it and use it directly — skip the Phase 2 first-run confirmation flow and do NOT use AskUserQuestion.
+
+If `.finyx/profile.json` contains an `insurance` section with `type` and `monthly_cost` populated:
+- Include the net insurance cost (monthly_cost minus employer_share) as a "needs" category line item labeled "Health Insurance ([type])"
+- If insurance.type is "PKV" and the net cost exceeds what GKV would cost at the user's income level, flag this as a recommendation opportunity: "PKV premium exceeds estimated GKV equivalent — review /finyx:insurance for cost comparison"
+- If insurance section is absent, null, or type is "none": skip — do not include any insurance line in allocation
 
 Complete all phases of your process and return your output wrapped in <allocation_result> tags.
 ```
@@ -263,6 +271,12 @@ Before ranking recommendations, scan the collected agent outputs for these cross
 - Insight: PGBL contributions up to 12% of gross Brazilian income are fully deductible under declaração completa — every R$1 contributed at a marginal rate of 27.5% saves R$0.275 in tax.
 - Recommendation: "Start PGBL contributions to utilize the 12% gross income deduction — reduce annual BR income tax by R$X"
 - Estimated impact: `pgbl_gap_brl × brazil_marginal_rate` (convert to EUR using stated BRL/EUR assumption)
+
+**Pattern CAL-05: High Insurance Cost — PKV Premium Drag on Savings Rate**
+- Trigger: `insurance.type == "PKV"` AND net insurance cost (monthly_cost - employer_share) exceeds €400/month AND savings rate is below 20%
+- Insight: High PKV premiums reduce disposable income available for savings and investments. The user may benefit from reviewing PKV tariff optimization (Tarifwechsel §204 VVG) or considering GKV return if still eligible.
+- Recommendation: "Review PKV tariff options via /finyx:insurance — Tarifwechsel within same insurer can reduce premiums without losing Altersrückstellungen"
+- Estimated impact: Potential monthly saving from tariff optimization (varies, typically €50–200/month = €600–2,400/year)
 
 **Additional cross-advisor patterns:** Claude may identify and surface novel cross-advisor links beyond these four examples if strong signal is present in the agent outputs. Any additional patterns must include: trigger condition, insight, one-line recommendation, estimated EUR/BRL impact.
 </cross_advisor_links>
