@@ -40,7 +40,7 @@ Phase 6: Benchmarks & Scoring Reference Docs, Phase 7: Insight Specialist Agents
 **Plans:** 1 plan
 
 Plans:
-- [ ] 09-01-PLAN.md — Create health-insurance.md reference document with all 2026 constants and formulas
+- [x] 09-01-PLAN.md — Create health-insurance.md reference document with all 2026 constants and formulas
 
 ### Phase 10: Specialist Agents
 **Goal**: Two specialist agents exist — a deterministic calculation agent and a live-research agent — ready to be orchestrated by the insurance command

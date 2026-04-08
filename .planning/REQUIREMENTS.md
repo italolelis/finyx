@@ -29,7 +29,7 @@ Requirements for the Health Insurance Advisor milestone. Each maps to roadmap ph
 ### Infrastructure
 
 - [ ] **INFRA-01**: Health questionnaire collects binary health flags, session-only (never persisted), GDPR Art. 9 compliant
-- [ ] **INFRA-02**: Reference doc `germany/health-insurance.md` exists with 2026 constants and staleness detection
+- [x] **INFRA-02**: Reference doc `germany/health-insurance.md` exists with 2026 constants and staleness detection
 - [ ] **INFRA-03**: All output includes legal disclaimer + recommendation to consult a Versicherungsberater
 - [ ] **INFRA-04**: `/finyx:insurance` command exists with all features wired
 
@@ -72,7 +72,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EDGE-02 | Phase 11 | Pending |
 | EDGE-03 | Phase 12 | Pending |
 | INFRA-01 | Phase 10 | Pending |
-| INFRA-02 | Phase 9 | Pending |
+| INFRA-02 | Phase 9 | Complete |
 | INFRA-03 | Phase 11 | Pending |
 | INFRA-04 | Phase 11 | Pending |
 
