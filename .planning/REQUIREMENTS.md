@@ -17,7 +17,7 @@ Requirements for the Health Insurance Advisor milestone. Each maps to roadmap ph
 ### Advanced Analysis
 
 - [ ] **ADV-01**: User can see 10/20/30-year cost projection with conservative/base/optimistic scenarios for PKV vs GKV
-- [ ] **ADV-02**: User can see PKV provider research with current tariffs, Beitragsrückerstattung, and Selbstbeteiligung options
+- [x] **ADV-02**: User can see PKV provider research with current tariffs, Beitragsrückerstattung, and Selbstbeteiligung options
 - [ ] **ADV-03**: User can see net PKV cost after tax deduction (Basisabsicherung §10 EStG, marginal rate from profile)
 
 ### Edge Cases & Integration
@@ -66,7 +66,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | COST-02 | Phase 10 | Pending |
 | COST-03 | Phase 10 | Pending |
 | ADV-01 | Phase 10 | Pending |
-| ADV-02 | Phase 10 | Pending |
+| ADV-02 | Phase 10 | Complete |
 | ADV-03 | Phase 10 | Pending |
 | EDGE-01 | Phase 11 | Pending |
 | EDGE-02 | Phase 11 | Pending |
