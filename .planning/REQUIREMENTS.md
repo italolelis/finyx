@@ -10,15 +10,15 @@ Requirements for the Health Insurance Advisor milestone. Each maps to roadmap ph
 ### Eligibility & Cost Comparison
 
 - [ ] **ELIG-01**: User can see eligibility check based on Versicherungspflichtgrenze (income vs JAEG threshold)
-- [ ] **COST-01**: User can see exact GKV monthly cost (base rate + Zusatzbeitrag + Pflegeversicherung, employer share deducted)
-- [ ] **COST-02**: User can see PKV cost estimate based on age and health risk tier from questionnaire
-- [ ] **COST-03**: User can see family impact comparison (GKV Familienversicherung vs PKV per-person costs for partner + children)
+- [x] **COST-01**: User can see exact GKV monthly cost (base rate + Zusatzbeitrag + Pflegeversicherung, employer share deducted)
+- [x] **COST-02**: User can see PKV cost estimate based on age and health risk tier from questionnaire
+- [x] **COST-03**: User can see family impact comparison (GKV Familienversicherung vs PKV per-person costs for partner + children)
 
 ### Advanced Analysis
 
-- [ ] **ADV-01**: User can see 10/20/30-year cost projection with conservative/base/optimistic scenarios for PKV vs GKV
+- [x] **ADV-01**: User can see 10/20/30-year cost projection with conservative/base/optimistic scenarios for PKV vs GKV
 - [x] **ADV-02**: User can see PKV provider research with current tariffs, Beitragsrückerstattung, and Selbstbeteiligung options
-- [ ] **ADV-03**: User can see net PKV cost after tax deduction (Basisabsicherung §10 EStG, marginal rate from profile)
+- [x] **ADV-03**: User can see net PKV cost after tax deduction (Basisabsicherung §10 EStG, marginal rate from profile)
 
 ### Edge Cases & Integration
 
@@ -28,7 +28,7 @@ Requirements for the Health Insurance Advisor milestone. Each maps to roadmap ph
 
 ### Infrastructure
 
-- [ ] **INFRA-01**: Health questionnaire collects binary health flags, session-only (never persisted), GDPR Art. 9 compliant
+- [x] **INFRA-01**: Health questionnaire collects binary health flags, session-only (never persisted), GDPR Art. 9 compliant
 - [x] **INFRA-02**: Reference doc `germany/health-insurance.md` exists with 2026 constants and staleness detection
 - [ ] **INFRA-03**: All output includes legal disclaimer + recommendation to consult a Versicherungsberater
 - [ ] **INFRA-04**: `/finyx:insurance` command exists with all features wired
@@ -62,16 +62,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | ELIG-01 | Phase 11 | Pending |
-| COST-01 | Phase 10 | Pending |
-| COST-02 | Phase 10 | Pending |
-| COST-03 | Phase 10 | Pending |
-| ADV-01 | Phase 10 | Pending |
+| COST-01 | Phase 10 | Complete |
+| COST-02 | Phase 10 | Complete |
+| COST-03 | Phase 10 | Complete |
+| ADV-01 | Phase 10 | Complete |
 | ADV-02 | Phase 10 | Complete |
-| ADV-03 | Phase 10 | Pending |
+| ADV-03 | Phase 10 | Complete |
 | EDGE-01 | Phase 11 | Pending |
 | EDGE-02 | Phase 11 | Pending |
 | EDGE-03 | Phase 12 | Pending |
-| INFRA-01 | Phase 10 | Pending |
+| INFRA-01 | Phase 10 | Complete |
 | INFRA-02 | Phase 9 | Complete |
 | INFRA-03 | Phase 11 | Pending |
 | INFRA-04 | Phase 11 | Pending |
