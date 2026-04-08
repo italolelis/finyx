@@ -61,26 +61,26 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ELIG-01 | — | Pending |
-| COST-01 | — | Pending |
-| COST-02 | — | Pending |
-| COST-03 | — | Pending |
-| ADV-01 | — | Pending |
-| ADV-02 | — | Pending |
-| ADV-03 | — | Pending |
-| EDGE-01 | — | Pending |
-| EDGE-02 | — | Pending |
-| EDGE-03 | — | Pending |
-| INFRA-01 | — | Pending |
-| INFRA-02 | — | Pending |
-| INFRA-03 | — | Pending |
-| INFRA-04 | — | Pending |
+| ELIG-01 | Phase 11 | Pending |
+| COST-01 | Phase 10 | Pending |
+| COST-02 | Phase 10 | Pending |
+| COST-03 | Phase 10 | Pending |
+| ADV-01 | Phase 10 | Pending |
+| ADV-02 | Phase 10 | Pending |
+| ADV-03 | Phase 10 | Pending |
+| EDGE-01 | Phase 11 | Pending |
+| EDGE-02 | Phase 11 | Pending |
+| EDGE-03 | Phase 12 | Pending |
+| INFRA-01 | Phase 10 | Pending |
+| INFRA-02 | Phase 9 | Pending |
+| INFRA-03 | Phase 11 | Pending |
+| INFRA-04 | Phase 11 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 14 total
-- Mapped to phases: 0
-- Unmapped: 14 ⚠️
+- Mapped to phases: 14
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-08*
-*Last updated: 2026-04-08 after initial definition*
+*Last updated: 2026-04-08 after roadmap creation*

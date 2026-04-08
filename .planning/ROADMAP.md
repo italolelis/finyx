@@ -2,82 +2,83 @@
 
 ## Milestones
 
-- ✅ **v1.0 MVP** — Phases 1-5 (shipped 2026-04-06) — [archive](milestones/v1.0-ROADMAP.md)
-- 🚧 **v1.1 Financial Insights Dashboard** — Phases 6-8 (in progress)
+- ✅ **v1.0 MVP** - Phases 1-5 (shipped 2026-04-06)
+- ✅ **v1.1 Financial Insights Dashboard** - Phases 6-8 (shipped 2026-04-06)
+- 🚧 **v1.2 Health Insurance Advisor** - Phases 9-12 (in progress)
 
 ## Phases
 
 <details>
-<summary>✅ v1.0 MVP (Phases 1-5) — SHIPPED 2026-04-06</summary>
+<summary>✅ v1.0 MVP (Phases 1-5) - SHIPPED 2026-04-06</summary>
 
-- [x] Phase 1: Foundation + Profile (4/4 plans)
-- [x] Phase 2: Tax Advisors (3/3 plans)
-- [x] Phase 3: Investment + Broker (3/3 plans)
-- [x] Phase 4: Pension Planning (2/2 plans)
-- [x] Phase 5: Profile Schema Sync (1/1 plan)
+Phase 1: Rebrand & Foundation, Phase 2: User Financial Profile, Phase 3: Tax Advisory, Phase 4: Investment Advisor + Broker, Phase 5: Pension Planning. 37/37 requirements satisfied.
 
 </details>
 
-### 🚧 v1.1 Financial Insights Dashboard (In Progress)
+<details>
+<summary>✅ v1.1 Financial Insights Dashboard (Phases 6-8) - SHIPPED 2026-04-06</summary>
 
-**Milestone Goal:** Generate actionable financial insights and recommendations by cross-referencing all existing advisor outputs and profile data via `/fin:insights`.
+Phase 6: Benchmarks & Scoring Reference Docs, Phase 7: Insight Specialist Agents, Phase 8: /fin:insights Command. All requirements satisfied.
 
-- [x] **Phase 6: Reference Foundation** — Country-aware benchmark and scoring reference docs that unblock all specialist agents (completed 2026-04-06)
-- [x] **Phase 7: Specialist Agents** — Three parallel agents computing allocation analysis, tax efficiency scoring, and net worth projections (completed 2026-04-06)
-- [x] **Phase 8: Orchestrator Command** — `/fin:insights` wires all agents, enforces completeness gate, synthesizes ranked recommendations with legal disclaimers (completed 2026-04-06)
+</details>
+
+### 🚧 v1.2 Health Insurance Advisor (In Progress)
+
+**Milestone Goal:** Users can run `/finyx:insurance` to get a personalized PKV vs GKV comparison with cost projections, tax impact, family analysis, and expat guidance — integrated into the full financial picture.
 
 ## Phase Details
 
-### Phase 6: Reference Foundation
-**Goal**: Country-aware benchmark and scoring reference docs exist and are usable by specialist agents
-**Depends on**: Phase 5
+### Phase 9: Reference Foundation
+**Goal**: The authoritative health insurance knowledge document exists with 2026 statutory constants, formulas, and four calculation paths
+**Depends on**: Phase 8 (v1.1 complete)
 **Requirements**: INFRA-02
 **Success Criteria** (what must be TRUE):
-  1. `benchmarks.md` exists with income allocation benchmarks adjusted per country (DE net-income basis, BR gross-income basis)
-  2. `scoring-rules.md` exists with per-country tax efficiency scoring criteria for DE (Sparerpauschbetrag, Vorabpauschale) and BR (IR/DARF thresholds)
-  3. Both docs carry tax-year metadata matching the staleness-detection convention used by existing reference docs
-**Plans:** 1/1 plans complete
-Plans:
-- [x] 06-01-PLAN.md — Country-aware benchmarks and scoring reference docs
+  1. `germany/health-insurance.md` exists with 2026 constants (JAEG €77,400, BBG €62,100, base rate 14.6%, PV rates, employer caps)
+  2. Document defines the four calculation paths: single employee, family employee, self-employed, Beamter redirect
+  3. Document includes GKV cost formula, PKV risk-tier estimation approach, and long-term projection methodology
+  4. Staleness detection metadata (tax_year, valid_until) present per project convention
+**Plans**: TBD
 
-### Phase 7: Specialist Agents
-**Goal**: Three specialist agents can independently analyze allocation, tax efficiency, and projections from profile data and return structured outputs
-**Depends on**: Phase 6
-**Requirements**: ALLOC-01, ALLOC-02, TAX-01, TAX-02, TAX-03, PROJ-01, PROJ-02
+### Phase 10: Specialist Agents
+**Goal**: Two specialist agents exist — a deterministic calculation agent and a live-research agent — ready to be orchestrated by the insurance command
+**Depends on**: Phase 9
+**Requirements**: COST-01, COST-02, COST-03, ADV-01, ADV-02, ADV-03, INFRA-01
 **Success Criteria** (what must be TRUE):
-  1. Allocation agent produces income breakdown (needs/wants/savings/investments/debt) vs country-adjusted benchmarks and flags emergency fund shortfall when savings < 3-6 months of expenses
-  2. Tax-scoring agent produces per-country efficiency gaps in € for DE (Sparerpauschbetrag unused amount, Vorabpauschale readiness) and BR (IR optimization gaps), scored separately — never combined
-  3. Projection agent produces net worth snapshot (assets vs liabilities) and goal pace indicator ("at current rate, target X reached in Y months")
-  4. Each agent reads `.finyx/profile.json` directly and emits a structured output consumable by the orchestrator
-**Plans:** 3/3 plans complete
-Plans:
-- [x] 07-01-PLAN.md — Allocation specialist agent (ALLOC-01, ALLOC-02)
-- [x] 07-02-PLAN.md — Tax-scoring specialist agent (TAX-01, TAX-02, TAX-03)
-- [x] 07-03-PLAN.md — Projection specialist agent (PROJ-01, PROJ-02)
+  1. `finyx-insurance-calc-agent.md` computes exact GKV monthly cost (base rate + Zusatzbeitrag + Pflegeversicherung with employer share deducted)
+  2. Calc agent computes PKV estimate from age and health risk tier, including family per-person vs Familienversicherung comparison
+  3. Calc agent produces 10/20/30-year projection with conservative/base/optimistic scenarios for PKV vs GKV
+  4. Calc agent nets PKV cost against §10 EStG tax deduction using marginal rate from profile
+  5. `finyx-insurance-research-agent.md` runs WebSearch for live PKV tariffs, Beitragsrückerstattung, and Selbstbeteiligung options
+  6. Health questionnaire input is binary flags only, never persisted, GDPR Art. 9 compliant
+**Plans**: TBD
+**UI hint**: no
 
-### Phase 8: Orchestrator Command
-**Goal**: `/fin:insights` delivers a unified financial health report with ranked recommendations, cross-advisor intelligence, and legal disclaimers
-**Depends on**: Phase 7
-**Requirements**: INFRA-01, INFRA-03, REC-01, REC-02
+### Phase 11: Command + Integration
+**Goal**: `/finyx:insurance` exists as a working end-to-end command — eligibility gate, health questionnaire, cost comparison, projections, expat guidance, age-55 warning, and legal disclaimers all wired
+**Depends on**: Phase 10
+**Requirements**: ELIG-01, EDGE-01, EDGE-02, INFRA-03, INFRA-04
 **Success Criteria** (what must be TRUE):
-  1. Running `/fin:insights` on an incomplete profile emits a completeness gate report listing missing sections before any analysis runs
-  2. Running `/fin:insights` on a complete profile produces a unified report with top-5 recommendations ranked by € annual impact
-  3. The report surfaces at least one cross-advisor intelligence link (e.g., pension gap affecting tax allowance, investment allocation affecting risk exposure)
-  4. All output includes the legal disclaimer via `disclaimer.md` — no advisory content is emitted without it
-  5. `bin/install.js` deploys the new command and agents alongside existing ones
-**Plans:** 1/1 plans complete
-Plans:
-- [x] 08-01-PLAN.md — Create /fin:insights orchestrator command and verify install.js deployment
+  1. User running `/finyx:insurance` sees an eligibility check against Versicherungspflichtgrenze (JAEG threshold) before any cost analysis
+  2. User sees prominent age-55 lock-in warning (§6 Abs. 3a SGB V) whenever PKV is a viable option
+  3. User sees expat considerations (Anwartschaft, EU portability, non-EU gaps) when expat flag is set in profile
+  4. All output includes legal disclaimer and recommendation to consult a Versicherungsberater
+**Plans**: TBD
+
+### Phase 12: Cross-Advisor Integration
+**Goal**: Insurance costs flow into `/finyx:insights` and `/finyx:tax` so the full financial picture reflects health insurance decisions
+**Depends on**: Phase 11
+**Requirements**: EDGE-03
+**Success Criteria** (what must be TRUE):
+  1. `.finyx/profile.json` schema extended with an insurance section (type, monthly cost, employer share)
+  2. `/finyx:insights` picks up insurance costs in net worth and allocation analysis when insurance section is populated
+  3. `/finyx:tax` reflects PKV Basisabsicherung deduction when insurance type is PKV
+**Plans**: TBD
 
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 1. Foundation + Profile | v1.0 | 4/4 | Complete | 2026-04-06 |
-| 2. Tax Advisors | v1.0 | 3/3 | Complete | 2026-04-06 |
-| 3. Investment + Broker | v1.0 | 3/3 | Complete | 2026-04-06 |
-| 4. Pension Planning | v1.0 | 2/2 | Complete | 2026-04-06 |
-| 5. Profile Schema Sync | v1.0 | 1/1 | Complete | 2026-04-06 |
-| 6. Reference Foundation | v1.1 | 1/1 | Complete   | 2026-04-06 |
-| 7. Specialist Agents | v1.1 | 3/3 | Complete   | 2026-04-06 |
-| 8. Orchestrator Command | v1.1 | 1/1 | Complete   | 2026-04-06 |
+| 9. Reference Foundation | v1.2 | 0/TBD | Not started | - |
+| 10. Specialist Agents | v1.2 | 0/TBD | Not started | - |
+| 11. Command + Integration | v1.2 | 0/TBD | Not started | - |
+| 12. Cross-Advisor Integration | v1.2 | 0/TBD | Not started | - |
