@@ -27,6 +27,7 @@ Output is conversational advisory text — no files are written. All guidance in
 
 @~/.claude/finyx/references/disclaimer.md
 @~/.claude/finyx/references/germany/tax-investment.md
+@~/.claude/finyx/references/germany/health-insurance.md
 @~/.claude/finyx/references/brazil/tax-investment.md
 @.finyx/profile.json
 
@@ -302,6 +303,50 @@ If user does not hold accumulating ETFs, briefly explain the concept and confirm
 | 2026 | 3.20% | January 2027 |
 
 > Note: Verify 2026 Basiszins against current BMF publication before filing.
+
+### 3.6 PKV Basisabsicherung Deduction (§10 EStG)
+
+*Execute this subsection only if `insurance.type == "PKV"` in `.finyx/profile.json`. If insurance section is absent, null, or type is not "PKV": skip entirely.*
+
+Using health-insurance.md Section 5 (loaded via `@~/.claude/finyx/references/germany/health-insurance.md`), show the PKV tax deduction calculation:
+
+**Read from profile:**
+- `insurance.monthly_cost` — total PKV monthly premium
+- `insurance.employer_share` — employer contribution (0 if self-employed)
+- `countries.germany.marginal_rate` — marginal tax rate
+
+**Determine cap:**
+- If employer_share > 0: employee cap = €1,900/year
+- If employer_share == 0: self-employed cap = €2,800/year
+
+**Calculate and display:**
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ PKV BASISABSICHERUNG DEDUCTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PKV monthly premium:                [monthly_cost] EUR
+Employer share:                     [employer_share] EUR
+Net monthly cost:                   [monthly_cost - employer_share] EUR
+
+Basisabsicherung estimate (85%):    [net × 0.85] EUR/month
+Annual deductible:                  min([basis × 12], [cap]) = [annual_deductible] EUR
+Deduction cap ([employee/self-employed]):  [1,900 or 2,800] EUR
+
+Tax benefit at [marginal_rate]%:    [annual_deductible × marginal_rate] EUR/year
+Monthly tax saving:                 [tax_benefit / 12] EUR/month
+Effective net PKV cost:             [monthly_cost - employer_share - (tax_benefit/12)] EUR/month
+```
+
+**Key notes to include:**
+- The Basisabsicherung portion (typically 80–90% of premium) covers only basic health coverage — not Zusatzleistungen, Krankentagegeld, or Zahnzusatz
+- The §10 EStG cap of €1,900/€2,800 is usually reached quickly for PKV premiums above €200/month
+- From 2026, insurers transmit Basisabsicherung data via ELStAM for employees — self-employed still file via Anlage Vorsorgeaufwand
+- This deduction is separate from investment tax — it reduces total taxable income, indirectly benefiting all income types
+
+**Cross-reference:**
+> For full PKV vs GKV cost comparison and long-term projections, run `/finyx:insurance`.
 
 ## Phase 4: Brazilian Investment Tax
 
