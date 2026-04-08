@@ -53,8 +53,12 @@ Plans:
   4. Calc agent nets PKV cost against §10 EStG tax deduction using marginal rate from profile
   5. `finyx-insurance-research-agent.md` runs WebSearch for live PKV tariffs, Beitragsrückerstattung, and Selbstbeteiligung options
   6. Health questionnaire input is binary flags only, never persisted, GDPR Art. 9 compliant
-**Plans**: TBD
+**Plans:** 2 plans
 **UI hint**: no
+
+Plans:
+- [ ] 10-01-PLAN.md — Create deterministic insurance calc agent (GKV/PKV cost, family, projections, tax netting)
+- [ ] 10-02-PLAN.md — Create live PKV research agent (provider search, tariff comparison)
 
 ### Phase 11: Command + Integration
 **Goal**: `/finyx:insurance` exists as a working end-to-end command — eligibility gate, health questionnaire, cost comparison, projections, expat guidance, age-55 warning, and legal disclaimers all wired
@@ -82,6 +86,6 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 9. Reference Foundation | v1.2 | 0/1 | Planning | - |
-| 10. Specialist Agents | v1.2 | 0/TBD | Not started | - |
+| 10. Specialist Agents | v1.2 | 0/2 | Planning | - |
 | 11. Command + Integration | v1.2 | 0/TBD | Not started | - |
 | 12. Cross-Advisor Integration | v1.2 | 0/TBD | Not started | - |
