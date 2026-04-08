@@ -9,7 +9,7 @@ Requirements for the Health Insurance Advisor milestone. Each maps to roadmap ph
 
 ### Eligibility & Cost Comparison
 
-- [ ] **ELIG-01**: User can see eligibility check based on Versicherungspflichtgrenze (income vs JAEG threshold)
+- [x] **ELIG-01**: User can see eligibility check based on Versicherungspflichtgrenze (income vs JAEG threshold)
 - [x] **COST-01**: User can see exact GKV monthly cost (base rate + Zusatzbeitrag + Pflegeversicherung, employer share deducted)
 - [x] **COST-02**: User can see PKV cost estimate based on age and health risk tier from questionnaire
 - [x] **COST-03**: User can see family impact comparison (GKV Familienversicherung vs PKV per-person costs for partner + children)
@@ -22,16 +22,16 @@ Requirements for the Health Insurance Advisor milestone. Each maps to roadmap ph
 
 ### Edge Cases & Integration
 
-- [ ] **EDGE-01**: User can see expat considerations (Anwartschaft, EU portability, non-EU gaps)
-- [ ] **EDGE-02**: User sees prominent age-55 lock-in warning (§6 Abs. 3a SGB V)
+- [x] **EDGE-01**: User can see expat considerations (Anwartschaft, EU portability, non-EU gaps)
+- [x] **EDGE-02**: User sees prominent age-55 lock-in warning (§6 Abs. 3a SGB V)
 - [ ] **EDGE-03**: Insurance costs feed into `/finyx:insights` and `/finyx:tax` via profile schema extension
 
 ### Infrastructure
 
 - [x] **INFRA-01**: Health questionnaire collects binary health flags, session-only (never persisted), GDPR Art. 9 compliant
 - [x] **INFRA-02**: Reference doc `germany/health-insurance.md` exists with 2026 constants and staleness detection
-- [ ] **INFRA-03**: All output includes legal disclaimer + recommendation to consult a Versicherungsberater
-- [ ] **INFRA-04**: `/finyx:insurance` command exists with all features wired
+- [x] **INFRA-03**: All output includes legal disclaimer + recommendation to consult a Versicherungsberater
+- [x] **INFRA-04**: `/finyx:insurance` command exists with all features wired
 
 ## v1.3 Requirements
 
@@ -61,20 +61,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ELIG-01 | Phase 11 | Pending |
+| ELIG-01 | Phase 11 | Complete |
 | COST-01 | Phase 10 | Complete |
 | COST-02 | Phase 10 | Complete |
 | COST-03 | Phase 10 | Complete |
 | ADV-01 | Phase 10 | Complete |
 | ADV-02 | Phase 10 | Complete |
 | ADV-03 | Phase 10 | Complete |
-| EDGE-01 | Phase 11 | Pending |
-| EDGE-02 | Phase 11 | Pending |
+| EDGE-01 | Phase 11 | Complete |
+| EDGE-02 | Phase 11 | Complete |
 | EDGE-03 | Phase 12 | Pending |
 | INFRA-01 | Phase 10 | Complete |
 | INFRA-02 | Phase 9 | Complete |
-| INFRA-03 | Phase 11 | Pending |
-| INFRA-04 | Phase 11 | Pending |
+| INFRA-03 | Phase 11 | Complete |
+| INFRA-04 | Phase 11 | Complete |
 
 **Coverage:**
 - v1.2 requirements: 14 total

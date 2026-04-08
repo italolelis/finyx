@@ -69,10 +69,10 @@ Plans:
   2. User sees prominent age-55 lock-in warning (§6 Abs. 3a SGB V) whenever PKV is a viable option
   3. User sees expat considerations (Anwartschaft, EU portability, non-EU gaps) when expat flag is set in profile
   4. All output includes legal disclaimer and recommendation to consult a Versicherungsberater
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 11-01-PLAN.md — Create /finyx:insurance command with eligibility gate, warnings, agents, synthesis, and disclaimer
+- [x] 11-01-PLAN.md — Create /finyx:insurance command with eligibility gate, warnings, agents, synthesis, and disclaimer
 
 ### Phase 12: Cross-Advisor Integration
 **Goal**: Insurance costs flow into `/finyx:insights` and `/finyx:tax` so the full financial picture reflects health insurance decisions
@@ -90,5 +90,5 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 9. Reference Foundation | v1.2 | 0/1 | Planning | - |
 | 10. Specialist Agents | v1.2 | 2/2 | Complete    | 2026-04-08 |
-| 11. Command + Integration | v1.2 | 0/1 | Planning | - |
+| 11. Command + Integration | v1.2 | 1/1 | Complete   | 2026-04-08 |
 | 12. Cross-Advisor Integration | v1.2 | 0/TBD | Not started | - |
