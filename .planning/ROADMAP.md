@@ -90,5 +90,5 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 9. Reference Foundation | v1.2 | 0/1 | Planning | - |
 | 10. Specialist Agents | v1.2 | 2/2 | Complete    | 2026-04-08 |
-| 11. Command + Integration | v1.2 | 1/1 | Complete   | 2026-04-08 |
+| 11. Command + Integration | v1.2 | 1/1 | Complete    | 2026-04-08 |
 | 12. Cross-Advisor Integration | v1.2 | 0/TBD | Not started | - |
