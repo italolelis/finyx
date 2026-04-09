@@ -15,7 +15,7 @@ Deliver a personalized PKV vs GKV comparison by orchestrating eligibility checks
 1. Checks PKV eligibility against JAEG threshold (per D-01, D-02) — reads the JAEG value from the loaded health-insurance.md, never hardcodes it
 2. Emits age-55 lock-in warning when applicable (per D-03) — uses §6 Abs. 3a SGB V legal basis
 3. Detects expat status and shows Anwartschaft/portability guidance (per D-06, D-07)
-4. Collects health questionnaire via single multiSelect with 15 binary flags (per D-04, D-05)
+4. Collects health questionnaire via single multiSelect with ~25 binary flags grouped by category (per D-04, D-05)
 5. Spawns calc + research agents in parallel (per D-08, D-09)
 6. Emits legal disclaimer BEFORE any advisory content (per D-10, matching insights.md pattern)
 7. Synthesizes unified comparison with a clear, reasoned recommendation
@@ -33,6 +33,55 @@ This command writes NO files. All output is conversational advisory text.
 </execution_context>
 
 <process>
+
+## Phase 0: Preferences
+
+Use AskUserQuestion to collect user preferences before running eligibility checks. Collect all three questions in a single round-trip where possible.
+
+**Question 1 — Monthly budget range:**
+"What is your monthly budget range for health insurance premiums?"
+- Under €400
+- €400–600
+- €600–800
+- €800+
+- No budget constraint
+
+**Question 2 — Coverage priority (single-select):**
+"What is your primary coverage priority?"
+- Lowest premium
+- Best coverage depth
+- Maximum flexibility (tariff switching)
+- Balanced
+
+**Question 3 — Lifestyle / coverage needs (multiSelect):**
+"Which coverage features are important to you? Select all that apply."
+- International travel coverage (worldwide, not just EU)
+- Alternative medicine / Heilpraktiker coverage
+- Single-room hospital (Einbettzimmer)
+- Chief physician treatment (Chefarztbehandlung)
+- Dental coverage beyond basic (Zahnzusatz)
+- Vision coverage (glasses/contacts/laser)
+- Outpatient psychotherapy (Ambulante Psychotherapie)
+
+Store results as `user_preferences` object:
+```
+user_preferences = {
+  budget_range: [selected],
+  coverage_priority: [selected],
+  lifestyle_needs: [comma-separated list of selected items, or "none"]
+}
+```
+
+Pass `user_preferences` to BOTH agents in Phase 4 Task prompts inside a `<user_preferences>` block:
+```
+<user_preferences>
+budget_range: [selected]
+coverage_priority: [selected]
+lifestyle_needs: [comma-separated list of selected items, or "none"]
+</user_preferences>
+```
+
+---
 
 ## Phase 1: Validation and Eligibility Gate
 
@@ -170,28 +219,59 @@ If user denies: set `show_expat = false` and skip Section 6.4 in Phase 6.
 
 ## Phase 3: Health Questionnaire
 
-Use AskUserQuestion with multiSelect to collect all 15 binary health flags in a single round-trip (per D-04). This satisfies GDPR Art. 9 by never writing health data to any file.
+Use AskUserQuestion with multiSelect to collect all ~25 binary health flags in a single round-trip (per D-04). This satisfies GDPR Art. 9 by never writing health data to any file.
 
 Present the following question:
 
 **Preamble:** "Select any conditions that apply. This information is used ONLY for this session to estimate PKV risk tier — it is never stored or persisted (GDPR Art. 9 compliant). Select none if no conditions apply."
 
-**Options (15 flags):**
+**Options (~25 flags grouped by category):**
+
+**Cardiovascular [CV]:**
 - [CV] High blood pressure (diagnosed/treated)
 - [CV] Heart condition or cardiac event
 - [CV] Elevated cholesterol (treated)
+
+**Metabolic [MET]:**
 - [MET] Diabetes (Type 1 or Type 2)
 - [MET] Thyroid condition (treated)
 - [MET] BMI above 30
+
+**Musculoskeletal [MSK]:**
 - [MSK] Chronic back condition
 - [MSK] Joint condition (diagnosed)
 - [MSK] Prior orthopedic surgery
+- [MSK] Sports injury history (recurring)
+
+**Mental Health [MH]:**
 - [MH] Depression or anxiety (diagnosed/treated)
 - [MH] Other psychiatric condition
 - [MH] Current psychotherapy
+
+**Medications & Hospitalizations [MED]:**
+- [MED] Currently taking prescription medications
+- [MED] Hospitalized in the last 5 years
+- [MED] Planned surgery or procedure in next 12 months
+
+**Lifestyle [LIFE]:**
+- [LIFE] Smoker (current or quit within last 5 years)
+- [LIFE] Alcohol consumption above moderate (>14 units/week)
+
+**Reproductive [REPR]:**
+- [REPR] Pregnancy planned in next 2 years
+
+**Dental & Vision [DV]:**
+- [DV] Dental treatment needed (crowns, implants, orthodontics)
+- [DV] Vision correction needed (glasses, contacts, or planned laser)
+
+**Family History [FAM]:**
+- [FAM] Parent with heart disease before age 60
+- [FAM] Parent with diabetes
+- [FAM] Parent with cancer before age 60
+
+**Other [OTH]:**
 - [OTH] Allergies requiring regular treatment
 - [OTH] Sleep apnea (diagnosed)
-- [OTH] Any condition requiring ongoing medication
 
 Collect the selected flags as a list. Map each selected flag to the corresponding `health_flags` field names expected by the calc agent (see Phase 4 Task 1 prompt). If none are selected, pass `health_flags: none`.
 
@@ -226,12 +306,23 @@ Profile data is at `.finyx/profile.json`. Reference doc is at `~/.claude/finyx/r
   - [MSK] Chronic back condition → back_spinal: 1
   - [MSK] Joint condition (diagnosed) → joint_conditions: 1
   - [MSK] Prior orthopedic surgery → previous_surgery: 1
+  - [MSK] Sports injury history (recurring) → sports_injury: 1
   - [MH] Depression or anxiety (diagnosed/treated) → depression_anxiety: 1  (maps to high-rejection flag)
   - [MH] Other psychiatric condition → other_psychiatric: 1  (maps to high-rejection flag)
   - [MH] Current psychotherapy → psychotherapy_current: 1  (maps to high-rejection flag)
+  - [MED] Currently taking prescription medications → regular_medication: 1
+  - [MED] Hospitalized in the last 5 years → recent_hospitalization: 1
+  - [MED] Planned surgery or procedure in next 12 months → planned_surgery: 1
+  - [LIFE] Smoker (current or quit within last 5 years) → smoker: 1
+  - [LIFE] Alcohol consumption above moderate → high_alcohol: 1
+  - [REPR] Pregnancy planned in next 2 years → pregnancy_planned: 1
+  - [DV] Dental treatment needed → dental_needs: 1
+  - [DV] Vision correction needed → vision_needs: 1
+  - [FAM] Parent with heart disease before age 60 → family_cardiac: 1
+  - [FAM] Parent with diabetes → family_diabetes: 1
+  - [FAM] Parent with cancer before age 60 → family_cancer: 1
   - [OTH] Allergies requiring regular treatment → allergies_severe: 1
   - [OTH] Sleep apnea (diagnosed) → sleep_apnea: 1
-  - [OTH] Any condition requiring ongoing medication → regular_medication: 1
 Unselected flags: set to 0. If none were selected: write "none"]
 </health_flags>
 
@@ -252,6 +343,14 @@ family_status: [family_status]
 children_count: [children_count]
 gross_income_bracket: [derive from gross_income — e.g., "80,000–90,000 EUR/year"]
 current_year: [CURRENT_YEAR from Phase 1]
+
+<user_preferences>
+budget_range: [from Phase 0 user_preferences]
+coverage_priority: [from Phase 0 user_preferences]
+lifestyle_needs: [from Phase 0 user_preferences]
+</user_preferences>
+
+Also research per provider: (a) direct application URL, (b) required documents to apply, (c) estimated application processing time. Include these in your output.
 
 Complete all phases of your process and return your output wrapped in <insurance_research_result> tags.
 ```
@@ -397,6 +496,18 @@ Note that actual PKV quotes from underwriting may exceed the estimates in this r
 
 Frame all recommendation language as "based on this analysis" — not as definitive advice.
 
+### Concrete Next Steps
+
+For each of the top 3 providers from the research agent output, present:
+
+1. **[Provider Name]**
+   - Apply: [URL from research agent's provider data]
+   - Required documents: [from research agent output]
+   - Estimated processing time: [from research agent output]
+   - First step: [specific action — e.g., "Request a non-binding quote online at [URL]"]
+
+If the research agent did not return application URLs or document requirements for a provider, note: "[Provider]: Application details not found in research — visit [provider website] directly."
+
 </process>
 
 <error_handling>
@@ -455,7 +566,7 @@ Both agents MUST be spawned in parallel in Phase 4 — do not wait for the calc 
 
 ## Health Flags Session-Only
 
-The 15 health flags collected in Phase 3 are:
+The 25 health flags collected in Phase 3 are:
 1. Shown to the user as a multiSelect question
 2. Passed inline to the calc agent only in the Task prompt as `<health_flags>` content
 3. NEVER written to `.finyx/profile.json` or any other file
