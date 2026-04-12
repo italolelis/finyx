@@ -82,7 +82,10 @@ Plans:
   3. User sees any duplicate coverage detected across policies (e.g., Fahrrad covered by both Hausrat and standalone)
   4. User sees per-type adequacy assessment against benchmarks (e.g., Hausrat sum below €650/m² threshold flagged)
   5. Insurance total cost appears in `/finyx:insights` financial health report allocation section
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 20-01-PLAN.md — Portfolio sub-skill + router wiring
+- [ ] 20-02-PLAN.md — Insights insurance integration (policies[] schema)
 
 ### Phase 21: Per-Type Sub-skills (Tier 1-2)
 **Goal**: Users can get detailed analysis and market comparison for the six high-priority insurance types
@@ -115,7 +118,7 @@ Plans:
 | 9-12. Health Insurance | v1.2 | 5/5 | Complete | 2026-04-09 |
 | 13-17. Plugin Architecture | v2.0 | 13/13 | Complete | 2026-04-12 |
 | 18. Router + Sub-skill Migration | v2.1 | 1/1 | Complete    | 2026-04-12 |
-| 19. Reference Docs + Profile Schema + Agents | v2.1 | 3/3 | Complete   | 2026-04-12 |
-| 20. Portfolio Analysis | v2.1 | 0/TBD | Not started | - |
+| 19. Reference Docs + Profile Schema + Agents | v2.1 | 3/3 | Complete    | 2026-04-12 |
+| 20. Portfolio Analysis | v2.1 | 0/2 | Not started | - |
 | 21. Per-Type Sub-skills (Tier 1-2) | v2.1 | 0/TBD | Not started | - |
 | 22. Per-Type Sub-skills (Tier 3-4) + Doc Reader | v2.1 | 0/TBD | Not started | - |
