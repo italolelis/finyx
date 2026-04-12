@@ -85,11 +85,11 @@ Plans:
   2. Every skill has `disable-model-invocation: true` in its frontmatter
   3. No agents exist at the project root `agents/` directory — all redistributed under their owning skill's `agents/` folder
   4. Every skill's reference docs are bundled under `skills/<name>/references/` with no `@~/.claude/` path references
-**Plans:** 3/6 plans executed
+**Plans:** 4/6 plans executed
 Plans:
 - [ ] 16-01-PLAN.md — Convert invest + broker commands to invest skill
 - [ ] 16-02-PLAN.md — Convert 7 real estate commands to realestate skill
-- [ ] 16-03-PLAN.md — Convert pension command to pension skill
+- [x] 16-03-PLAN.md — Convert pension command to pension skill
 - [x] 16-04-PLAN.md — Convert insurance command to insurance skill
 - [x] 16-05-PLAN.md — Convert insights command to insights skill
 - [x] 16-06-PLAN.md — Convert help + status + update commands to help skill
@@ -113,5 +113,5 @@ Plans:
 | 13. Plugin Foundation | v2.0 | 2/2 | Complete    | 2026-04-12 |
 | 14. Profile Skill | v2.0 | 1/1 | Complete    | 2026-04-12 |
 | 15. Pilot Skill | v2.0 | 1/1 | Complete    | 2026-04-12 |
-| 16. Bulk Migration | v2.0 | 3/6 | In Progress|  |
+| 16. Bulk Migration | v2.0 | 4/6 | In Progress|  |
 | 17. Integration + Distribution | v2.0 | 0/? | Not started | - |
