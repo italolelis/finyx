@@ -84,7 +84,7 @@ Plans:
   5. Insurance total cost appears in `/finyx:insights` financial health report allocation section
 **Plans**: 2 plans
 Plans:
-- [ ] 20-01-PLAN.md — Portfolio sub-skill + router wiring
+- [x] 20-01-PLAN.md — Portfolio sub-skill + router wiring
 - [x] 20-02-PLAN.md — Insights insurance integration (policies[] schema)
 
 ### Phase 21: Per-Type Sub-skills (Tier 1-2)
@@ -119,6 +119,6 @@ Plans:
 | 13-17. Plugin Architecture | v2.0 | 13/13 | Complete | 2026-04-12 |
 | 18. Router + Sub-skill Migration | v2.1 | 1/1 | Complete    | 2026-04-12 |
 | 19. Reference Docs + Profile Schema + Agents | v2.1 | 3/3 | Complete    | 2026-04-12 |
-| 20. Portfolio Analysis | v2.1 | 1/2 | In Progress|  |
+| 20. Portfolio Analysis | v2.1 | 2/2 | Complete   | 2026-04-12 |
 | 21. Per-Type Sub-skills (Tier 1-2) | v2.1 | 0/TBD | Not started | - |
 | 22. Per-Type Sub-skills (Tier 3-4) + Doc Reader | v2.1 | 0/TBD | Not started | - |

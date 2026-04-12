@@ -9,10 +9,10 @@ Requirements for the Comprehensive Insurance Advisor milestone.
 
 ### Portfolio Management
 
-- [ ] **PORT-01**: User can see insurance portfolio overview (all policies, total monthly cost, tier classification)
-- [ ] **PORT-02**: User can see coverage gap detection (missing mandatory/essential types based on life situation)
-- [ ] **PORT-03**: User can see overlap/redundancy detection (duplicate coverage across policies)
-- [ ] **PORT-04**: User can see coverage adequacy check per type (benchmarks: Hausrat >=€650/m², Haftpflicht >=€5M, etc.)
+- [x] **PORT-01**: User can see insurance portfolio overview (all policies, total monthly cost, tier classification)
+- [x] **PORT-02**: User can see coverage gap detection (missing mandatory/essential types based on life situation)
+- [x] **PORT-03**: User can see overlap/redundancy detection (duplicate coverage across policies)
+- [x] **PORT-04**: User can see coverage adequacy check per type (benchmarks: Hausrat >=€650/m², Haftpflicht >=€5M, etc.)
 
 ### Optimization
 
@@ -68,10 +68,10 @@ Deferred to future release.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PORT-01 | Phase 20 | Pending |
-| PORT-02 | Phase 20 | Pending |
-| PORT-03 | Phase 20 | Pending |
-| PORT-04 | Phase 20 | Pending |
+| PORT-01 | Phase 20 | Complete |
+| PORT-02 | Phase 20 | Complete |
+| PORT-03 | Phase 20 | Complete |
+| PORT-04 | Phase 20 | Complete |
 | OPT-01 | Phase 21 | Pending |
 | OPT-02 | Phase 22 | Pending |
 | OPT-03 | Phase 21 | Pending |

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: Comprehensive Insurance Advisor
-status: executing
-stopped_at: Completed 20-02-PLAN.md
-last_updated: "2026-04-12T20:28:58.622Z"
+status: verifying
+stopped_at: Completed 20-01-PLAN.md
+last_updated: "2026-04-12T20:30:37.075Z"
 last_activity: 2026-04-12
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 6
-  completed_plans: 5
+  completed_plans: 6
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 
 Phase: 20 (portfolio-analysis) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-12
 
 ```
@@ -61,6 +61,8 @@ v2.1 key context:
 - [Phase 19]: Health type retains existing PKV 3-provider comparison; all other types use criteria-only output per §34d GewO
 - [Phase 19]: Portfolio agent loads all 11 reference docs unconditionally in execution_context
 - [Phase 20]: insurance.monthly_cost prohibition text in allocation agent prompt is intentional — single occurrence tells agent not to use defunct field
+- [Phase 20-portfolio-analysis]: Sub-skill writes to profile.json only in Phase 0 empty-portfolio entry; all other output is conversational
+- [Phase 20-portfolio-analysis]: Portfolio sub-skill spawns single agent (not parallel) — portfolio agent consolidates all analysis internally
 
 ### Pending Todos
 
@@ -72,6 +74,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-12T20:28:58.619Z
-Stopped at: Completed 20-02-PLAN.md
+Last session: 2026-04-12T20:30:37.072Z
+Stopped at: Completed 20-01-PLAN.md
 Resume file: None
