@@ -43,12 +43,14 @@ Keyword map (case-insensitive match against user input):
 - "fahrrad", "bicycle", "bike", "fahrradversicherung" → sub-skill: fahrrad
 - "kfz-schutzbrief", "schutzbrief", "roadside", "schutzbriefversicherung" → sub-skill: kfz-schutzbrief
 - "mietkaution", "rental deposit", "kaution", "mietkautionsversicherung" → sub-skill: mietkaution
+- "portfolio", "overview", "summary", "all policies", "alle versicherungen", "uebersicht" -> sub-skill: portfolio
 
 If matched: set `sub_skill_type` to the matched value and proceed to Phase 1.
 
 If not matched (no input or unrecognized type):
 Use AskUserQuestion with singleSelect:
 "Which insurance type would you like advice on?"
+- Portfolio overview (all policies, gaps, overlaps, adequacy summary)
 - Health insurance (Krankenversicherung — GKV vs PKV)
 - Liability insurance (Haftpflichtversicherung — personal liability)
 - Household contents insurance (Hausratversicherung — contents protection)
@@ -62,6 +64,7 @@ Use AskUserQuestion with singleSelect:
 - Rental deposit insurance (Mietkautionsversicherung — deposit replacement)
 
 Map the answer:
+- "Portfolio overview (all policies, gaps, overlaps, adequacy summary)" -> sub_skill_type = "portfolio"
 - "Health insurance (Krankenversicherung — GKV vs PKV)" → sub_skill_type = "health"
 - "Liability insurance (Haftpflichtversicherung — personal liability)" → sub_skill_type = "haftpflicht"
 - "Household contents insurance (Hausratversicherung — contents protection)" → sub_skill_type = "hausrat"
@@ -77,6 +80,7 @@ Map the answer:
 ## Phase 1: Sub-skill Dispatch
 
 Read `${CLAUDE_SKILL_DIR}/sub-skills/${sub_skill_type}.md`.
+<!-- Examples: health.md, haftpflicht.md, hausrat.md, kfz.md, rechtsschutz.md, zahnzusatz.md, risikoleben.md, reise.md, fahrrad.md, kfz-schutzbrief.md, mietkaution.md, portfolio.md -->
 
 Follow all instructions in the loaded file from its Phase 0 onward.
 
@@ -99,6 +103,7 @@ Currently available insurance types:
   - fahrrad         (Fahrradversicherung — bicycle insurance)
   - kfz-schutzbrief (Kfz-Schutzbriefversicherung — roadside assistance)
   - mietkaution     (Mietkautionsversicherung — rental deposit)
+  - portfolio        (Portfolio -- all policies, gaps, overlaps, cost summary)
 
 Run /finyx:insurance [type]  (or use the type selection menu)
 ```
@@ -121,6 +126,7 @@ This SKILL.md is a pure dispatcher — it contains NO insurance-type-specific lo
 
 The `allowed-tools` list is the union of all tools required by any sub-skill. Tool permissions are set at skill load time (YAML frontmatter), so the router must declare every tool any sub-skill may use. Current sub-skill tool requirements:
 - health.md: Read, Bash, Write, Task, AskUserQuestion, WebSearch, WebFetch
+- portfolio.md: Read, Task, AskUserQuestion, Write
 
 Sub-skills for other types will be added in Phases 21-22. When adding new sub-skills in future phases, verify their tool requirements and expand `allowed-tools` if needed.
 
