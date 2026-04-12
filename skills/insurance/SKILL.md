@@ -43,6 +43,7 @@ Keyword map (case-insensitive match against user input):
 - "fahrrad", "bicycle", "bike", "fahrradversicherung" → sub-skill: fahrrad
 - "kfz-schutzbrief", "schutzbrief", "roadside", "schutzbriefversicherung" → sub-skill: kfz-schutzbrief
 - "mietkaution", "rental deposit", "kaution", "mietkautionsversicherung" → sub-skill: mietkaution
+- "doc", "pdf", "document", "reader", "dokument", "police", "unterlagen" → sub-skill: doc-reader
 - "portfolio", "overview", "summary", "all policies", "alle versicherungen", "uebersicht" -> sub-skill: portfolio
 
 If matched: set `sub_skill_type` to the matched value and proceed to Phase 1.
@@ -62,6 +63,7 @@ Use AskUserQuestion with singleSelect:
 - Bicycle insurance (Fahrradversicherung — theft and damage)
 - Roadside assistance (Kfz-Schutzbriefversicherung — breakdown and towing)
 - Rental deposit insurance (Mietkautionsversicherung — deposit replacement)
+- Document reader (parse PDF policy documents into your profile)
 
 Map the answer:
 - "Portfolio overview (all policies, gaps, overlaps, adequacy summary)" -> sub_skill_type = "portfolio"
@@ -76,11 +78,12 @@ Map the answer:
 - "Bicycle insurance (Fahrradversicherung — theft and damage)" → sub_skill_type = "fahrrad"
 - "Roadside assistance (Kfz-Schutzbriefversicherung — breakdown and towing)" → sub_skill_type = "kfz-schutzbrief"
 - "Rental deposit insurance (Mietkautionsversicherung — deposit replacement)" → sub_skill_type = "mietkaution"
+- "Document reader (parse PDF policy documents into your profile)" → sub_skill_type = "doc-reader"
 
 ## Phase 1: Sub-skill Dispatch
 
 Read `${CLAUDE_SKILL_DIR}/sub-skills/${sub_skill_type}.md`.
-<!-- Examples: health.md, haftpflicht.md, hausrat.md, kfz.md, rechtsschutz.md, zahnzusatz.md, risikoleben.md, reise.md, fahrrad.md, kfz-schutzbrief.md, mietkaution.md, portfolio.md -->
+<!-- Examples: health.md, haftpflicht.md, hausrat.md, kfz.md, rechtsschutz.md, zahnzusatz.md, risikoleben.md, reise.md, fahrrad.md, kfz-schutzbrief.md, mietkaution.md, portfolio.md, doc-reader.md -->
 
 Follow all instructions in the loaded file from its Phase 0 onward.
 
@@ -104,6 +107,7 @@ Currently available insurance types:
   - kfz-schutzbrief (Kfz-Schutzbriefversicherung — roadside assistance)
   - mietkaution     (Mietkautionsversicherung — rental deposit)
   - portfolio        (Portfolio -- all policies, gaps, overlaps, cost summary)
+  - doc-reader    (Document reader -- parse PDF policy documents)
 
 Run /finyx:insurance [type]  (or use the type selection menu)
 ```
