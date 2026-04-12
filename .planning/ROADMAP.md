@@ -66,7 +66,11 @@ Plans:
   3. Generic research agent can be parameterized with any insurance type and returns criteria-based comparison (never specific tariff names)
   4. Portfolio agent and document reader agent are defined and callable from orchestrating skills
   5. All advisory outputs include §34d GewO advisory-only disclaimer and use criteria-based language
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 19-01-PLAN.md — Infrastructure contracts (disclaimer, profile schema, SKILL.md keyword map, health-insurance.md update)
+- [ ] 19-02-PLAN.md — 10 per-type reference docs (coverage benchmarks, legal minimums, field extraction schemas)
+- [ ] 19-03-PLAN.md — 3 specialist agents (generic research, portfolio, document reader)
 
 ### Phase 20: Portfolio Analysis
 **Goal**: Users can see their full insurance portfolio with cost summary, gaps, overlaps, and adequacy assessment
@@ -110,8 +114,8 @@ Plans:
 | 6-8. Insights | v1.1 | 5/5 | Complete | 2026-04-06 |
 | 9-12. Health Insurance | v1.2 | 5/5 | Complete | 2026-04-09 |
 | 13-17. Plugin Architecture | v2.0 | 13/13 | Complete | 2026-04-12 |
-| 18. Router + Sub-skill Migration | v2.1 | 1/1 | Complete   | 2026-04-12 |
-| 19. Reference Docs + Profile Schema + Agents | v2.1 | 0/TBD | Not started | - |
+| 18. Router + Sub-skill Migration | v2.1 | 1/1 | Complete    | 2026-04-12 |
+| 19. Reference Docs + Profile Schema + Agents | v2.1 | 0/3 | In progress | - |
 | 20. Portfolio Analysis | v2.1 | 0/TBD | Not started | - |
 | 21. Per-Type Sub-skills (Tier 1-2) | v2.1 | 0/TBD | Not started | - |
 | 22. Per-Type Sub-skills (Tier 3-4) + Doc Reader | v2.1 | 0/TBD | Not started | - |
