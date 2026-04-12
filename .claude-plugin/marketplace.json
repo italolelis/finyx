@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "finyx",
+  "name": "italolelis",
   "description": "AI-powered personal finance advisor — tax, investments, insurance, pensions, real estate",
   "owner": {
     "name": "Italo Vietro"
