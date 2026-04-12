@@ -27,15 +27,10 @@ Finyx is a collection of Claude Code slash-commands and specialist AI agents tha
 
 ## Installation
 
+Finyx is a Claude Code plugin. Install it with:
+
 ```bash
-# Install globally (recommended)
-npx finyx-cc --global
-
-# Or install to current project only
-npx finyx-cc --local
-
-# Uninstall
-npx finyx-cc --uninstall
+claude plugin add github:italolelis/finyx
 ```
 
 Requires [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installed on your machine.
@@ -91,32 +86,30 @@ Requires [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installed
 
 ## How it works
 
-Finyx is not an application — it's a set of Markdown prompt files that Claude Code interprets as slash commands. All "business logic" is encoded in structured prompts, not executable code.
+Finyx is not an application — it's a set of Markdown prompt files that Claude Code interprets as slash commands via the plugin system. All "business logic" is encoded in structured prompts, not executable code.
 
 ```
-finyx-cc/
-├── bin/install.js              # CLI installer (the only JS file)
-├── commands/finyx/             # Slash-command prompt files
-│   ├── profile.md              # /finyx:profile
-│   ├── tax.md                  # /finyx:tax
-│   ├── invest.md               # /finyx:invest
-│   ├── insights.md             # /finyx:insights
-│   └── ...
-├── agents/                     # Specialist AI sub-agents
-│   ├── finyx-allocation-agent.md
-│   ├── finyx-tax-scoring-agent.md
-│   ├── finyx-projection-agent.md
-│   └── ...
-└── finyx/
-    ├── references/             # Domain knowledge (tax rules, benchmarks)
-    │   ├── germany/
-    │   ├── brazil/
-    │   ├── insights/
-    │   └── disclaimer.md
-    └── templates/              # Config and output templates
+finyx/
+├── .claude-plugin/plugin.json      # Plugin manifest
+├── skills/                         # Self-contained skill bundles
+│   ├── profile/                    # /finyx:profile — financial profile management
+│   │   ├── SKILL.md
+│   │   ├── agents/
+│   │   └── references/
+│   ├── tax/                        # /finyx:tax — tax advisor
+│   ├── invest/                     # /finyx:invest — investment advisor
+│   ├── pension/                    # /finyx:pension — pension planning
+│   ├── insurance/                  # /finyx:insurance — PKV/GKV advisor
+│   ├── insights/                   # /finyx:insights — unified dashboard
+│   ├── realestate/                 # /finyx:scout, analyze, filter, compare, ...
+│   └── help/                       # /finyx:help — command reference
+└── agents/                         # Shared specialist agents
+    ├── finyx-allocation-agent.md
+    ├── finyx-projection-agent.md
+    └── ...
 ```
 
-**Zero runtime dependencies.** The only code is the installer. Everything else is Markdown consumed by Claude Code.
+**Zero runtime dependencies.** Everything is Markdown consumed by Claude Code via the plugin system.
 
 ## Country support
 
@@ -137,6 +130,20 @@ The `/finyx:insights` command synthesizes all your financial data into a single 
 - **Goal tracking** — "At current rate, target X reached in Y months"
 - **Top-5 recommendations** — Ranked by estimated € annual impact
 - **Cross-advisor intelligence** — Detects links across domains (unused tax allowance + low investment = double gap)
+
+## Migrating from v1.x
+
+If you previously installed via `npx finyx-cc`, uninstall first:
+
+```bash
+npx finyx-cc --uninstall
+```
+
+Then install the plugin:
+
+```bash
+claude plugin add github:italolelis/finyx
+```
 
 ## Legal disclaimer
 
