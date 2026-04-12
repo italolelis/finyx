@@ -96,7 +96,11 @@ Plans:
   2. Each sub-skill shows current coverage vs benchmark and criteria-based market comparison (Stiftung Warentest/Finanztip sourced)
   3. Kfz analysis covers all three coverage levels (Haftpflicht, Teilkasko, Vollkasko) including SF-Klasse impact
   4. User sees cancellation deadlines (Kündigungsfrist) and any open Sonderkündigungsrecht windows for each policy
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 21-01-PLAN.md — Haftpflicht, Hausrat, Rechtsschutz sub-skills (sum-based + module-based types)
+- [ ] 21-02-PLAN.md — Zahnzusatz, Risikoleben sub-skills (Staffelung + income-based benchmark types)
+- [ ] 21-03-PLAN.md — Kfz sub-skill (3-tier comparison, SF-Klasse, extended vehicle questions)
 **UI hint**: no
 
 ### Phase 22: Per-Type Sub-skills (Tier 3-4) + Doc Reader
@@ -119,6 +123,6 @@ Plans:
 | 13-17. Plugin Architecture | v2.0 | 13/13 | Complete | 2026-04-12 |
 | 18. Router + Sub-skill Migration | v2.1 | 1/1 | Complete    | 2026-04-12 |
 | 19. Reference Docs + Profile Schema + Agents | v2.1 | 3/3 | Complete    | 2026-04-12 |
-| 20. Portfolio Analysis | v2.1 | 2/2 | Complete   | 2026-04-12 |
-| 21. Per-Type Sub-skills (Tier 1-2) | v2.1 | 0/TBD | Not started | - |
+| 20. Portfolio Analysis | v2.1 | 2/2 | Complete    | 2026-04-12 |
+| 21. Per-Type Sub-skills (Tier 1-2) | v2.1 | 0/3 | Not started | - |
 | 22. Per-Type Sub-skills (Tier 3-4) + Doc Reader | v2.1 | 0/TBD | Not started | - |
