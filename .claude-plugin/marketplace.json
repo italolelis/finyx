@@ -10,7 +10,11 @@
       "name": "finyx",
       "description": "AI-powered personal finance advisor for Germany and Brazil — tax optimization, investment portfolio, PKV/GKV insurance, pension planning, real estate analysis, and unified financial insights.",
       "category": "productivity",
-      "source": ".",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/italolelis/finyx.git",
+        "sha": "1bac98cc7f1b98ff88a8f4ca5aa679fb0a070652"
+      },
       "homepage": "https://github.com/italolelis/finyx"
     }
   ]
