@@ -1,5 +1,22 @@
 # Milestones
 
+## v2.0 Plugin Architecture (Shipped: 2026-04-12)
+
+**Phases completed:** 5 phases, 13 plans, 2 tasks
+
+**Key accomplishments:**
+
+- Task 1:
+- One-liner:
+- One-liner:
+- One-liner:
+- One-liner:
+- One-liner:
+- One-liner:
+- One-liner:
+
+---
+
 ## v1.2 Health Insurance Advisor (Shipped: 2026-04-09)
 
 **Phases completed:** 4 phases, 5 plans, 5 tasks

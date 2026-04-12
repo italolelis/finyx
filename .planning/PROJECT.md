@@ -51,17 +51,18 @@ A single AI-powered financial advisor that knows your full financial picture —
 - ✓ Long-term cost projection (10/20/30-year scenarios, PKV age growth vs GKV income-tracking) — v1.2
 - ✓ Cross-advisor insurance integration — insights allocation + tax PKV deduction — v1.2
 
+- ✓ `.claude-plugin/plugin.json` manifest for plugin distribution — v2.0
+- ✓ All 17 commands converted to 8 self-contained skills under `skills/` — v2.0
+- ✓ Each skill bundles its own agents and reference docs — v2.0
+- ✓ `finyx-profile` foundation skill with global fallback path — v2.0
+- ✓ `finyx-insights` cross-skill integration layer — v2.0
+- ✓ Legacy directories removed (commands/, agents/, finyx/) — v2.0
+- ✓ Plugin installable via `claude plugin add github:italolelis/finyx` — v2.0
+- ✓ All advisory skills have `disable-model-invocation: true` — v2.0
+
 ### Active
 
-#### v2.0 — Plugin Architecture
-- [ ] `.claude-plugin/plugin.json` manifest for marketplace distribution
-- [ ] Convert all commands into self-contained skills under `skills/`
-- [ ] Each skill bundles its own agents and reference docs
-- [ ] `finyx-profile` foundation skill (shared profile management)
-- [ ] `finyx-insights` cross-skill integration layer
-- [ ] Thin command triggers preserved for `/finyx:*` syntax
-- [ ] `bin/install.js` npm fallback for backward compatibility
-- [ ] Submit to Anthropic plugin directory
+(Next milestone — define via `/gsd:new-milestone`)
 
 ### Out of Scope
 
@@ -76,18 +77,17 @@ A single AI-powered financial advisor that knows your full financial picture —
 
 ## Context
 
-Shipped v1.2 with 7 new files (+1,932 lines) on top of v1.1. Total ~27,900 LOC across 116 files.
-Tech stack: Claude Code slash-commands (Markdown prompts), Node.js installer, zero runtime dependencies.
-6 specialist commands: `/finyx:profile`, `/finyx:tax`, `/finyx:invest`, `/finyx:broker`, `/finyx:pension`, `/finyx:insights`.
-3 specialist insight agents: allocation, tax-scoring, projection.
-3 legacy real estate agents preserved under finyx namespace.
+Shipped v2.0 — full plugin architecture migration. 8 self-contained skills, ~7,000 lines of skill content.
+Tech stack: Claude Code plugin system (skills + agents in Markdown prompts), zero runtime dependencies.
+8 skills: profile, tax, invest (+ broker), pension, insurance, insights, realestate (7 workflows), help (+ status + update).
+8 agents scoped to owning skills. All paths use portable `${CLAUDE_SKILL_DIR}/references/`.
 Country support: Germany + Brazil with shared profile and per-country reference docs.
-Distributed via npm as `finyx-cc`.
+Distributed as Claude Code plugin via `claude plugin add github:italolelis/finyx`.
 
 ## Constraints
 
 - **Tech stack**: Claude Code slash-command architecture — no application framework, all logic in Markdown prompts
-- **Runtime**: Node.js >=16.7.0, npm distribution, zero runtime dependencies
+- **Runtime**: Claude Code plugin system, zero runtime dependencies
 - **Legal**: Advisory only — all recommendations include disclaimers, no automated execution
 - **Data freshness**: Market data via live web search + APIs, tax rules in versioned reference docs updated per tax year
 - **Country scope**: Germany + Brazil for v1, architecture must support adding countries without refactoring
@@ -134,4 +134,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-12 after v2.0 milestone start*
+*Last updated: 2026-04-12 after v2.0 milestone*
