@@ -86,6 +86,20 @@
     ]
   },
 
+  "_documents_schema": {
+    "description": "Per-category document location paths. Used by skills to locate source documents for extraction.",
+    "path_format": "Absolute path or path relative to user's home directory. Accepts local folder or NAS mount.",
+    "categories": "insurance, banking, investments, real_estate — extensible for future skills"
+  },
+  "documents": {
+    "locations": {
+      "insurance": null,
+      "banking": null,
+      "investments": null,
+      "real_estate": null
+    }
+  },
+
   "project": {
     "name": "",
     "propertiesFolder": "properties",
