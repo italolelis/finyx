@@ -131,7 +131,7 @@ Comparison
 | Command | Description |
 |---------|-------------|
 | `/finyx:invest` | Portfolio analysis, ETF recommendations, rebalancing, and live market data |
-| `/finyx:broker` | Broker fee comparison and profile-based recommendation for German and Brazilian brokers |
+| `/finyx:broker` | Broker fee comparison and profile-based recommendation with live market discovery |
 
 ### Pension Advisory
 
@@ -230,8 +230,9 @@ Get portfolio analysis and ETF recommendations based on your financial profile.
 Compare broker fees and get a profile-based broker recommendation.
 
 **Covers:**
-- German broker fee comparison (Trade Republic, Scalable Capital FREE and PRIME+, ING, comdirect)
-- Brazilian broker fee comparison (NuInvest, XP Investimentos, BTG Pactual)
+- German broker fee comparison (live discovery + baseline reference data)
+- Brazilian broker fee comparison (live discovery + baseline reference data)
+- New broker detection via web search (discovers current market entrants)
 - Profile-based recommendation considering trading frequency, investment strategy, and tax simplicity preference
 - Tax reporting quality: German brokers (automatic Abgeltungssteuer withholding, Freistellungsauftrag, Jahressteuerbescheinigung) vs foreign brokers (manual Anlage KAP + Anlage KAP-INV)
 
