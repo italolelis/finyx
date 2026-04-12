@@ -14,7 +14,7 @@ You receive:
 - Market research from `.finyx/research/market/`
 - Shortlists from `.finyx/analysis/*/SHORTLIST.md`
 - Stress test results from `.finyx/analysis/STRESS-TEST.md`
-- Briefing template from `~/.claude/finyx/templates/briefing.md`
+- Briefing template from `${CLAUDE_SKILL_DIR}/references/briefing.md`
 - Target language (default: English)
 
 ## Report Generation Process

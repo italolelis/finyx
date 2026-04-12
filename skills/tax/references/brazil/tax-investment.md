@@ -177,7 +177,7 @@ FII dividends must be declared in your annual IR filing even when exempt from ta
 - **DBA (Double Taxation Agreement):** Brazil and Germany have a tax treaty that prevents double taxation. In general, investment income sourced in Brazil is taxed in Brazil first; Germany applies a credit for Brazilian tax already paid against any German tax obligation on the same income.
 - **Brazilian withholding on investment income for non-residents:** 15% standard withholding rate applies to most investment income paid to non-resident investors (e.g., dividends, interest, capital gains). Specific rates may vary by income type.
 - **German residents with Brazilian investments:** Must declare all foreign income on their German IR return (Anlage KAP for capital income, Anlage AUS for foreign income). German Abgeltungssteuer applies, with DBA credit reducing the German tax due.
-- **Full DBA interaction detail** — including residency tiebreaker rules and withholding credit mechanics — is surfaced by the `/finyx:tax` command when cross-border mode is active. See `finyx/references/germany/tax-investment.md` for the German-side treatment.
+- **Full DBA interaction detail** — including residency tiebreaker rules and withholding credit mechanics — is surfaced by the `/finyx:tax` command when cross-border mode is active. See `skills/tax/references/germany/tax-investment.md` for the German-side treatment.
 
 ---
 

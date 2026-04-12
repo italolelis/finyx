@@ -75,7 +75,7 @@ For equity ETFs, Teilfreistellung rate = 0.30 (30% exempt). Source: `germany/tax
 
 ### ALLOC-01: Investment Rate (DE)
 
-**Source:** `finyx/references/insights/benchmarks.md` Section 2 — investment sub-targets for Germany
+**Source:** `${CLAUDE_SKILL_DIR}/references/insights/benchmarks.md` Section 2 — investment sub-targets for Germany
 
 **Thresholds:**
 
@@ -96,7 +96,7 @@ gap_to_minimum      = max(0, 0.15 x net_after_mandatory - annual_investment_cont
 
 ### ALLOC-02: Emergency Fund (DE)
 
-**Source:** `finyx/references/insights/benchmarks.md` Section 3 — 6-month threshold
+**Source:** `${CLAUDE_SKILL_DIR}/references/insights/benchmarks.md` Section 3 — 6-month threshold
 
 **Thresholds:**
 
@@ -163,7 +163,7 @@ tax_savings   = pgbl_gap_brl x marginal_ir_rate  (varies by income bracket)
 
 ### ALLOC-01: Investment Rate (BR)
 
-**Source:** `finyx/references/insights/benchmarks.md` Section 2 — investment sub-targets for Brazil
+**Source:** `${CLAUDE_SKILL_DIR}/references/insights/benchmarks.md` Section 2 — investment sub-targets for Brazil
 
 **Thresholds:**
 
@@ -185,7 +185,7 @@ gap_to_minimum  = max(0, 0.10 x net_after_mandatory - (annual_investments + annu
 
 ### ALLOC-02: Emergency Fund (BR)
 
-**Source:** `finyx/references/insights/benchmarks.md` Section 3 — 6-month threshold
+**Source:** `${CLAUDE_SKILL_DIR}/references/insights/benchmarks.md` Section 3 — 6-month threshold
 
 **Thresholds:** Same structure as DE ALLOC-02.
 
@@ -253,4 +253,4 @@ Append a confidence flag when data quality is uncertain:
 
 ---
 
-*Sources for scoring threshold values in this document: `germany/tax-investment.md` (Sparerpauschbetrag limits, Vorabpauschale formula, Abgeltungssteuer rates, Teilfreistellung rates), `brazil/tax-investment.md` (DARF rules, PGBL 12% limit, IR progressive table), `finyx/references/insights/benchmarks.md` (allocation targets, emergency fund threshold).*
+*Sources for scoring threshold values in this document: `germany/tax-investment.md` (Sparerpauschbetrag limits, Vorabpauschale formula, Abgeltungssteuer rates, Teilfreistellung rates), `brazil/tax-investment.md` (DARF rules, PGBL 12% limit, IR progressive table), `${CLAUDE_SKILL_DIR}/references/insights/benchmarks.md` (allocation targets, emergency fund threshold).*
