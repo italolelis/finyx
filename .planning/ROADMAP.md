@@ -113,8 +113,8 @@ Plans:
   3. Extracted PDF data populates the `insurance.policies[]` profile schema fields for use in portfolio analysis
 **Plans**: 3 plans
 Plans:
-- [ ] 22-01-PLAN.md — Reise + Fahrrad sub-skills + profile schema documents.locations extension
-- [ ] 22-02-PLAN.md — Kfz-Schutzbrief + Mietkaution sub-skills (overlap detection + computed benchmark)
+- [x] 22-01-PLAN.md — Reise + Fahrrad sub-skills + profile schema documents.locations extension
+- [x] 22-02-PLAN.md — Kfz-Schutzbrief + Mietkaution sub-skills (overlap detection + computed benchmark)
 - [ ] 22-03-PLAN.md — Doc-reader sub-skill + router keyword update
 
 ## Progress
@@ -129,4 +129,4 @@ Plans:
 | 19. Reference Docs + Profile Schema + Agents | v2.1 | 3/3 | Complete    | 2026-04-12 |
 | 20. Portfolio Analysis | v2.1 | 2/2 | Complete    | 2026-04-12 |
 | 21. Per-Type Sub-skills (Tier 1-2) | v2.1 | 3/3 | Complete    | 2026-04-12 |
-| 22. Per-Type Sub-skills (Tier 3-4) + Doc Reader | v2.1 | 0/3 | Not started | - |
+| 22. Per-Type Sub-skills (Tier 3-4) + Doc Reader | v2.1 | 2/3 | In Progress|  |

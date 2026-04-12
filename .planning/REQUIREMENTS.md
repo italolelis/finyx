@@ -37,10 +37,10 @@ Requirements for the Comprehensive Insurance Advisor milestone.
 - [x] **TYPE-04**: Rechtsschutzversicherung (legal protection)
 - [x] **TYPE-05**: Zahnzusatzversicherung (dental supplement)
 - [x] **TYPE-06**: Risikolebensversicherung (term life)
-- [ ] **TYPE-07**: Reiseversicherung (travel)
-- [ ] **TYPE-08**: Fahrradversicherung (bicycle)
-- [ ] **TYPE-09**: Kfz-Schutzbriefversicherung (roadside assistance)
-- [ ] **TYPE-10**: Mietkautionsversicherung (rental deposit)
+- [x] **TYPE-07**: Reiseversicherung (travel)
+- [x] **TYPE-08**: Fahrradversicherung (bicycle)
+- [x] **TYPE-09**: Kfz-Schutzbriefversicherung (roadside assistance)
+- [x] **TYPE-10**: Mietkautionsversicherung (rental deposit)
 
 ### Infrastructure
 
@@ -87,10 +87,10 @@ Deferred to future release.
 | TYPE-04 | Phase 21 | Complete |
 | TYPE-05 | Phase 21 | Complete |
 | TYPE-06 | Phase 21 | Complete |
-| TYPE-07 | Phase 22 | Pending |
-| TYPE-08 | Phase 22 | Pending |
-| TYPE-09 | Phase 22 | Pending |
-| TYPE-10 | Phase 22 | Pending |
+| TYPE-07 | Phase 22 | Complete |
+| TYPE-08 | Phase 22 | Complete |
+| TYPE-09 | Phase 22 | Complete |
+| TYPE-10 | Phase 22 | Complete |
 | INFRA-01 | Phase 19 | Complete |
 | INFRA-02 | Phase 19 | Complete |
 | INFRA-03 | Phase 19 | Complete |

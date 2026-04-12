@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: Comprehensive Insurance Advisor
-status: verifying
-stopped_at: Completed 21-01-PLAN.md
-last_updated: "2026-04-12T20:55:51.372Z"
+status: executing
+stopped_at: Completed 22-01-PLAN.md
+last_updated: "2026-04-12T21:19:13.079Z"
 last_activity: 2026-04-12
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 12
+  completed_plans: 11
   percent: 0
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-12)
 
 **Core value:** A single AI-powered financial advisor that knows your full financial picture and gives integrated, country-aware advice
-**Current focus:** Phase 21 — per-type-sub-skills-tier-1-2
+**Current focus:** Phase 22 — per-type-sub-skills-tier-3-4-doc-reader
 
 ## Current Position
 
-Phase: 21 (per-type-sub-skills-tier-1-2) — EXECUTING
+Phase: 22 (per-type-sub-skills-tier-3-4-doc-reader) — EXECUTING
 Plan: 3 of 3
-Status: Phase complete — ready for verification
+Status: Ready to execute
 Last activity: 2026-04-12
 
 ```
@@ -70,6 +70,8 @@ v2.1 key context:
 - [Phase 21-02]: Gesundheitsprüfung warning placed in 3 locations in Risikoleben (disclaimer, cancellation, recommendation) — intentional due to severity of cancel-before-approval mistake
 - [Phase 21-per-type-sub-skills-tier-1-2]: Rechtsschutz coverage_amount is null — Phase 3 uses module-based PASS/MISSING/N/A, never monetary benchmark
 - [Phase 21-per-type-sub-skills-tier-1-2]: Hausrat living_area_sqm uses 3-source priority: Phase 0 user input > profile field lookup > UNKNOWN (never skips benchmark phase)
+- [Phase 22]: Kfz-Schutzbrief leads with overlap detection (Kfz policy then ADAC) before component benchmark
+- [Phase 22]: Mietkaution Regresspflicht warning placed in Phase 3 and Phase 6 (dual placement) — intentional for severity
 
 ### Pending Todos
 
@@ -81,6 +83,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-12T20:55:51.369Z
-Stopped at: Completed 21-01-PLAN.md
+Last session: 2026-04-12T21:19:13.076Z
+Stopped at: Completed 22-01-PLAN.md
 Resume file: None
