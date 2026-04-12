@@ -1,346 +1,227 @@
-# Technology Stack: Claude Code Plugin Architecture
+# Technology Stack — Comprehensive German Insurance Advisor (v2.1)
 
-**Project:** Finyx v2.0 Plugin Migration
+**Project:** Finyx insurance skill expansion
 **Researched:** 2026-04-12
-**Confidence:** HIGH — verified from actual installed plugins at `~/.claude/plugins/`
+**Scope:** 11 additional German insurance types on top of the existing PKV/GKV skill
+
+> **Note:** v2.0 plugin architecture stack (plugin.json manifest, SKILL.md frontmatter, agent placement rules) is unchanged. This document focuses on what v2.1 adds to the insurance skill specifically.
 
 ---
 
-## Plugin System: Verified Ground Truth
+## Constraint Reminder
 
-All findings below were verified against:
-- `/Users/italovietro/.claude/plugins/marketplaces/claude-plugins-official/plugins/example-plugin/` — canonical reference
-- `/Users/italovietro/.claude/plugins/marketplaces/claude-plugins-official/plugins/plugin-dev/` — authoritative dev guide
-- `/Users/italovietro/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/` — installed Anthropic plugin
-- `/Users/italovietro/.claude/skills/fin-advisor/`, `fin-tax/` — locally created skill prototypes
-
----
-
-## Plugin Directory Structure
-
-```
-finyx/
-├── .claude-plugin/
-│   └── plugin.json              # Required manifest (MUST be in .claude-plugin/)
-├── skills/
-│   └── <skill-name>/
-│       ├── SKILL.md             # Required (must be named SKILL.md, not README.md)
-│       ├── references/          # Docs loaded into context as needed
-│       ├── scripts/             # Deterministic/reusable code
-│       └── assets/              # Templates, icons, output files (not loaded into context)
-├── commands/                    # Legacy slash commands (.md files) — still valid
-├── agents/                      # Subagent definitions (.md files)
-├── hooks/
-│   └── hooks.json               # Event handlers (PreToolUse, PostToolUse, etc.)
-├── .mcp.json                    # MCP server configuration (optional)
-└── README.md
-```
-
-**Critical layout rules (verified from plugin-dev manifest-reference.md):**
-- `plugin.json` MUST be inside `.claude-plugin/` — not at root, not named `.claude-plugin.json`
-- `commands/`, `agents/`, `skills/`, `hooks/` MUST be at plugin root, NOT inside `.claude-plugin/`
-- Each skill MUST be a subdirectory with `SKILL.md` inside it (not a flat `.md` file in `skills/`)
-- Skills placed directly in `~/.claude/skills/<name>/SKILL.md` (outside any plugin) also work — this is how the fin-advisor, fin-tax prototypes are installed
+Zero-runtime-dependency Claude Code plugin. "Stack additions" means:
+- New reference `.md` files per insurance type (11 files)
+- One new generic agent `.md` file
+- Profile schema additions (JSON fields only)
+- Prompt-level data extraction patterns (no Node.js code)
+- No npm packages, no API clients, no build steps
 
 ---
 
-## plugin.json Manifest Schema
+## Data Sources Per Insurance Type
 
-**Location:** `.claude-plugin/plugin.json`
+### Source Hierarchy (same rule as existing PKV agent, applies to all 11 types)
 
-### Minimum viable (only required field)
+1. **Stiftung Warentest / Finanztip** — neutral, no commercial bias, rigorous methodology. Use first.
+2. **Direct provider websites** — authoritative for pricing, terms, exclusions.
+3. **Verivox / Tarifcheck** — acceptable secondary neutral aggregators for market ranges.
+4. **Check24** — fallback only, never primary. Same commission-bias rule as existing PKV research agent.
+
+### Per-Type Data Source Map
+
+| Insurance Type | DE Name | Primary Search Targets | Key Benchmarks |
+|----------------|---------|------------------------|----------------|
+| Household contents | Hausratversicherung | finanztip.de/hausratversicherung, verivox.de/hausratversicherung | €650/m² standard sum; Unterversicherungsverzicht; Elementarschutz inclusion; €19–80/yr for 70m² |
+| Private liability | Privathaftpflicht | test.de/Vergleich-Haftpflichtversicherung-4775777-0, finanztip.de | Min. €50M Deckungssumme; Schlüsselverlust; €6–15/month |
+| Car insurance | Kfz-Versicherung | finanztip.de/kfz-versicherung, adac.de | SF-Klasse 0–50; Typklasse; Regionalklasse; Haftpflicht/Teilkasko/Vollkasko; €300–1,200/yr |
+| Breakdown cover | Kfz-Schutzbrief | adac.de ADAC Schutzbrief product page | Pannenhilfe, Abschleppen, Auslandsschutz; ~€20–50/yr add-on or ADAC membership |
+| Legal protection | Rechtsschutzversicherung | test.de/Rechtsschutzversicherung-im-Vergleich-4776988-0, finanztip.de | 84 packages / 31 insurers tested Oct 2025 (Stiftung Warentest); modules: Privat/Beruf/Verkehr/Miete |
+| Dental supplement | Zahnzusatzversicherung | test.de, finanztip.de/zahnzusatzversicherung | Erstattungssatz 60–100%; Wartezeit 3–8 months statutory; Jahreshöchstleistung; KFO inclusion |
+| Term life | Risikolebensversicherung | finanztip.de/risikolebensversicherung | Todesfallsumme = 3–5× gross income; from ~€3/month (age 25, €150k, 10yr); price spreads up to 3× between providers |
+| Private pension | Private Rentenversicherung | finanztip.de, bafin.de/Verbraucher/Versicherungen | Klassisch/fondsgebunden/indexgebunden; intersects with pension skill — reference to finyx-pension |
+| Travel insurance | Reiseversicherung | check24.de/reiseversicherung, finanztip.de/reiseruecktrittsversicherung | 300+ tariffs on Check24; modules: Rücktritt/Kranken/Gepäck/Haftpflicht; Jahrespolice vs. Einzelreise |
+| Bicycle insurance | Fahrradversicherung | check24.de/fahrradversicherung, verivox.de | Diebstahlschutz scope; Neuwertersatz vs. Zeitwert; E-Bike rules; Selbstbeteiligung |
+| Rental deposit | Mietkautionsversicherung | finanztip.de, eurokaution.de, mietkautionskonto.info | §551 BGB max 3 Monatskaltmieten; 4–6% annual premium (EuroKaution: 4.7%); providers: EuroKaution/R+V, Kautionsfrei |
+
+**Confidence on benchmarks:** MEDIUM — search-verified ranges from multiple neutral sources. Live quotes vary by individual parameters (age, location, vehicle, flat size, etc.).
+
+---
+
+## WebSearch Agent Pattern: Scalability Assessment
+
+**Verdict: Scales. Use one generic agent, not 11 separate agents.**
+
+### Why It Scales
+
+The existing `finyx-insurance-research-agent.md` pattern (WebSearch + WebFetch, 3-provider output, confidence flags) works for any insurance type. The pattern is stateless and parameter-driven.
+
+### Recommended Architecture
+
+**Keep 3 agents total** (unchanged from v1.2):
+
+| Agent | Role | Change in v2.1 |
+|-------|------|----------------|
+| `finyx-insurance-calc-agent.md` | Portfolio-level cost aggregation, gap scoring, coverage assessment | Extend to handle portfolio view across all types, not just PKV/GKV calc |
+| `finyx-insurance-research-agent.md` | PKV/GKV health insurance research | No change |
+| `finyx-insurance-type-research-agent.md` | **New** — generic research agent for all 11 property/liability/life/travel types | New file |
+
+**One generic agent covers all 11 types** by receiving `insurance_type` as a Task prompt parameter and reading the type-specific reference doc from `${CLAUDE_SKILL_DIR}/references/germany/{type}.md`.
+
+### What The Generic Agent Gets From Each Reference Doc
+
+Each type-specific reference doc includes a `## Agent Query Templates` section that provides:
+- 3–5 pre-built WebSearch query strings with `{current_year}` placeholders
+- Primary neutral source URLs to WebFetch first
+- Key fields to extract (provider name, premium, coverage scope, key terms)
+- Data confidence heuristics for the type
+
+This pattern is already proven — it mirrors how the PKV agent reads `health-insurance.md` Section 2.1 before searching.
+
+---
+
+## Policy Document Parsing (PDF Reading)
+
+### Approach: Native Read Tool, No External OCR
+
+Claude Code's `Read` tool reads text-layer PDFs natively. No external OCR library, no npm package, no build step required.
+
+**Workflow:**
+1. User places policy PDFs in `.finyx/insurance-docs/` (configurable path in profile)
+2. `/finyx:insurance` command `Read`s each PDF
+3. Claude extracts structured fields using the per-type extraction schema from the reference doc
+4. Fields are compared against coverage benchmarks to flag gaps and over-insurance
+
+### Universal Fields (All Policy Types)
+
+| Field | German Term | Notes |
+|-------|-------------|-------|
+| Policy number | Versicherungsscheinnummer | Top of Deckblatt |
+| Insurer name | Versicherungsgesellschaft | |
+| Annual premium | Jahresprämie / Monatsbeitrag × 12 | Normalize to annual |
+| Coverage start | Versicherungsbeginn | |
+| Next renewal / end | Versicherungsende / nächste Hauptfälligkeit | |
+| Cancellation deadline | Kündigungsfrist | Usually 3 months before Hauptfälligkeit |
+| Deductible | Selbstbeteiligung / Selbstbehalt | |
+
+### Type-Specific Extraction Fields
+
+Each reference doc encodes a `## PDF Extraction Schema` section. Key fields per type:
+
+**Hausratversicherung:** `Versicherungssumme`, `Unterversicherungsverzicht` (y/n), `Elementarschutz` (y/n), `covered_perils` (Einbruch, Leitungswasser, Feuer, Sturm/Hagel)
+
+**Kfz-Versicherung:** `Deckungsart` (Haftpflicht/Teilkasko/Vollkasko), `SF-Klasse`, `Typklasse`, `SB_Teilkasko`, `SB_Vollkasko`, `Fahrerschutz` (y/n), `GAP-Deckung` (y/n)
+
+**Privathaftpflicht:** `Deckungssumme`, `Schlüsselverlust` (y/n), `Gefälligkeitsschäden` (y/n), `Auslandsschutz` scope
+
+**Rechtsschutzversicherung:** covered modules (Privat/Beruf/Verkehr/Miete), `Wartezeit` (months), `Streitwertlimit`, `Selbstbeteiligung`
+
+**Risikolebensversicherung:** `Todesfallsumme`, `Laufzeit`, `Beitragsbefreiung_bei_BU` (y/n), `fallende_Versicherungssumme` (y/n)
+
+**Zahnzusatzversicherung:** `Erstattungssatz` (%), `Jahreshöchstleistung`, `Wartezeit`, `KFO_included` (y/n)
+
+**Mietkautionsversicherung:** `Kautionsbetrag`, `Jahresprämie`, `Bürgschaftsnehmerin` (landlord name)
+
+### PDF Parsing Limitations
+
+- Scanned PDFs (image-only) will fail — Claude reads text-layer only. Command must warn: "If your PDF was scanned without a text layer, extraction will be incomplete."
+- Heavily stylized insurer layouts degrade extraction quality. Flag partial results as `[PARTIAL EXTRACTION]`.
+- Do NOT attempt to extract health data from any document — GDPR Art. 9 restriction applies system-wide.
+- Budget ~30s per PDF for extraction. For large policy booklets (AVB/Bedingungen), read only the Deckblatt/Versicherungsschein page, not the full terms.
+
+---
+
+## Profile Schema Extension
+
+Add an `insurance` block to `profile.json`. This is the only schema change needed for v2.1.
+
 ```json
-{
-  "name": "finyx"
-}
-```
-
-### Recommended for marketplace
-```json
-{
-  "name": "finyx",
-  "version": "2.0.0",
-  "description": "AI-powered personal finance advisor for Germany and Brazil",
-  "author": {
-    "name": "Italo Vietro",
-    "email": "italo@example.com",
-    "url": "https://github.com/italolelis/finyx"
+"insurance": {
+  "health": {
+    "type": "GKV|PKV|unknown",
+    "provider": null,
+    "monthly_premium": null
   },
-  "homepage": "https://github.com/italolelis/finyx",
-  "repository": "https://github.com/italolelis/finyx",
-  "license": "MIT",
-  "keywords": ["finance", "tax", "investing", "germany", "brazil", "pension", "insurance"]
+  "policies": [
+    {
+      "type": "hausrat|haftpflicht|kfz|kfz-schutzbrief|rechtsschutz|zahnzusatz|risikoleben|rente-privat|reise|fahrrad|mietkaution",
+      "provider": null,
+      "annual_premium": null,
+      "coverage_start": null,
+      "next_cancellation_deadline": null,
+      "doc_path": null,
+      "notes": null
+    }
+  ],
+  "docs_folder": ".finyx/insurance-docs"
 }
 ```
 
-### Full schema with all fields
-
-| Field | Type | Required | Notes |
-|-------|------|----------|-------|
-| `name` | string | YES | kebab-case, `/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/` |
-| `version` | string | no | semver `MAJOR.MINOR.PATCH`, default `"0.1.0"` |
-| `description` | string | no | 50-200 chars for marketplace display |
-| `author` | object or string | no | `{name, email?, url?}` or `"Name <email> (url)"` |
-| `homepage` | string (URL) | no | Docs/landing page link |
-| `repository` | string or object | no | Source URL; object: `{type, url, directory?}` |
-| `license` | string | no | SPDX identifier (`"MIT"`, `"Apache-2.0"`) |
-| `keywords` | string[] | no | 5-10 tags for marketplace discovery |
-| `commands` | string or string[] | no | Additional command dirs, supplements `./commands` default |
-| `agents` | string or string[] | no | Additional agent dirs, supplements `./agents` default |
-| `hooks` | string or object | no | Path to hooks.json OR inline hooks config |
-| `mcpServers` | string or object | no | Path to `.mcp.json` OR inline MCP config |
-
-**Path rules for `commands`, `agents`, `hooks`, `mcpServers`:**
-- Must be relative paths starting with `./`
-- No `../` parent traversal
-- Forward slashes only
-
-**Auto-discovery defaults (no need to specify in manifest):**
-- `./commands/` — slash commands
-- `./agents/` — subagents
-- `./skills/` — skills
-- `./hooks/hooks.json` — hooks
-- `./.mcp.json` — MCP servers
+`doc_path` enables the command to `Read` the policy PDF. `docs_folder` is the default scan location.
 
 ---
 
-## SKILL.md Frontmatter
+## Reference Docs Required (11 New Files)
 
-### Model-invoked skill (auto-triggered by context)
+Location: `skills/insurance/references/germany/`
 
-```yaml
----
-name: finyx-tax
-description: German and Brazilian investment tax guidance. Trigger this skill when the user asks
-  about Abgeltungssteuer, Sparerpauschbetrag, Vorabpauschale, Teilfreistellung, Anlage KAP,
-  imposto de renda, DARF, come-cotas, Fundo Imobiliário (FII), or any question about how
-  German or Brazilian taxes affect investments. Also trigger when the user mentions Steuererklarung,
-  ELSTER, TaxFix, Receita Federal, or tax filing in either country.
-version: 2.0.0
----
-```
+Each file follows the existing `health-insurance.md` pattern: YAML frontmatter (`tax_year`, `last_updated`, `source`), then sections for market data, legal minimums, PDF extraction schema, agent query templates, and coverage traps.
 
-### User-invoked skill (slash command `/finyx:tax`)
-
-```yaml
----
-name: finyx:tax
-description: Analyze tax situation for Germany and Brazil, optimize for Abgeltungssteuer and IR
-argument-hint: [--country de|br] [--year YYYY]
-allowed-tools: [Read, WebSearch, AskUserQuestion]
-model: sonnet
----
-```
-
-### All supported SKILL.md frontmatter fields
-
-| Field | Required | Notes |
-|-------|----------|-------|
-| `name` | YES | Skill identifier; determines slash command name if user-invoked |
-| `description` | YES | PRIMARY trigger mechanism — how Claude decides when to invoke |
-| `version` | no | Semantic version string |
-| `license` | no | License reference |
-| `argument-hint` | no | Shown to user in `/help` for slash commands |
-| `allowed-tools` | no | Pre-approved tools, reduces runtime permission prompts |
-| `model` | no | Override model: `"haiku"`, `"sonnet"`, `"opus"` |
-| `type` | no | Seen in real plugins: `"encoded_preference"`, `"capability_uplift"` (internal convention) |
-| `evolution` | no | Claudes-kitchen convention only — eval tracking metadata |
-
-**The `description` field is the trigger.** Claude reads name + description (~100 words, always in context). The SKILL.md body is loaded only when the skill triggers. Write descriptions as imperative trigger conditions with specific phrases users will say.
-
-**Description writing pattern (from skill-creator):**
-- Include specific trigger phrases in quotes
-- Cover adjacent domains and edge cases
-- Slightly "pushy" — "Also trigger when..." — Claude tends to undertrigger
-- Third-person recommended: "This skill should be used when..."
+| File | Primary Legal/Data Source | Key Content |
+|------|--------------------------|-------------|
+| `hausrat.md` | GDV, VVG §§81ff, finanztip.de | 650 EUR/m² benchmark, Unterversicherung math, Elementarschutz inclusion check |
+| `haftpflicht.md` | §823 BGB, Stiftung Warentest 400+ tariff data | Deckungssumme minimum (50M EUR), module types, Schlüsselverlust, Mietsachschäden |
+| `kfz.md` | PflVG (Pflichtversicherungsgesetz), adac.de, finanztip.de | SF-Klasse table 0–35+, Typklasse/Regionalklasse, Deckungsarten, Kasko decision logic |
+| `kfz-schutzbrief.md` | ADAC product pages | ADAC vs. insurer comparison, Pannenhilfe abroad, Mietwagen inclusion |
+| `rechtsschutz.md` | GDV, test.de Oct 2025 benchmark | Module definitions, 3-month Wartezeit rule, Streitwertlimits, Selbstbeteiligung |
+| `zahnzusatz.md` | GKV dental coverage gaps (§55 SGB V), finanztip.de | Erstattungssatz tiers, statutory Wartezeit, Jahreshöchstleistung table, KFO inclusion |
+| `risikoleben.md` | finanztip.de Summer 2025 analysis | 3–5× gross income benchmark, level vs. annuitized sum, premium table by age/coverage |
+| `rente-privat.md` | BaFin consumer guidance, §10a EStG | Product type decision (klassisch vs fondsgebunden), intersection with finyx-pension skill, BaFin warnings on Rentengarantiezeit |
+| `reise.md` | GDV, finanztip.de | Module breakdown, Jahrespolice threshold (2+ trips/yr), EU travel vs. worldwide, Stornoversicherung scope |
+| `fahrrad.md` | finanztip.de | Diebstahlschutz scope, E-Bike rules (Versicherungspflicht for speed pedelecs), Neuwertersatz vs. Zeitwert |
+| `mietkaution.md` | §551 BGB, eurokaution.de, mietkautionskonto.info | 3 Monatskaltmieten cap (statutory), 4–6% annual premium benchmark, key providers (EuroKaution/R+V, Kautionsfrei), Kündigung rules |
 
 ---
 
-## Agent Frontmatter (agents/*.md)
+## Gap Analysis Logic (No New Agent Needed)
 
-```yaml
----
-name: finyx-tax-scoring-agent
-description: Use this agent when detailed German Abgeltungssteuer or Brazilian IR calculations are needed.
+The portfolio gap analysis (coverage gaps, over-insurance detection, total cost) runs in the orchestrating `/finyx:insurance` command, not a separate agent. Logic:
 
-<example>
-Context: User has provided their portfolio with ETF holdings at foreign broker
-user: "How much tax will I owe on my Trading212 dividends?"
-assistant: "I'll use the finyx-tax-scoring-agent to calculate Anlage KAP line-by-line."
-<commentary>
-Requires detailed per-fund Teilfreistellung calculation and cross-broker offset analysis.
-</commentary>
-</example>
+1. Read `profile.json` insurance block — what policies exist
+2. Read each `doc_path` PDF if present — extract coverage fields
+3. Compare extracted coverage against benchmarks in each type's reference doc
+4. Flag: missing mandatory types (Kfz Haftpflicht for car owners is legally required), underinsured (Hausrat sum < 650/m² × flat size), potentially redundant (Reise Haftpflicht vs. existing Privathaftpflicht with travel scope)
+5. Aggregate total annual insurance spend from all policy premiums
 
-model: sonnet
-color: blue
-tools: ["Read", "Bash", "WebSearch"]
----
-```
-
-### Agent frontmatter fields
-
-| Field | Required | Notes |
-|-------|----------|-------|
-| `name` | YES | kebab-case, 3-50 chars |
-| `description` | YES | When to use + `<example>` blocks for reliable triggering |
-| `model` | no | `"inherit"` (default), `"haiku"`, `"sonnet"`, `"opus"` |
-| `color` | no | UI display color: `red`, `blue`, `green`, `yellow`, `purple`, `orange` |
-| `tools` | no | Array of tool names the agent is allowed |
+This is deterministic prompt logic — no new agent, no new tooling.
 
 ---
 
-## Progressive Disclosure (3-Level Loading)
+## Scalability Summary
 
-```
-Level 1: name + description    -> Always in context (~100 words)
-Level 2: SKILL.md body         -> Loaded when skill triggers (<500 lines ideal)
-Level 3: references/, scripts/ -> Read explicitly when needed (unlimited)
-```
-
-Practical rule: Keep `SKILL.md` under 500 lines. Move detailed reference material (tax rules, country docs, methodology) to `references/` subdirectory. The skill body tells Claude *when* to read them, not their content.
-
----
-
-## Plugin Installation and Updates
-
-### Installation commands (verified from marketplace README)
-
-```
-/plugin install finyx@claude-plugins-official     # From official marketplace
-/plugin install finyx@claudes-kitchen             # From community marketplace
-/plugin install github:italolelis/finyx           # Direct from GitHub repo
-/plugin marketplace add italolelis/finyx          # Add custom marketplace
-```
-
-### Marketplace registration
-
-- **Official:** Submit via form at `https://clau.de/plugin-directory-submission`
-  - Anthropic reviews for quality and security standards
-  - Plugins must have disclaimers, no harmful content
-- **Community (claudes-kitchen):** PR to `parloa/claudes-kitchen` GitHub repo
-- **Self-hosted:** Clone/copy plugin directory to `~/.claude/plugins/marketplaces/<name>/`
-
-### Auto-updates
-
-Marketplace plugins auto-update by default (`autoUpdate: true` in `installed_plugins.json`). Users get new skills/commands without re-running any install command. This is the key advantage over `npx finyx-cc` which requires manual re-runs.
-
-### Plugin install state
-
-Tracked at `~/.claude/plugins/installed_plugins.json`:
-```json
-{
-  "version": 2,
-  "plugins": {
-    "finyx@claude-plugins-official": [{
-      "scope": "user",
-      "installPath": "~/.claude/plugins/cache/claude-plugins-official/finyx/2.0.0",
-      "version": "2.0.0",
-      "installedAt": "...",
-      "lastUpdated": "...",
-      "gitCommitSha": "..."
-    }]
-  }
-}
-```
-
-Scope can be `"user"` (global) or project-scoped.
-
----
-
-## Proposed Finyx Plugin Structure
-
-```
-finyx/
-├── .claude-plugin/
-│   └── plugin.json
-├── skills/
-│   ├── finyx-profile/
-│   │   ├── SKILL.md             # Profile management — foundation skill
-│   │   └── references/
-│   │       └── profile-schema.md
-│   ├── finyx-tax/
-│   │   ├── SKILL.md
-│   │   └── references/
-│   │       ├── germany/tax-investment.md
-│   │       └── brazil/tax-investment.md
-│   ├── finyx-invest/
-│   │   ├── SKILL.md
-│   │   └── references/
-│   │       └── etf-methodology.md
-│   ├── finyx-insurance/
-│   │   ├── SKILL.md
-│   │   └── references/
-│   │       └── germany/health-insurance.md
-│   ├── finyx-pension/
-│   │   ├── SKILL.md
-│   │   └── references/
-│   │       ├── germany/pension.md
-│   │       └── brazil/pension.md
-│   ├── finyx-broker/
-│   │   ├── SKILL.md
-│   │   └── references/
-│   │       └── broker-comparison.md
-│   ├── finyx-insights/
-│   │   ├── SKILL.md
-│   │   └── references/
-│   │       └── benchmarks.md
-│   └── finyx-realestate/
-│       ├── SKILL.md
-│       └── references/
-│           ├── methodology.md
-│           └── germany/tax-rules.md
-├── agents/
-│   ├── finyx-tax-scoring-agent.md
-│   ├── finyx-allocation-agent.md
-│   ├── finyx-projection-agent.md
-│   ├── finyx-insurance-calc-agent.md
-│   ├── finyx-insurance-research-agent.md
-│   ├── finyx-analyzer-agent.md
-│   ├── finyx-location-scout.md
-│   └── finyx-reporter-agent.md
-├── commands/
-│   └── (optional thin /finyx:* triggers — skills with argument-hint cover this)
-├── bin/install.js               # Legacy npm fallback, keep working
-└── package.json                 # npm distribution preserved
-```
-
----
-
-## Key Design Decisions
-
-### Agents in plugin root `agents/` vs skill-local agents
-
-The plugin system supports both. No evidence from real installed plugins (skill-creator, feature-dev) that skill-scoped agent subdirectories are auto-discovered. All real-world examples put agents at the plugin root `agents/` directory. **Recommendation:** Put all Finyx agents at root `agents/`, not inside skill subdirectories.
-
-### Shared profile access
-
-Skills have no formal dependency declaration. Each skill must independently handle profile loading via instructions in SKILL.md ("Read `.finyx/profile.json` at session start"). Convention-based, not enforced by the plugin system.
-
-### Reference doc deduplication
-
-Tax rules used by both `finyx-tax` and `finyx-insights`: duplicate in each skill's `references/`. No shared library mechanism in the plugin system. Since they're Markdown files loaded on demand, duplication is acceptable — keep per-skill copies.
-
-### commands/ vs skills/ for slash commands
-
-`commands/*.md` is now officially documented as "legacy" by Anthropic. Both load identically. For new slash commands in Finyx v2.0, use `skills/<name>/SKILL.md` with `argument-hint` and `allowed-tools` frontmatter. The `/finyx:*` naming works from skill `name` field using colon namespace.
-
-### npm + plugin dual distribution
-
-Fully supported simultaneously. Keep `bin/install.js` and `package.json`. Add `.claude-plugin/plugin.json`. Users who installed via npm continue to work. Plugin system users get auto-updates. No migration script needed — they coexist.
+| Dimension | v1.2 State | v2.1 Change | Verdict |
+|-----------|------------|-------------|---------|
+| Reference docs | 1 (health-insurance.md) | +11 type docs | Linear growth, manageable |
+| Agents | 2 | +1 generic type-research agent | Flat — one agent covers all 11 types |
+| Profile schema | No insurance block | Add `insurance.policies[]` array | Single backward-compatible addition |
+| PDF parsing | Not implemented | Native `Read` tool, no OCR | No new tooling needed |
+| WebSearch pattern | PKV-specific | Parameterized by type | Same pattern, different inputs |
+| Command complexity | 1 workflow (PKV/GKV) | +type dispatch phase | Still one command file |
+| Annual maintenance | 1 doc per tax year | 12 docs per tax year | ~12× more maintenance burden — mitigated by annual batch update pattern |
 
 ---
 
 ## Sources
 
-All findings are HIGH confidence — verified from files on disk:
-
-- `~/.claude/plugins/marketplaces/claude-plugins-official/plugins/example-plugin/` — Canonical example (Anthropic)
-- `~/.claude/plugins/marketplaces/claude-plugins-official/plugins/plugin-dev/skills/plugin-structure/references/manifest-reference.md` — Complete manifest reference
-- `~/.claude/plugins/cache/claude-plugins-official/skill-creator/unknown/skills/skill-creator/SKILL.md` — Skill anatomy documentation
-- `~/.claude/plugins/marketplaces/claude-plugins-official/README.md` — Marketplace install commands, submission URL (`https://clau.de/plugin-directory-submission`)
-- `~/.claude/skills/fin-advisor/SKILL.md`, `fin-tax/SKILL.md` — Locally installed skill prototypes
-- `~/.claude/plugins/cache/claudes-kitchen/workflows/0cbdc25041ed/skills/github-recipe/SKILL.md` — Real-world skill with extended frontmatter fields
-- `~/.claude/plugins/marketplaces/claude-plugins-official/plugins/feature-dev/agents/code-reviewer.md` — Agent frontmatter reference
-- `~/.claude/plugins/installed_plugins.json` — Install state schema
-- `~/.claude/plugins/known_marketplaces.json` — Marketplace source schema
+- Stiftung Warentest Rechtsschutz (Oct 2025, 84 packages, 31 insurers): https://www.test.de/Rechtsschutzversicherung-im-Vergleich-4776988-0/
+- Stiftung Warentest Haftpflicht (400+ tariffs): https://www.test.de/Vergleich-Haftpflichtversicherung-4775777-0/
+- Finanztip Risikolebensversicherung (Summer 2025 analysis): https://www.finanztip.de/risikolebensversicherung/
+- Finanztip Hausratversicherung: https://www.finanztip.de/hausratversicherung/
+- EuroKaution Mietkautionsversicherung (4.7% benchmark): https://www.eurokaution.de/mietkautionsversicherung/
+- Mietkautionskonto.info benchmark (4.5–5%): https://mietkautionskonto.info/mietkautionsbuergschaft/
+- ADAC Kfz SF-Klassen (Verivox 2026): https://www.verivox.de/kfz-versicherung/schadenfreiheitsklasse/
+- Check24 Reiseversicherung (300+ tariffs): https://www.check24.de/reiseversicherung/
+- GDV Hausrat 650 EUR/m² standard: corroborated by Allianz, Verivox, Finanztip
+- Franke und Bornberg PHV rating 2025: https://www.franke-bornberg.de/fb-news/pressemitteilungen/private-haftpflichtversicherung-rating-2025
+- §551 BGB (Mietkaution cap): German Civil Code — authoritative
+- §6 SGB V (PKV eligibility), §10 EStG (deduction): existing health-insurance.md references preserved

@@ -1,217 +1,345 @@
-# Domain Pitfalls: Plugin Migration
+# Domain Pitfalls: Comprehensive Insurance Advisor (v2.1)
 
-**Domain:** Migrating Finyx (17 commands, 8 agents) from npm/standalone to Claude Code plugin system
+**Domain:** German insurance comparison/advisory CLI tool covering all major insurance types
 **Researched:** 2026-04-12
-**Confidence:** HIGH (official docs + verified issue reports + community post-mortems)
+**Confidence:** HIGH (verified with official German law sources, BaFin, and domain-specific documentation)
 
 ---
 
 ## Critical Pitfalls
 
-### Pitfall 1: `@~/.claude/` Path References Break Completely in Plugin Context
+### Pitfall 1: Crossing the §34d GewO Legal Boundary — Unlicensed Vermittlung
 
 **What goes wrong:**
-Every Finyx command uses absolute `@~/.claude/finyx/references/...` includes in `<execution_context>` blocks. Inside a plugin skill, Claude Code resolves supporting files relative to `${CLAUDE_SKILL_DIR}`, not `~/.claude/`. The `@~/.claude/` paths resolve to nothing — skills silently lose all reference doc context and operate without tax rules, methodology, or disclaimer files.
+Finyx gives a specific recommendation like "Switch from Allianz Hausrat tariff X to HUK tariff Y — you save €84/year and get better coverage." Under §34d GewO, this constitutes Versicherungsvermittlung (insurance distribution), which requires an IHK-issued license. Giving personalized switch-to-specific-product recommendations without that license is a regulatory violation.
 
 **Why it happens:**
-The npm installer physically copies files into `~/.claude/` and the commands encode that install-time path. The plugin system never touches `~/.claude/finyx/` — it provides `${CLAUDE_SKILL_DIR}` as the canonical self-referencing path.
+The line between "advisory" and "distribution" is not where most developers expect. Explaining *that* a user is over-insured = advisory. Recommending *which specific competing tariff* to sign up for = distribution. The Insurance Distribution Directive (IDD) applies to automated tools: EIOPA Q&A 3407 (August 2025) formally asked the European Commission whether AI chatbots fall under IDD — the answer is "likely yes" for product-specific switching recommendations.
 
 **Consequences:**
-Skills appear to work but give advice without loaded reference docs. Tax calculations run without `tax-investment.md`. Insurance comparisons run without `health-insurance.md`. No error is raised — the model just answers from training data with HIGH confidence.
+Regulatory violation of §34d GewO. As an open-source tool, liability rests with the user but the reputational risk of shipping a tool that crosses this line is significant. BaFin can issue cease-and-desist orders.
 
 **Prevention:**
-Replace every `@~/.claude/finyx/references/...` include with `${CLAUDE_SKILL_DIR}/references/...` during migration. Each skill must carry its own copy of the reference docs it needs. Verify with a post-migration smoke test: ask a question that should cite a specific rule from a reference doc, confirm the cited rule is present in that skill's directory.
+- Finyx must never recommend a specific tariff or provider for a new contract. Frame outputs as: "Based on Stiftung Warentest ratings and your profile, tariffs with these characteristics tend to score well. Use Check24/Verivox to get actual quotes."
+- Use "class of product" recommendations: "Vollkasko is likely not cost-effective for your 12-year-old Volkswagen" is advisory. "Switch to ADAC Teilkasko" is distribution.
+- Every output block must include: "This is educational analysis, not an insurance recommendation. Finyx is not a registered Versicherungsvermittler."
+- The boundary: recommend *criteria* and *coverage characteristics*, not *specific products* or *providers*.
 
 **Detection:**
-After migration, run each skill and ask it to "quote the source rule you used." If it cannot cite a specific rule from a reference file, the include is broken.
+Review every output that includes a provider name or tariff name. If it says "sign up for X" or "cancel Y and get Z" — rewrite to "tariffs with these features exist at providers like X, verify current terms directly."
 
 ---
 
-### Pitfall 2: `profile.json` Relative Path Breaks for Standalone Skill Installs
+### Pitfall 2: Stale Reference Data Presented as Current Pricing
 
 **What goes wrong:**
-All 17 commands resolve `.finyx/profile.json` as a relative path — meaning the file must exist in the user's current working directory. When skills are installed individually (e.g., only `finyx-tax` installed without `finyx-profile`), and when users run skills from directories that are not their financial project root, the profile check `[ -f .finyx/profile.json ]` fails with a confusing error, or worse — it succeeds against a different project's profile in an ancestor directory.
+The agent does web research to find Kfz insurance pricing, PKV tariffs, or Hausrat premiums, then presents these in an output that users treat as current quotes. Prices are highly individual (location, vehicle, health history, SF-Klasse) and change frequently. Reference doc authors update annually but Check24 rates update in real-time. An agent that says "expect around €180/year for Haftpflicht in Munich" is training-data hallucination dressed as research.
 
 **Why it happens:**
-The npm distribution assumes single-context install: all commands live under one roof and the user always runs from their financial project. Individual skill installation breaks this assumption.
+WebSearch returns articles, not live quotes. Insurance pricing is parametric — the same tariff costs €90 for one person and €310 for another. No web search returns a user-specific price.
 
 **Consequences:**
-Skill fails silently or uses wrong profile. `finyx-tax` installed standalone has no way to depend on `finyx-profile` being present. Users who install only `finyx-insurance` get a hard error on first run.
+Users make cancellation decisions based on stale estimates, then find actual quotes are 40–60% different. Particularly dangerous for PKV where health history affects pricing dramatically.
 
 **Prevention:**
-1. Document that `finyx-profile` is a prerequisite and list it as a `dependencies` entry in `plugin.json` if the spec supports it.
-2. Add a fallback resolution path in each skill: check `./finyx/profile.json`, then `~/.finyx/profile.json` (global profile location).
-3. Provide a clear user-facing error: "No profile found at `.finyx/profile.json`. Run `/finyx:profile` first, or check that you are in your Finyx project directory."
-4. Consider making `~/.finyx/profile.json` the canonical location so it works regardless of working directory.
+- Never output a specific euro price for any insurance as a quote. Output price *ranges* from authoritative sources (Stiftung Warentest, Finanztip) with explicit "verify with provider" instructions.
+- Add explicit staleness framing: "Stiftung Warentest 2024 data shows Haftpflicht tariffs range €45–€180/year for singles — get your personal quote from Check24."
+- Reference doc headers must include `last_updated` and `data_source` fields. Agents emit a staleness warning if `last_updated` is > 12 months.
 
 **Detection:**
-Test each skill in isolation from a directory that does NOT contain `.finyx/profile.json`. The skill should fail with a clear actionable message, not a silent wrong-data scenario.
+Any output containing a specific price without a "get your own quote" disclaimer is a failure. Any output citing a specific premium without a date range is a failure.
 
 ---
 
-### Pitfall 3: Skill Description Over-Triggering — Finance Terms Are Too Common
+### Pitfall 3: Comparing Incomparable Coverage Tiers
 
 **What goes wrong:**
-Skill descriptions like "German and Brazilian investment tax guidance" or "portfolio analysis and ETF recommendations" contain terms (`tax`, `investment`, `portfolio`) that appear in general conversations. Claude auto-triggers `finyx-tax` when a user asks an unrelated question mentioning "tax situation" in passing, or triggers `finyx-invest` when discussing a hypothetical investment in a tech project context.
+The agent compares two Hausrat tariffs on price without accounting for coverage tier differences: one tariff is "Basis" (no Fahrraddiebstahl, no grobe Fahrlässigkeit coverage), the other is "Komfort" (full coverage). The price difference looks like savings but is actually a coverage downgrade. The user switches and discovers the gap after a claim.
 
 **Why it happens:**
-Claude's auto-invocation uses description matching, not intent classification. Financial vocabulary is ubiquitous and high-frequency. With 8 skills all covering finance-adjacent language, the combined description surface area is enormous.
+Coverage tier comparison requires structured analysis of AVB (Allgemeine Versicherungsbedingungen) clauses. Web search returns marketing pages, not AVB comparison. Agents default to price-first framing.
 
 **Consequences:**
-Users get unsolicited financial advice mid-conversation. Skills load full reference doc context (500+ tokens each) for unrelated tasks. Multiple skills trigger simultaneously on ambiguous prompts.
+User has a coverage gap they were not warned about. For Hausrat: grobe Fahrlässigkeit exclusion means insurance doesn't pay if the user forgot to lock a window. For Kfz: comparing Teilkasko to Vollkasko on price without flagging the coverage difference is misleading.
 
 **Prevention:**
-- Add `disable-model-invocation: true` to all Finyx skills. Finance advice is high-stakes; require explicit invocation via `/finyx:tax`, etc.
-- If auto-triggering is desired for some skills, prefix descriptions with explicit intent markers: "Use ONLY when the user explicitly asks for Finyx financial analysis of their..." and add `paths` glob patterns to restrict auto-triggering to `*.finyx` or `.finyx/` file contexts.
-- The official docs confirm: descriptions over 250 characters are truncated. Front-load the disambiguating qualifier in the first 60 characters.
+- Structure coverage comparison with explicit tier labels before price comparison.
+- For every insurance type, define the minimum coverage floor the agent must verify before price-comparing: Hausrat (grobe Fahrlässigkeit included?), Haftpflicht (Deckungssumme ≥ €50M for Personen?), Kfz (Haftpflicht limit, Kasko type, SF-Klasse compatibility).
+- Output format must show: Coverage Tier | Key Inclusions | Key Exclusions | Price Range — never just price.
 
 **Detection:**
-In a fresh session with all Finyx skills loaded, say "I'm thinking about the tax implications of this API design decision." Count how many Finyx skills trigger. Any trigger is a misfire.
+Any output that ranks tariffs by price without a coverage-comparison table first is a failure.
 
 ---
 
-### Pitfall 4: Agent Files Placed Inside `.claude-plugin/` Instead of Plugin Root
+### Pitfall 4: Missing Kündigungsfristen — User Misses the Cancellation Deadline
 
 **What goes wrong:**
-The official docs state: "Don't put `commands/`, `agents/`, `skills/`, or `hooks/` inside the `.claude-plugin/` directory. Only `plugin.json` goes inside `.claude-plugin/`." Migrators frequently put agent files under `.claude-plugin/agents/` by analogy with other config-bundle patterns. These agents silently fail to load.
+User asks about switching Kfz insurance. Agent gives a correct recommendation but does not flag that the Kündigungsfrist for annual contracts is **November 30** (one month before December 31 renewal) and it is already November 15. User misses the window and is locked in for another year.
 
 **Why it happens:**
-The `.claude-plugin/` directory name suggests it is the plugin config container, implying other plugin files belong there too. The actual convention is the opposite — only the manifest lives in `.claude-plugin/`.
+Kündigungsfristen are contract-specific and insurance-type-specific. The agent knows the general rule but does not apply it to the user's specific situation with a date-aware urgency check.
 
 **Consequences:**
-Agents are not discoverable. Skills that delegate to `finyx-tax-scoring-agent` or `finyx-insurance-calc-agent` via `Task` tool get "agent not found" errors at runtime.
+User is locked into a worse or more expensive contract for 12 months. Particularly painful for Kfz (locked until next November 30) and multi-year household contracts.
 
 **Prevention:**
-Correct structure:
-```
-finyx-plugin/
-├── .claude-plugin/
-│   └── plugin.json          # manifest ONLY
-├── skills/
-│   └── finyx-tax/
-│       ├── SKILL.md
-│       ├── agents/
-│       │   └── finyx-tax-scoring-agent.md
-│       └── references/
-├── agents/                  # plugin-level agents
-└── ...
-```
-Run `claude plugin validate` after every structural change during migration.
+- For every insurance review that could lead to a switch, the agent must: (1) ask the user when their contract renews, (2) calculate Kündigungsfrist deadline, (3) emit a date-aware warning if within 6 weeks of deadline.
+- Reference doc `insurance-types.md` must include per-type standard Kündigungsfristen: Kfz (1 month before renewal, default Dec 31 = Nov 30), Hausrat/Haftpflicht (3 months), Lebensversicherung (varies — check contract).
+- Use `currentDate` from system context to compute urgency in all deadline calculations.
 
 **Detection:**
-`claude plugin validate` will not catch this (the directory is valid, just ignored). Test by running a skill that spawns an agent and verifying the agent actually executes.
+Run the agent on a "should I switch my Kfz?" prompt in November. If the output does not mention the November 30 deadline, it is broken.
 
 ---
 
-## Moderate Pitfalls
-
-### Pitfall 5: Marketplace Validator Schema Bugs Cause Silent Rejection
+### Pitfall 5: Ignoring Sonderkündigungsrecht — Missed Escape Windows
 
 **What goes wrong:**
-The `claude plugin validate` command has a documented bug (GitHub issue #38480, active March 2026): including `description` in `marketplace.json` causes a hard error ("Unrecognized key"), while omitting it produces a warning. Anthropic's own official `claude-plugins-official` marketplace fails its own validator. Additionally, `git-subdir` source type is not in the schema enum, causing any plugin using it to block the entire marketplace (issue #36651 — one invalid entry fails all 86+ plugins).
-
-**Prevention:**
-- Run `claude plugin validate` and treat warnings as errors — do not submit with any warnings.
-- For `marketplace.json`, omit top-level `description` (use `metadata.description` instead).
-- Use `"source": "git"` not `"source": "git-subdir"` for subdirectory references.
-- Use full HTTPS URLs (not `owner/repo` shorthand) in all source references.
-- Cross-reference against a plugin that is already successfully listed in `claude-plugins-official` before submitting.
-
----
-
-### Pitfall 6: Reference Doc Duplication Across Skills Creates Staleness Drift
-
-**What goes wrong:**
-`finyx/references/germany/tax-investment.md` is currently shared by `finyx-tax`, `finyx-insights`, and `finyx-pension` skills. In the plugin structure, each skill bundles its own copy. When a new tax year requires updating the doc, developers update `finyx-tax/references/germany/tax-investment.md` but forget `finyx-pension/references/germany/tax-investment.md`. The skills silently diverge.
+User recently received a premium increase notice from their insurer. They ask Finyx about their insurance costs. Finyx does not recognize that the premium increase triggered a Sonderkündigungsrecht, which gives them 1 month from notification to cancel and switch mid-contract. User does not know this window exists and waits until regular renewal.
 
 **Why it happens:**
-Plugin architecture forces per-skill isolation, but reference docs contain cross-cutting domain knowledge. There is no native deduplication mechanism.
+Sonderkündigungsrecht triggers are event-driven and require the agent to ask about recent insurer communications, not just current contract terms.
 
 **Consequences:**
-`finyx-pension` gives advice based on last year's Sparerpauschbetrag while `finyx-tax` uses the updated figure.
+User pays higher premiums for up to 11 months unnecessarily. The Sonderkündigungsrecht window (1 month from notification) is narrow and easy to miss.
+
+**Key Sonderkündigungsrecht triggers:**
+- Beitragserhöhung (premium increase) — 1 month after notification
+- After a claim settlement — 1 month after settlement
+- Vehicle sale (Kfz) — buyer can cancel seller's policy within 1 month
+- After a Schaden event — both insurer and insured can cancel
+- Moving abroad permanently — 3 months notice
 
 **Prevention:**
-- Keep shared reference docs in a `finyx-core` layer that skills reference via `${CLAUDE_SKILL_DIR}/../../references/shared/` (if directory traversal is permitted), OR
-- Maintain a single source of truth in the repo and use a build step (a simple `bin/sync-refs.js`) that copies shared docs into each skill's `references/` directory before plugin packaging.
-- Add a `tax_year` frontmatter field to every reference doc. Skills validate this at runtime: if `tax_year` < current year, emit a staleness warning in the output.
+- The insurance questionnaire must ask: "Have you received any premium increase notices or made any claims in the past 3 months?"
+- If yes → agent must evaluate Sonderkündigungsrecht eligibility and compute the remaining window.
+- Reference doc must enumerate all Sonderkündigungsrecht triggers per insurance type.
 
 ---
 
-### Pitfall 7: Skill Name Namespace Collision — `/finyx:tax` vs Plugin Namespace `/finyx:finyx-tax`
+## Critical: Kfz Insurance Type Pitfalls
+
+### Pitfall 6: Oversimplifying Vollkasko vs Teilkasko vs Haftpflicht
 
 **What goes wrong:**
-Plugin skills are automatically namespaced as `/plugin-name:skill-name`. If `plugin.json` names the plugin `finyx` and the skill directory is `finyx-tax`, the invocation becomes `/finyx:finyx-tax` — clunky and inconsistent with v1 muscle memory (`/finyx:tax`). If the skill directory is instead named `tax`, the command is `/finyx:tax` — correct, but the plugin-level agents directory must use unambiguous names to avoid shadowing.
+Agent recommends Teilkasko for a 3-year-old car "because Vollkasko isn't worth it for older cars." But the car has a Leasing or financing agreement requiring Vollkasko, or the user's high SF-Klasse means Vollkasko premium is lower than expected. Or the reverse: agent recommends Vollkasko for a 15-year-old car with low market value.
+
+**Coverage coverage boundaries (must be in reference doc):**
+- **Haftpflicht** (mandatory): Covers damage *you cause to others*. Does NOT cover damage to your own vehicle.
+- **Teilkasko** (optional add-on): Covers your vehicle from theft, wildlife collision (Wildunfall), fire, storm, hail, broken glass. Does NOT cover self-caused accidents or vandalism.
+- **Vollkasko** (optional add-on, superset of Teilkasko): Adds coverage for self-caused accidents AND vandalism. SF-Klasse applies to Vollkasko, not Teilkasko.
+
+**Common wrong recommendations:**
+- Recommending Teilkasko for a leased car (financing agreements often mandate Vollkasko)
+- Recommending dropping Vollkasko without checking SF-Klasse — at SF-50, Vollkasko can cost *less* than Teilkasko at SF-0
+- Not accounting for Selbstbeteiligung (deductible) when comparing costs
 
 **Prevention:**
-Name skill directories after the command suffix only: `tax/`, `invest/`, `insurance/`, not `finyx-tax/`. This produces `/finyx:tax`, `/finyx:invest`, etc. — preserving all existing user muscle memory.
-
-Verify each skill name: `ls skills/` should read `tax invest insurance broker pension profile insights realestate`.
+- Before recommending Kasko type, agent must ask: (1) Is the car leased/financed? (2) What is the car's current market value (Zeitwert)? (3) What SF-Klasse are you in?
+- Rule of thumb in reference doc: Vollkasko worth it if annual Vollkasko premium < 1/3 of car's Zeitwert.
+- Always note that Teilkasko has no SF-Klasse — this affects premium structure fundamentally.
 
 ---
 
-### Pitfall 8: `context: fork` Skills Lose Conversation History — Breaking Profile-Dependent Flows
+### Pitfall 7: Not Accounting for Schadenfreiheitsklasse (SF-Klasse) Complexity
 
 **What goes wrong:**
-Adding `context: fork` to skills that need `.finyx/profile.json` data is tempting (isolation, clean state). But forked subagents do not have access to conversation history. Any profile data passed conversationally ("my marginal tax rate is 42%") is invisible to the forked skill.
+Agent quotes premium estimates without factoring in SF-Klasse. A driver at SF-35 pays ~25% of the base rate. A new driver at SF-0 pays 100%+. A driver who just filed a claim dropped from SF-10 to SF-3 (insurer-specific downgrade table). Agent comparing premiums across providers without considering that SF-Klasse recognition varies between insurers is giving meaningless numbers.
+
+**SF-Klasse system facts (must be in reference doc):**
+- Range: SF-M (worst, <0), SF-S, SF-0, SF-½, SF-1 through SF-50
+- New drivers: SF-0 (or SF-½ after 3 years of license without a vehicle)
+- After claim: downgraded by insurer-specific table (e.g., SF-10 → SF-3 at some, SF-10 → SF-5 at others)
+- Rabattschutz: some tariffs protect SF-Klasse after first claim — but Rabattschutz at Insurer A is NOT recognized at Insurer B when switching
+- SF-Klasse is per-vehicle, per-coverage type (Haftpflicht and Vollkasko tracked separately)
+
+**Prevention:**
+- Reference doc must include standard SF-Klasse downgrade examples (with caveat that tables vary by insurer)
+- Agent must ask for current SF-Klasse before any Kfz premium analysis
+- Agent must warn: "If switching insurers, verify your SF-Klasse is transferable. Rabattschutz SF-Klassen may not be honored."
+- Never present SF-Klasse as transferable between providers without the Rabattschutz caveat
+
+**Detection:**
+Any Kfz output that includes a premium estimate without referencing SF-Klasse as an input variable is a failure.
+
+---
+
+## Per-Type Coverage Pitfalls
+
+### Pitfall 8: Hausrat — Unterversicherung and Versicherungssumme Miscalculation
+
+**What goes wrong:**
+Agent accepts the user's stated Hausrat Versicherungssumme (e.g., "€30,000") without checking whether it covers the actual Neuwert (replacement value) of their household contents. If the actual Neuwert is €50,000, the user has 40% Unterversicherung. After a total loss, the insurer only pays proportionally: €30k/€50k × claim = 60% of the actual loss.
+
+**Unterversicherung formula:**
+`Payout = (Versicherungssumme / Actual Neuwert) × Claim Amount`
+
+**Standard calculation rules:**
+- Rule of thumb: €650–€750/m² of living space
+- Modern household with electronics, furniture, clothing for a family of 3 in 80m² flat: ~€52,000–€60,000
+- Most users dramatically underestimate Neuwert (they think "what would I get at a garage sale," not "what does it cost to replace with new items")
+
+**Prevention:**
+- Agent must ask for flat size (m²) and calculate estimated Neuwert using standard per-m² rate
+- Flag if user's stated Versicherungssumme is >20% below the calculated estimate
+- Recommend Unterversicherungsverzicht tariffs (insurers waive the Unterversicherung check if the area-based formula is used)
+- Note: Neuwertentschädigung (replacement value, not depreciated value) is the standard — verify the tariff includes it
+
+---
+
+### Pitfall 9: Haftpflicht — Deckungssumme Far Below Recommended Minimum
+
+**What goes wrong:**
+User has an old Haftpflicht policy with a €5M Deckungssumme. This was standard 10 years ago but is now considered insufficient. A serious accident causing permanent disability can easily exceed €10M in lifetime compensation claims. Agent does not flag the inadequate coverage.
+
+**Current recommended minimums (HIGH confidence, Stiftung Warentest and Finanztip consistently recommend):**
+- Personenschäden: ≥ €15M (some recommend €50M)
+- Sachschäden: ≥ €5M
+- Vermögensschäden: ≥ €250,000
+
+**Prevention:**
+- Reference doc must include current recommended Deckungssummen for private Haftpflicht
+- Agent must always check Deckungssumme before assessing adequacy — never assume "has Haftpflicht = adequate"
+- Flag any Deckungssumme < €15M for Personenschäden as potentially inadequate
+
+---
+
+### Pitfall 10: Rechtsschutz — Wartezeit, Streitentstehung, and Family/Inheritance Exclusions
+
+**What goes wrong:**
+User buys Rechtsschutz today and expects coverage for a rental dispute they have been escalating for 2 weeks. Rechtsschutz has a standard 3-month Wartezeit for most coverage areas (employment law has 3 months, contract disputes 3 months). The dispute started before contract conclusion — it is excluded permanently regardless of when the policy starts.
+
+**Wartezeiten by coverage area:**
+- Verkehrsrechtsschutz: no waiting period (traffic)
+- Privatrechtsschutz (contract, neighbor): 3 months
+- Berufsrechtsschutz / Arbeitsrecht: 3–6 months (insurer-dependent)
+- Straf-Rechtsschutz: typically no waiting period
+
+**Blanket exclusions (do NOT suggest Rechtsschutz covers these):**
+- Family law (divorce, custody, Unterhalt)
+- Inheritance disputes (Erbstreitigkeiten)
+- Investment / speculation disputes
+- Intentional criminal acts
+- Disputes about construction contracts (varies — some tariffs include)
+
+**The Deckungsprozess trap:** When the insurer disputes whether a claim is covered, the insured must potentially sue their own insurer to get coverage. This is a known risk and should be mentioned.
+
+**Prevention:**
+- Reference doc must enumerate Wartezeiten and exclusions per Rechtsschutz coverage module
+- Agent must ask: "Do you have any pending or ongoing legal disputes?" If yes → warn that new Rechtsschutz will not cover pre-existing disputes
+- Never recommend Rechtsschutz as a solution to an existing dispute
+
+---
+
+### Pitfall 11: Zahnzusatz — Pre-existing Treatment Plans Are Excluded
+
+**What goes wrong:**
+User asks about Zahnzusatz. Their dentist has already recommended a crown (Zahnersatz). User buys a Zahnzusatz policy. The treatment is excluded because it was "planned or recommended before contract start," even though they have not started it yet. Policies without Wartezeit still exclude pre-existing treatment plans.
+
+**Key Zahnzusatz traps:**
+- Standard Wartezeiten: 3 months (Behandlung), 8 months (Zahnersatz) — though "ohne Wartezeit" tariffs exist
+- "Ohne Wartezeit" ≠ "no exclusions": pre-planned treatments are always excluded regardless of waiting period
+- Missing teeth at contract start are typically excluded (especially >4 missing teeth)
+- Health questionnaire answers must be truthful — misrepresentation voids the contract retroactively
+- Annual benefit caps (Jahreshöchstleistung) vary enormously: €500–€5,000/year — must compare absolute amounts, not percentages
+
+**Prevention:**
+- Agent must ask: "Has your dentist recommended any treatments in the past 12 months that have not been completed?"
+- If yes → warn that this treatment will be excluded from most Zahnzusatz policies regardless of Wartezeit
+- Reference doc must document Jahreshöchstleistung comparison approach (not just reimbursement percentage)
+
+---
+
+### Pitfall 12: BU (Berufsunfähigkeitsversicherung) — Abstrakte vs Konkrete Verweisung
+
+**What goes wrong:**
+Agent compares BU policies without checking for the abstrakte Verweisung clause. If the policy includes abstract referral rights, the insurer can deny benefits because the insured *could theoretically* work in another profession — even if they never do. A software engineer who becomes unable to code can be denied because they could theoretically work as a hardware store cashier.
+
+**The single most important BU quality indicator:**
+"Verzicht auf abstrakte Verweisung" (waiver of abstract referral) — any BU policy that does not include this clause is considered substandard by every independent German rating (Stiftung Warentest, Finanztip, map-report).
+
+**Other BU pitfalls:**
+- Gesundheitsfragen must be answered with full disclosure — any omission can void the contract at claim time (even innocent omissions)
+- BU is age and health sensitive: premiums rise sharply with age and deteriorating health; deferring purchase is costly
+- Mental health is the leading BU claim cause in Germany — verify the tariff covers Burnout and depression without additional exclusions
+
+**Prevention:**
+- Reference doc must flag "Verzicht auf abstrakte Verweisung" as non-negotiable requirement
+- Agent must include this check in any BU assessment
+- Never recommend BU tariffs that include abstrakte Verweisung
+
+---
+
+### Pitfall 13: Kfz — Confusing Risikolebensversicherung with Kapitallebensversicherung Rückkaufswert
+
+**What goes wrong:**
+User asks about canceling their Lebensversicherung. Agent advises cancellation, mentioning Rückkaufswert. But the user has a Risikolebensversicherung (term life), not a Kapitallebensversicherung (whole life with savings component). Risikolebens has NO Rückkaufswert — canceling it simply ends coverage with zero payout.
+
+**Key distinction:**
+- **Risikolebensversicherung**: Pure death benefit, no savings component, no Rückkaufswert. Canceling = losing coverage, no money returned.
+- **Kapitallebensversicherung**: Combined death benefit + savings (Sparanteil). Has Rückkaufswert. Canceling early is typically a bad deal (high agent commissions front-loaded, early surrender penalty). Alternative: Beitragsfreistellung (freeze contributions, preserve reduced death benefit).
+
+**Prevention:**
+- Agent must ask for the policy type before mentioning Rückkaufswert
+- For Kapitallebens: always present Beitragsfreistellung as an alternative to full cancellation
+- Reference doc must clearly separate these two insurance types
+
+---
+
+## Document Parsing Pitfalls
+
+### Pitfall 14: Versicherungsschein Field Extraction — Wrong Fields from German PDFs
+
+**What goes wrong:**
+Agent parses a Versicherungsschein PDF and extracts incorrect values because:
+- German PDFs use `.` as thousands separator and `,` as decimal separator — "1.250,00 €" is twelve hundred fifty euros, not 1.250 euros
+- The Beitrag (premium) field may appear as annual (Jahresbeitrag), monthly (Monatsbeitrag), or quarterly — agent extracts the number without the period indicator
+- "Versicherungssumme" and "Haftungssumme" appear near each other with different values; extracting the wrong one gives a 10× error
+- Scanned PDFs with stamps or watermarks over key fields cause OCR to return garbage or skip the field entirely
+
+**German-specific parsing rules that must be in the parsing logic:**
+- Number format: always normalize "1.250,50" → 1250.50 before any arithmetic
+- Always extract the period indicator (jährlich/monatlich/vierteljährlich) alongside the premium amount
+- Verify extracted Deckungssumme is plausible for the insurance type (Haftpflicht: typically €5M–€50M, not €5,000)
+- For scanned documents: treat any field where the confidence is low as "NOT FOUND" rather than a wrong value — ask user to confirm
+
+**Prevention:**
+- All document parsing must include explicit German number format normalization
+- Extract period indicator as a required field alongside every monetary amount
+- Include sanity checks: Haftpflicht premium < €500/year, Deckungssumme > €1M — flag anomalies for user confirmation
+- Never propagate a parsed value into calculations without showing the user: "I parsed [field] as [value] — please confirm"
+
+---
+
+## Provider Research Pitfalls
+
+### Pitfall 15: Check24 / Verivox Affiliate Bias in Source Prioritization
+
+**What goes wrong:**
+Agent uses Check24 or Verivox as the primary source for provider comparisons. These platforms are registered insurance brokers (Versicherungsmakler) that earn commissions on referrals. Providers who pay higher commissions rank better. Some quality providers (e.g., DEVK, Huk-Coburg direct) do not list on Check24 at all because they don't pay commissions. The agent presents a commission-biased subset as a comprehensive market view.
 
 **Why it happens:**
-`context: fork` is designed for self-contained tasks. Finance skills are stateful — they need profile context that may have been established earlier in the session.
+Check24 is the most visible and scraped source for German insurance pricing. It appears comprehensive but covers ~60–70% of the market.
 
 **Consequences:**
-Forked `finyx-tax` skill asks the user for their tax rate even though they provided it two turns ago. Profile pre-flight checks that rely on conversational context fail.
+Systematically missing some of the best-value providers. The user is steered toward commission-paying providers, not necessarily the best ones.
 
 **Prevention:**
-Do NOT use `context: fork` for any skill that reads from `.finyx/profile.json` or depends on session-established context. Use inline execution (default) for all Finyx advisory skills. Reserve `context: fork` only for pure-research tasks (e.g., a web-search-only provider research sub-task).
+- Source priority hierarchy in agent prompt: (1) Stiftung Warentest ratings (independent, subscription-funded), (2) Finanztip recommendations (no affiliate revenue model), (3) ADAC ratings for Kfz, (4) Check24/Verivox as quote-getting tools only, not ranking tools
+- Always note when citing Check24: "Check24 does not list all providers — check Stiftung Warentest for providers not on portals"
+- Never present a Check24 ranking as a neutral market ranking
 
 ---
 
-### Pitfall 9: Skill Content Survives Compaction With Only First 5,000 Tokens
+### Pitfall 16: Ignoring Provider Stability — Insolvency Risk for Long-Duration Contracts
 
 **What goes wrong:**
-When context fills and auto-compaction runs, each invoked skill is re-attached with a cap of 5,000 tokens. Skills longer than this are silently truncated. `finyx-insurance/SKILL.md` is already large — it includes the 25-flag questionnaire logic, 3-tier risk model, and PKV/GKV comparison methodology. If it exceeds 5,000 tokens, the tail of the skill (e.g., the cross-advisor integration section) silently disappears mid-session.
+For long-duration contracts (BU, Lebensversicherung, PKV), agent recommends a smaller/newer provider because they currently offer the best premium. PKV and BU are 20–40 year commitments. A provider that cannot be taken over by a healthier insurer or faces financial difficulty can raise premiums drastically or transfer policies to Protektor (the German insurance rescue fund, which reduces benefits).
 
 **Prevention:**
-- Keep each `SKILL.md` under 500 lines (per official guidance) and under 4,000 tokens.
-- Move detailed reference content to supporting files (`references/pkv-methodology.md`) and reference them from `SKILL.md` with explicit load instructions.
-- Test long sessions: run the full insurance skill flow for 10+ turns and verify behavior is consistent in the final turns.
-
----
-
-## Minor Pitfalls
-
-### Pitfall 10: `bin/install.js` Backward Compatibility — npm Users Get Orphaned
-
-**What goes wrong:**
-Users who installed via `npx finyx-cc` have files at `~/.claude/commands/finyx/` and `~/.claude/agents/`. After migrating to the plugin, they install `/plugin install finyx`. Both versions coexist silently. The npm-installed commands take precedence over the plugin-namespaced skills (standalone > plugin for same-name items). Users keep using the old `/finyx:tax` command path, which does not benefit from plugin updates.
-
-**Prevention:**
-Update `bin/install.js` to detect plugin installation and warn: "A plugin version of Finyx is installed. Your npm-installed commands may shadow it. Run `npx finyx-cc --uninstall` to migrate cleanly."
-
-Document the migration path explicitly in README: uninstall npm version first, then install plugin.
-
----
-
-### Pitfall 11: `allowed-tools` Must Be Exhaustive Per Skill — Not Inherited
-
-**What goes wrong:**
-In the command architecture, `allowed-tools` in frontmatter is an allowlist and works at the command level. In the plugin skill system, each skill's `allowed-tools` grants pre-approved tools for that skill only. Skills that spawn agents via `Task` need `Task` in their `allowed-tools`. Forgetting `Task` in a skill that delegates to `finyx-tax-scoring-agent` causes a permission prompt every invocation.
-
-**Prevention:**
-Audit every skill that uses sub-agents and verify `Task` is in its `allowed-tools`. Finyx skills that need it: `finyx-insights` (spawns 3 agents), `finyx-insurance` (spawns calc + research agents), `finyx-tax` (spawns tax-scoring agent).
-
----
-
-### Pitfall 12: `user-invocable: false` vs `disable-model-invocation: true` Confusion
-
-**What goes wrong:**
-These two flags sound similar but control different things:
-- `disable-model-invocation: true` — removes skill from Claude's context entirely; Claude cannot auto-trigger it
-- `user-invocable: false` — hides from `/` menu; Claude CAN still auto-trigger it
-
-Using `user-invocable: false` thinking it prevents auto-triggering (the actual goal for high-stakes finance skills) while Claude continues to auto-invoke the skill.
-
-**Prevention:**
-For all Finyx advisory skills where auto-trigger is unwanted: use `disable-model-invocation: true`, not `user-invocable: false`. These skills should remain user-invocable (they need `/finyx:tax` to work), so never set `user-invocable: false`.
+- For PKV, BU, and Risikolebens: reference doc must note that financial stability (BaFin-rated solvency, AM Best rating) is a selection criterion for long-term contracts
+- Agent must note: "For long-term contracts like BU and PKV, prefer established large providers (Allianz, AXA, Debeka, Continentale) over price-optimized newer entrants — claims may be decades away"
 
 ---
 
@@ -219,50 +347,31 @@ For all Finyx advisory skills where auto-trigger is unwanted: use `disable-model
 
 | Phase Topic | Likely Pitfall | Mitigation |
 |-------------|----------------|------------|
-| Plugin manifest creation | `description` field in `marketplace.json` causes validator rejection | Omit top-level description; use `metadata.description` |
-| Skill directory naming | Double-prefixed names like `/finyx:finyx-tax` | Name directories `tax/`, `invest/`, not `finyx-tax/` |
-| `finyx-profile` skill (foundation) | profile.json relative path breaks outside project dir | Add `~/.finyx/profile.json` fallback resolution |
-| `finyx-tax` pilot conversion | `@~/.claude/` includes silently break | Replace all absolute `@` paths with `${CLAUDE_SKILL_DIR}/references/...` |
-| Agent redistribution | Agents placed inside `.claude-plugin/` | All agents at plugin root or inside skill `agents/` subdirectory |
-| `finyx-insights` (last, cross-cutting) | Reference doc drift across 3+ skills using same tax docs | Build step to sync shared docs before packaging |
-| Auto-trigger behavior | Finance terms over-trigger on unrelated queries | Set `disable-model-invocation: true` on all advisory skills |
-| Backward compatibility | npm-installed commands shadow plugin skills | Update installer to detect and warn; document migration path |
-| Marketplace submission | Single invalid entry blocks all plugins | `claude plugin validate` with zero warnings before submit |
-| Long-session use | Skills truncated to 5k tokens after compaction | Keep SKILL.md under 500 lines; move detail to supporting files |
-
----
-
-## Testing Approach
-
-### Local Pre-Submission Checklist
-
-1. **Structural validation:** `claude plugin validate` — zero warnings, zero errors.
-2. **Path resolution test:** In each skill, include a sentence that should be quoted from a reference doc. Verify Claude cites a rule from the bundled file, not from training data.
-3. **Profile isolation test:** Run each skill from a directory without `.finyx/profile.json`. Verify a clear, actionable error message appears.
-4. **Auto-trigger test:** With all skills loaded, start a fresh session. Mention finance terms in a non-Finyx context. Verify no skills auto-trigger.
-5. **Namespace test:** Verify all commands invoke as `/finyx:tax`, `/finyx:invest` etc. — not `/finyx:finyx-tax`.
-6. **Agent delegation test:** Run skills that spawn agents (`insights`, `insurance`, `tax`). Verify agents load and execute without permission prompts for pre-approved tools.
-7. **Compaction test:** Run `finyx-insurance` through the full 25-question flow + comparison output (~10+ turns). Verify behavior in final turns matches behavior in early turns.
-8. **Backward compat test:** Install both npm and plugin versions. Verify the correct version wins and the installer warns about the conflict.
-
-### Local Plugin Loading
-
-```bash
-# Test plugin during development without installing
-claude --plugin-dir ./finyx-plugin
-
-# Reload without restarting (after editing skills)
-/reload-plugins
-```
+| Insurance portfolio schema | Missing Versicherungsperiode (annual vs monthly) on every entry | Store as separate field, never derive from premium amount alone |
+| Policy document parsing | German number format (1.250,00 €) parsed as 1.25 | Normalize before arithmetic; extract period indicator |
+| Kfz analysis | SF-Klasse not captured, premium estimates meaningless | Add SF-Klasse to questionnaire as required field |
+| Hausrat analysis | Unterversicherung not detected | Calculate Neuwert from m² and flag if stated sum is <80% of estimate |
+| Rechtsschutz assessment | Recommending for active dispute | Always ask about pending disputes; warn about Wartezeit |
+| Zahnzusatz | Pre-planned treatments excluded regardless of Wartezeit | Ask for recent dental treatment plans before recommending |
+| BU assessment | Abstrakte Verweisung in tariff not flagged | Non-negotiable filter in any BU comparison |
+| Provider research | Check24 presented as neutral market view | Always lead with Stiftung Warentest; present portals as quote tools only |
+| Switch recommendations | Specific tariff recommendation = unlicensed Vermittlung | Recommend criteria and characteristics, never specific products |
+| Cancellation advice | Missing Sonderkündigungsrecht trigger | Always ask about recent premium increases and claims |
+| All outputs | Price quotes presented as current actuals | All prices must include vintage date and "verify with provider" |
 
 ---
 
 ## Sources
 
-- [Claude Code Skills docs](https://code.claude.com/docs/en/skills) — frontmatter reference, invocation control, compaction behavior (HIGH confidence)
-- [Claude Code Plugins docs](https://code.claude.com/docs/en/plugins) — structure, migration steps, submission (HIGH confidence)
-- [GitHub issue #38480](https://github.com/anthropics/claude-code/issues/38480) — description field validator bug (HIGH confidence, verified against official repo)
-- [GitHub issue #36651](https://github.com/anthropics/claude-code/issues/36651) — all-or-nothing marketplace schema rejection (HIGH confidence, verified against official repo)
-- [Scott Spence: Skills don't auto-activate](https://scottspence.com/posts/claude-code-skills-dont-auto-activate) — 50/50 activation rate with passive descriptions (MEDIUM confidence, community)
-- [Scott Spence: Reliable activation techniques](https://scottspence.com/posts/how-to-make-claude-code-skills-activate-reliably) — forced eval hook, 84% success rate (MEDIUM confidence, community)
-- [MindStudio: Common skill mistakes](https://www.mindstudio.ai/blog/claude-code-skills-common-mistakes-guide) — monolithic files, context bloat (MEDIUM confidence, community)
+- [§34d GewO — official text](https://www.gesetze-im-internet.de/gewo/__34d.html) — Erlaubnispflicht for Versicherungsvermittler/Versicherungsberater (HIGH confidence)
+- [BaFin — terminating insurance contracts](https://www.bafin.de/EN/Verbraucher/Versicherung/VertraegeKuendigen/vertraege_kuendigen_node_en.html) — Kündigungsfristen and Sonderkündigungsrecht (HIGH confidence)
+- [ADAC — Sonderkündigungsrecht Kfz](https://www.adac.de/produkte/versicherungen/ratgeber/kfz-versicherung-sonderkuendigungsrecht/) — Kfz-specific special termination rights (HIGH confidence)
+- [ADAC — Schadenfreiheitsklasse](https://www.adac.de/rund-ums-fahrzeug/auto-kaufen-verkaufen/versicherung/schadenfreiheitsklasse/) — SF-Klasse system and Rabattschutz behavior (HIGH confidence)
+- [ADAC — Haftpflicht vs Teilkasko vs Vollkasko](https://www.adac.de/produkte/versicherungen/ratgeber/haftpflicht-teilkasko-vollkasko/) — coverage boundary definitions (HIGH confidence)
+- [Finanztip — Unterversicherungsverzicht](https://www.finanztip.de/hausratversicherung/unterversicherungsverzicht/) — Hausrat Unterversicherung mechanics (HIGH confidence)
+- [BU-Portal24 — abstrakte Verweisung](https://www.bu-portal24.de/abstrakte-verweisung.html) — BU abstrakte vs konkrete Verweisung explained (HIGH confidence)
+- [insurtech4good — Is ChatGPT an IDD distributor?](https://www.insurtech4good.com/blog/is-chatgpt-an-insurance-distributor-in-the-eu/) — IDD scope for AI tools, EIOPA Q&A 3407 (MEDIUM confidence — regulatory interpretation)
+- [EIOPA — Third IDD Report 2026](https://www.eiopa.europa.eu/eiopa-publishes-third-report-application-insurance-distribution-directive-2026-03-30_en) — Current regulatory thinking on AI in distribution (HIGH confidence)
+- [rombey.capital — Insurance broker vs online portal](https://rombey.capital/en/insurance-broker-vs-online-comparison-portal-which-is-better-for-you/) — Check24/Verivox commission model and coverage gaps (MEDIUM confidence)
+- [Finanztip — Teilkasko vs Vollkasko](https://www.finanztip.de/kfz-versicherung/teilkasko-vollkasko/) — vehicle value threshold for Vollkasko (HIGH confidence)
+- [zahnzusatzversicherungen-vergleich.com — Wartezeit](https://www.zahnzusatzversicherungen-vergleich.com/vertragsdetails/wartezeit/) — Zahnzusatz waiting periods and pre-existing exclusions (MEDIUM confidence)

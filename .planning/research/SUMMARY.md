@@ -1,49 +1,53 @@
-# Research Summary — v2.0 Plugin Architecture
+# Research Summary — v2.1 Comprehensive Insurance Advisor
 
 **Researched:** 2026-04-12
-**Confidence:** HIGH (verified from actual installed plugins on disk)
+**Confidence:** MEDIUM-HIGH
 
 ## Executive Summary
 
-Finyx v2.0 migrates from npm-only slash-command distribution to the Claude Code plugin system. The plugin format is minimal (`plugin.json` + `skills/` + `agents/`), the marketplace is live, and the migration is mostly structural — rewriting frontmatter and path references, not logic. The highest-risk step is replacing all `@~/.claude/finyx/references/` includes with `${CLAUDE_SKILL_DIR}/references/`.
+Finyx v2.1 expands the insurance skill from health-only to all major German insurance types. Router pattern in SKILL.md dispatches to per-type sub-skill prompts. One generic research agent (parameterized by type) + one new portfolio agent + one new doc-reader agent. 11 per-type reference docs. Legal constraint: recommend criteria, not specific products (§34d GewO).
 
 ## Key Findings
 
 ### Stack
-- `plugin.json` requires only `name` — auto-discovery handles skills, agents, commands
-- SKILL.md frontmatter: `name`, `description` (trigger text), `allowed-tools`, `disable-model-invocation`
-- `${CLAUDE_SKILL_DIR}` replaces `@~/.claude/` for reference doc paths
-- Agents at plugin root `agents/` (globally available) or per-skill `skills/<name>/agents/`
-- Marketplace: `claude.ai/settings/plugins/submit` (official) or PR to `parloa/claudes-kitchen`
-- Auto-updates enabled by default
+- One generic research agent parameterized by `<insurance_type>` — no proliferation
+- Claude's native `Read` tool handles text-layer PDFs — no OCR dependency
+- 11 per-type reference docs needed (coverage benchmarks, legal minimums, field extraction schemas)
+- Profile schema: `insurance.policies[]` array with type/provider/premium/coverage/doc_path
+- Check24/Verivox as quote-retrieval fallback only — lead with Stiftung Warentest/Finanztip
 
 ### Features
-- **Auto-triggering** via description field (but finance vocab over-triggers → use `disable-model-invocation: true`)
-- **Progressive disclosure** — reference docs load on demand, not all at context start
-- **SessionStart hooks** — can detect stale tax year docs proactively
-- **Plugin is the install unit** — users get all skills at once, not individually
+**Table stakes:** Portfolio overview, coverage gap detection, coverage adequacy check, cost benchmarks
+**Differentiators:** Overlap/redundancy detection (Fahrrad↔Hausrat, Schutzbrief↔Vollkasko↔ADAC), Sonderkündigungsrecht deadline tracking, tier-based advisory urgency
+**Anti-features:** Specific product recommendations (legal risk), automated switching, storing health data
+
+**Tier system:**
+- Tier 1 (mandatory): Krankenversicherung, Privathaftpflicht, Kfz-Haftpflicht
+- Tier 2 (essential): Hausrat, Risiko-Leben, BU, Rechtsschutz, Zahnzusatz
+- Tier 3 (situational): Reise, Fahrrad, Kfz-Vollkasko, Schutzbrief
+- Tier 4 (niche): Mietkaution
 
 ### Architecture
-- Skill dir naming determines command syntax: `skills/tax/` → `/finyx:tax`
-- Shared agents (tax-scoring used by both tax + insights) go to plugin root `agents/`
-- Profile stays at `.finyx/profile.json` — add `~/.finyx/` as global fallback
-- No `finyx-core` package needed — insights reads profile, not other skills' ref docs
-- `bin/install.js` updated to target skills layout as npm fallback
+- Router pattern: SKILL.md (~100 lines dispatch) → sub-skills/ per type
+- 3 agents total: generic research + portfolio + doc-reader
+- Existing PKV calc agent stays health-specific
+- Reference docs: one per type under `references/germany/`
 
 ### Top Pitfalls
-1. **`@~/.claude/` paths silently break** — skills load from model training data with no error
-2. **Finance vocab over-triggers** — set `disable-model-invocation: true` on all advisory skills
-3. **Skill dir naming trap** — `finyx-tax/` → `/finyx:finyx-tax`; use `tax/` → `/finyx:tax`
-4. **Profile path assumption** — `.finyx/profile.json` needs `~/.finyx/` global fallback
-5. **Marketplace validator bugs** — `claude plugin validate` must pass zero warnings
+1. **§34d GewO legal boundary** — recommend criteria, not specific competing tariffs
+2. **Kfz complexity** — SF-Klasse, Typklasse, Regionalklasse, three coverage types
+3. **Sonderkündigungsrecht windows** — 1-month window after premium increase
+4. **German number format traps** — "1.250,00 €" = €1,250 not €1.25
+5. **Check24/Verivox miss ~30-40% of market** — not neutral tools
+6. **BU abstrakte Verweisung** — non-negotiable quality filter
 
 ## Suggested Phases (5)
 
-1. **Plugin Foundation** — Create `plugin.json`, restructure dirs, update `bin/install.js`
-2. **Profile Skill** — Convert `finyx-profile` as foundation (profile path strategy)
-3. **Pilot Skill** — Convert `finyx-tax` to validate the pattern (path refs, frontmatter, agents)
-4. **Bulk Migration** — Convert remaining 14 commands to skills in parallel
-5. **Integration + Submission** — `finyx-insights` cross-skill wiring, marketplace submission, backward compat testing
+1. **Router + Sub-skill Migration** — Convert health flow to sub-skill, build router SKILL.md
+2. **Reference Docs + Profile Schema** — 11 per-type reference docs + insurance.policies[] schema
+3. **Portfolio Agent + Gap Detection** — Portfolio overview, gap/overlap detection, tier-based advisory
+4. **Per-Type Sub-skills (Tier 1-2)** — Haftpflicht, Hausrat, Kfz, Rechtsschutz, Zahn, Risiko-Leben
+5. **Per-Type Sub-skills (Tier 3-4) + Doc Reader** — Reise, Fahrrad, Schutzbrief, Mietkaution + PDF parsing agent
 
 ---
 *Research completed: 2026-04-12*

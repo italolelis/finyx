@@ -348,3 +348,331 @@ finyx/
 - Verified against actual installed plugin directory trees: `feature-dev`, `skill-creator`, `example-plugin`, `typescript-services` — HIGH confidence
 - Cross-referenced against existing Finyx source: `commands/finyx/`, `agents/`, `finyx/references/` — HIGH confidence
 - Existing `fin-advisor`, `fin-tax` skills at `~/.claude/skills/` verified for SKILL.md format and references structure — HIGH confidence
+
+---
+
+---
+
+# Architecture Extension: Comprehensive Insurance Skill (v2.1)
+
+**Domain:** Expanding insurance skill from PKV/GKV to 11+ insurance types
+**Researched:** 2026-04-12
+**Confidence:** HIGH (based on existing codebase patterns + German insurance domain knowledge)
+
+---
+
+## Core Architectural Decision: Router Pattern in SKILL.md
+
+The existing SKILL.md becomes a **router** — it identifies which insurance type(s) the user wants and delegates to per-type sub-flows via the Task tool. This is the only viable approach given:
+
+- A single SKILL.md cannot hold 11 independent workflows. The current health-only SKILL.md is 605 lines for one type. 11 types would produce a 5,000+ line file that is unmaintainable and loads irrelevant reference docs on every invocation.
+- Adding separate slash commands per type (`/finyx:insurance-liability`, `/finyx:insurance-car`, etc.) pollutes the command namespace and breaks the unified `insurance` UX.
+- The router pattern (one entry point, delegates to sub-flows) is established precedent within Claude Code: the real estate skill routes between scout/analyze/filter/compare/stress-test/report based on user invocation.
+
+**Do NOT use a mega-SKILL.md.** A single file for all 11 types wastes the context window loading all reference docs every run and makes per-type updates error-prone.
+
+---
+
+## Recommended Insurance Skill Structure (v2.1)
+
+```
+skills/insurance/
+  SKILL.md                              ← Router: mode selection + dispatch only (~100 lines)
+  agents/
+    finyx-insurance-calc-agent.md       ← Existing (GKV/PKV cost calc, unchanged)
+    finyx-insurance-research-agent.md   ← Existing, generalized to accept <insurance_type>
+    finyx-insurance-doc-reader.md       ← NEW: reads user policy documents
+    finyx-insurance-portfolio.md        ← NEW: cross-type portfolio overview + gap detection
+  references/
+    disclaimer.md                       ← Existing (shared across all types)
+    germany/
+      health-insurance.md               ← Existing
+      liability-insurance.md            ← NEW: Haftpflichtversicherung
+      household-insurance.md            ← NEW: Hausratversicherung
+      car-insurance.md                  ← NEW: KFZ (Haftpflicht/Teilkasko/Vollkasko)
+      legal-insurance.md                ← NEW: Rechtsschutzversicherung
+      life-insurance.md                 ← NEW: Risikolebens- / Kapitallebensversicherung
+      disability-insurance.md           ← NEW: Berufsunfähigkeitsversicherung (BU)
+      dental-insurance.md               ← NEW: Zahnzusatzversicherung
+      travel-insurance.md               ← NEW: Reiseversicherung (Kranken/Gepäck/Rücktritt)
+      bicycle-insurance.md              ← NEW: Fahrradversicherung
+      rental-deposit-insurance.md       ← NEW: Kautionsversicherung
+      insurance-portfolio.md            ← NEW: Coverage gap matrix + over-insurance signals
+  sub-skills/
+    health.md                           ← EXTRACTED from current SKILL.md (~500 lines)
+    liability.md                        ← NEW
+    household.md                        ← NEW
+    car.md                              ← NEW
+    legal.md                            ← NEW
+    life.md                             ← NEW
+    disability.md                       ← NEW
+    dental.md                           ← NEW
+    travel.md                           ← NEW
+    bicycle.md                          ← NEW
+    rental-deposit.md                   ← NEW
+    portfolio-overview.md               ← NEW (cross-type synthesis)
+```
+
+### What `sub-skills/` contains
+
+These are NOT Claude Code skills (no `name:` YAML frontmatter). They are Markdown prompt fragments that SKILL.md reads via the `Read` tool and pastes inline into Task prompts. The router reads the selected sub-skill file and executes its instructions as the Task payload. This pattern keeps SKILL.md thin and makes each type's flow independently editable without touching the router.
+
+---
+
+## SKILL.md Router: Minimal Responsibility
+
+The router does exactly four things:
+
+1. **Validate profile** (same bash check as existing Phase 1)
+2. **Mode selection via AskUserQuestion:**
+   - "Review a specific insurance type" → show list of 11 types
+   - "Scan my insurance documents" → invoke doc reader path
+   - "Insurance portfolio overview" → invoke portfolio overview
+3. **Load only the reference doc for the selected type** — not all docs
+4. **Read the sub-skill prompt and execute it** — router has no type-specific logic
+
+The entire existing PKV/GKV flow moves into `sub-skills/health.md`. The router shrinks from 605 lines to ~100 lines.
+
+---
+
+## Agent Decomposition
+
+### Keep existing calc agent for health only
+
+`finyx-insurance-calc-agent.md` handles PKV/GKV cost calculations. This requires specialized actuarial math (JAEG, §10 EStG netting, 30-year projections, risk tier classification). No other insurance type has equivalent computational complexity. Keep it as-is, health-specific.
+
+### Generalize research agent across all types
+
+The current `finyx-insurance-research-agent.md` is PKV-specific in its search queries. Generalize it to accept `<insurance_type>` and `<search_context>` blocks. The underlying capability — query Stiftung Warentest, Check24, Verivox, official provider sites; extract premium ranges, coverage limits, inclusions/exclusions — is identical for all types. The type-specific terms are passed in the Task prompt.
+
+Generalized research agent accepts:
+```
+<insurance_type>liability</insurance_type>
+<search_context>
+type: Haftpflichtversicherung
+profile: married, 1 child, Germany
+focus: coverage_limit, premium_range, key_exclusions
+neutral_sources: Stiftung Warentest, Verbraucherzentrale, BaFin
+</search_context>
+```
+
+The agent must never bias toward specific providers. Source priority: Stiftung Warentest > Verbraucherzentrale > BaFin > aggregator sites (Check24, Verivox) for price ranges only. Provider mentions in output are always presented as a representative sample, not a ranked list.
+
+### Two new agents for v2.1
+
+**`finyx-insurance-doc-reader.md`** — reads user-provided policy documents from `.finyx/insurance/documents/`. Uses Claude's native `Read` tool to load PDF/text files. Extracts structured policy data and returns normalized JSON. No external OCR dependency — Claude's multimodal PDF reading handles this natively.
+
+**`finyx-insurance-portfolio.md`** — takes normalized policy objects (from doc reader or manual profile data) and performs cross-type gap analysis, cost rollup, and overlap detection. Outputs a portfolio summary consumable by `/finyx:insights`.
+
+**Agent roster for v2.1:**
+
+| Agent | Scope | Type |
+|-------|-------|------|
+| `finyx-insurance-calc-agent` | GKV/PKV cost calculations only | Existing, unchanged |
+| `finyx-insurance-research-agent` | Web research for any insurance type | Existing, generalized |
+| `finyx-insurance-doc-reader` | Reads + extracts from user policy documents | New |
+| `finyx-insurance-portfolio` | Cross-type portfolio analysis, gap detection | New |
+
+No per-type research agents. No per-type calc agents (only health needs one).
+
+---
+
+## Document Reader Agent
+
+Document folder convention (configurable, default shown):
+```
+.finyx/
+  insurance/
+    documents/
+      haftpflicht-huk24-2024.pdf
+      hausrat-allianz-2023.pdf
+      kfz-huk24-2024.pdf
+```
+
+The agent reads each file using the `Read` tool (Claude's native PDF reading), extracts structured fields, and returns a normalized policy object per document:
+
+```json
+{
+  "type": "liability",
+  "provider": "HUK24",
+  "policy_number": "...",
+  "annual_premium": 89.00,
+  "monthly_premium": 7.42,
+  "coverage_limit": 10000000,
+  "deductible": 0,
+  "start_date": "2024-01-01",
+  "renewal_date": "2024-12-31",
+  "key_inclusions": ["personal", "bicycle", "animals"],
+  "key_exclusions": ["intentional damage"],
+  "source": "document",
+  "source_file": "haftpflicht-huk24-2024.pdf",
+  "confidence": "high"
+}
+```
+
+**Anti-hallucination rule (mandatory):** If a field cannot be clearly read from the document, output `"NOT_FOUND"` for that field — never infer or estimate from "typical" policy values. Coverage amounts and premiums must come from the document text.
+
+The doc reader agent does NOT write to `.finyx/profile.json` directly. It returns JSON output. The router confirms with the user before writing to profile.
+
+---
+
+## Profile Schema Extension
+
+Add an `insurance` block to `.finyx/profile.json`. Populated by the doc reader (automated) or via `/finyx:profile` (manual).
+
+```json
+"insurance": {
+  "document_folder": ".finyx/insurance/documents",
+  "last_portfolio_scan": null,
+  "policies": [
+    {
+      "type": "health",
+      "subtype": "pkv",
+      "provider": "AXA",
+      "monthly_premium": 420.00,
+      "coverage_summary": "Komfort tariff, Selbstbeteiligung €600/yr",
+      "last_reviewed": "2026-04-01",
+      "source": "manual"
+    },
+    {
+      "type": "liability",
+      "provider": "HUK24",
+      "monthly_premium": 7.42,
+      "coverage_limit": 10000000,
+      "last_reviewed": "2026-04-01",
+      "source": "document",
+      "source_file": "haftpflicht-huk24-2024.pdf"
+    }
+  ]
+}
+```
+
+**Schema decisions:**
+- `type` is the canonical key: `health`, `liability`, `household`, `car`, `legal`, `life`, `disability`, `dental`, `travel`, `bicycle`, `rental-deposit`
+- `subtype` is optional — used for `health` (pkv/gkv), `car` (vollkasko/teilkasko/haftpflicht)
+- `monthly_premium` is always monthly EUR — normalize at extraction time (annual / 12)
+- `source` is `"manual"` or `"document"` — audit trail for anti-hallucination verification
+- `coverage_summary` is free text — surfaced as-is, not parsed further
+- Health flags (from Phase 3 questionnaire) are NEVER stored here — GDPR Art. 9 constraint is unchanged
+
+**Integration with `/finyx:insights`:** The insights skill reads `insurance.policies[]` and sums `monthly_premium` across all policies to produce the insurance line item in the allocation analysis. No change to the insights skill is needed — it already reads `profile.json` holistically.
+
+---
+
+## Reference Doc Standard (per type)
+
+One doc per insurance type. Not grouped. Content standard:
+
+1. Legal basis (which statute governs — e.g., §1 PflVG for KFZ)
+2. Coverage mechanics (what's covered, what's not — canonical, provider-neutral)
+3. Market structure (approximate premium ranges, what differentiates tariffs)
+4. Mandatory vs. optional status for the target profile
+5. Tax implications (BU premiums as Sonderausgaben, Risikoleben as Vorsorgeaufwendungen, etc.)
+6. Key decisions (Selbstbeteiligung tradeoffs, coverage limit recommendations)
+
+What reference docs do NOT contain: provider-specific prices, application URLs, current promotional rates. Those come from the research agent's live WebSearch, keeping reference docs stable between invocations and free of commercial bias.
+
+---
+
+## Data Flow
+
+```
+User: /finyx:insurance
+          |
+          v
+    SKILL.md (Router)
+    - Validate profile
+    - AskUserQuestion: mode
+          |
+    +-----------+-----------+
+    |           |           |
+ type        scan        portfolio
+ select     documents    overview
+    |           |           |
+    v           v           v
+Read           Read       Read
+sub-skills/    .finyx/    all profile
+<type>.md      insurance/  insurance[]
+    |          documents/  |
+    v               |      v
+Spawn              v    Spawn
+research      Spawn     portfolio
+agent         doc-reader  agent
+(generalized) agent       |
+    |               |     v
+    v               v   Gap matrix
+Output:        Normalized  Total cost
+type advisory  policy JSON  Overlaps
+               |           Gaps
+               v           Recommendations
+        User confirmation
+        Write to profile.json
+```
+
+---
+
+## Portfolio Overview Sub-Skill
+
+Triggers when: user selects "portfolio overview", or after any type-specific analysis as an optional cross-sell.
+
+Requires: at least one entry in `profile.json insurance.policies[]` (from doc reader or manual).
+
+Output sections:
+1. Total monthly insurance spend (sum of all `monthly_premium` values)
+2. Coverage gap matrix — which types the user has vs. recommended for their profile
+3. Over-insurance signals — duplicate coverage (e.g., bicycle covered in both Hausrat and a standalone bicycle policy)
+4. Optimization flags — policies where market research agent detects current premium is above market rate by >15%
+5. Insights integration line — single number for `/finyx:insights` allocation: "insurance: €XXX/mo (N policies)"
+
+The portfolio agent runs the gap matrix against a profile-aware baseline. For a married-with-child, high-income German resident: Haftpflicht and health are mandatory; KFZ is mandatory if car owned; Hausrat is highly recommended; BU is strongly recommended for high earners; Rechtsschutz is useful; the rest are situational.
+
+---
+
+## Scalability
+
+| Concern | Current (1 type) | v2.1 (11 types) | Future (Brazil) |
+|---------|-----------------|-----------------|-----------------|
+| SKILL.md size | 605 lines | ~100 lines (router) | No change |
+| Reference docs | 1 doc | 11 docs | Add `brazil/` subdirectory |
+| Agent count | 2 agents | 4 agents | No new agents |
+| Profile schema | No insurance block | `insurance[]` array | Same schema, EUR amounts |
+| Context per invocation | 2 docs always loaded | 1 doc per selected type | Same (router gates loading) |
+
+Adding a new insurance type (e.g., pet insurance, cyber insurance) in the future requires:
+1. One new reference doc in `references/germany/`
+2. One new `sub-skills/<type>.md` prompt
+3. One new entry in the router's AskUserQuestion list
+
+No agent changes. No profile schema changes. No SKILL.md structural changes.
+
+---
+
+## Anti-Patterns to Avoid
+
+### Mega-SKILL.md with all 11 type flows inline
+Results in 5,000+ line file. Every update to one type risks breaking others. All reference docs load on every invocation regardless of which type the user selected.
+
+### Per-type research agents (11 separate agents)
+Identical web search pattern duplicated 11 times. Generalize the existing research agent with `<insurance_type>` parameter.
+
+### Writing health flags to the insurance portfolio schema
+The `insurance.policies[]` block in profile.json stores only premium/coverage/provider data. Health questionnaire flags (GDPR Art. 9) are never persisted anywhere.
+
+### Hardcoding provider names in reference docs
+Reference docs are provider-neutral. The research agent's live WebSearch surfaces current providers. This keeps the advisory unbiased as the market changes and avoids commercial appearance.
+
+### Per-type slash commands (/finyx:insurance-liability, etc.)
+Pollutes command namespace. The router handles type selection via AskUserQuestion within the single `/finyx:insurance` entry point.
+
+### Doc reader agent writing directly to profile.json
+The doc reader returns JSON output. The router confirms with the user before writing. This prevents silent profile corruption from misread documents.
+
+---
+
+## Sources
+
+- Existing codebase: `skills/insurance/SKILL.md` — current PKV/GKV implementation, 605 lines (HIGH confidence)
+- Existing codebase: `.planning/PROJECT.md` — v2.1 requirements (HIGH confidence)
+- German insurance type taxonomy: settle-in-berlin.com/insurance-in-germany/, allaboutberlin.com/guides/insurance (MEDIUM confidence — consumer guides, accurate for scope)
+- AI multi-agent insurance patterns: dialonce.ai/en/blog-ai/trends/multi-agent-ai-system-insurance (LOW confidence — descriptive, not prescriptive for this use case)
+- AI insurance document extraction: datagrid.com/blog/ai-agents-automate-insurance-policy-comparison-document-control-managers (MEDIUM confidence — commercial context, extraction field patterns are applicable)
