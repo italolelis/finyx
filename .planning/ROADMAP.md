@@ -5,117 +5,111 @@
 - ✅ **v1.0 MVP** - Phases 1-5 (shipped 2026-04-06)
 - ✅ **v1.1 Financial Insights Dashboard** - Phases 6-8 (shipped 2026-04-06)
 - ✅ **v1.2 Health Insurance Advisor** - Phases 9-12 (shipped 2026-04-09)
-- 🚧 **v2.0 Plugin Architecture** - Phases 13-17 (in progress)
+- ✅ **v2.0 Plugin Architecture** - Phases 13-17 (shipped 2026-04-12)
+- 🚧 **v2.1 Comprehensive Insurance Advisor** - Phases 18-22 (in progress)
 
 ## Phases
 
 <details>
 <summary>✅ v1.0 MVP (Phases 1-5) - SHIPPED 2026-04-06</summary>
 
-Phase 1: Rebrand & Foundation, Phase 2: User Financial Profile, Phase 3: Tax Advisory, Phase 4: Investment Advisor + Broker, Phase 5: Pension Planning. 37/37 requirements satisfied.
+Phases 1-5 delivered the MVP: financial profile, German + Brazilian tax advisor, investment advisor, broker comparison, pension planning.
 
 </details>
 
 <details>
 <summary>✅ v1.1 Financial Insights Dashboard (Phases 6-8) - SHIPPED 2026-04-06</summary>
 
-Phase 6: Benchmarks & Scoring Reference Docs, Phase 7: Insight Specialist Agents, Phase 8: /fin:insights Command. All requirements satisfied.
+Phases 6-8 delivered the unified financial health report with allocation analysis, tax efficiency scoring, and goal pace tracking.
 
 </details>
 
 <details>
 <summary>✅ v1.2 Health Insurance Advisor (Phases 9-12) - SHIPPED 2026-04-09</summary>
 
-Phase 9: Reference Foundation, Phase 10: Specialist Agents, Phase 11: Command + Integration, Phase 12: Cross-Advisor Integration. All requirements satisfied.
+Phases 9-12 delivered PKV vs GKV decision advisor with health questionnaire, cost projections, family impact analysis, and insights integration.
 
 </details>
 
-### 🚧 v2.0 Plugin Architecture (In Progress)
+<details>
+<summary>✅ v2.0 Plugin Architecture (Phases 13-17) - SHIPPED 2026-04-12</summary>
 
-**Milestone Goal:** Finyx ships as a first-class Claude Code plugin — installable via `claude plugin install`, all commands converted to skills under `skills/`, all agents scoped to their owning skill, path references portable, and the plugin validator passes with zero warnings.
+Phases 13-17 delivered full plugin architecture migration: 8 self-contained skills, per-skill agents and reference docs, plugin distribution via `claude plugin add github:italolelis/finyx`.
+
+</details>
+
+### 🚧 v2.1 Comprehensive Insurance Advisor (In Progress)
+
+**Milestone Goal:** Expand insurance skill to cover all major German insurance types with portfolio analysis, gap detection, market comparison, and PDF policy parsing.
 
 ## Phase Details
 
-### Phase 13: Plugin Foundation
-**Goal**: The plugin skeleton exists — `plugin.json` manifest, restructured `skills/` directory layout, and portable path references — so the plugin can be recognized by Claude Code's plugin system
-**Depends on**: Phase 12 (v1.2 complete)
-**Requirements**: PLUG-01, PLUG-02, PLUG-03
+### Phase 18: Router + Sub-skill Migration
+**Goal**: Insurance skill dispatches to per-type sub-skills via a router
+**Depends on**: Phase 17 (v2.0 plugin architecture)
+**Requirements**: ARCH-01
 **Success Criteria** (what must be TRUE):
-  1. `.claude-plugin/plugin.json` exists with correct `name` field and passes `claude plugin validate` with zero warnings
-  2. `skills/` directory exists with the correct naming convention (`skills/tax/` not `skills/finyx-tax/`) preserving `/finyx:*` command syntax
-  3. No `@~/.claude/finyx/references/` path strings exist anywhere in the codebase — all replaced with `${CLAUDE_SKILL_DIR}/references/`
-**Plans:** 2/2 plans complete
-Plans:
-- [x] 13-01-PLAN.md — Plugin manifest + skill directory skeleton with SKILL.md stubs + agent/reference redistribution
-- [x] 13-02-PLAN.md — Path migration (@~/.claude/ to ${CLAUDE_SKILL_DIR}/) + end-to-end validation
+  1. `/finyx:insurance` routes to health sub-skill when user asks about health insurance
+  2. Router SKILL.md dispatches to sub-skill prompts based on insurance type keyword
+  3. Existing health insurance flow works identically after migration to sub-skill
+**Plans**: TBD
 
-### Phase 14: Profile Skill
-**Goal**: `finyx-profile` is converted to a fully working skill that other skills can depend on, with profile path strategy (`.finyx/profile.json` + `~/.finyx/` global fallback) validated end-to-end
-**Depends on**: Phase 13
-**Requirements**: INTG-01
+### Phase 19: Reference Docs + Profile Schema + Agents
+**Goal**: All supporting infrastructure (knowledge docs, data schema, specialist agents) is in place for per-type advisory
+**Depends on**: Phase 18
+**Requirements**: ARCH-02, ARCH-03, ARCH-04, ARCH-05, INFRA-01, INFRA-02, INFRA-03
 **Success Criteria** (what must be TRUE):
-  1. `skills/profile/SKILL.md` exists with correct frontmatter and `disable-model-invocation: true`
-  2. Running `/finyx:profile` from a project directory reads and writes `.finyx/profile.json` correctly
-  3. Running `/finyx:profile` from a directory without `.finyx/` falls back to `~/.finyx/profile.json` without error
-  4. Profile skill's agent is scoped under `skills/profile/agents/` — not at plugin root
-**Plans:** 1/1 plans complete
-Plans:
-- [x] 14-01-PLAN.md — Convert profile command to skill with bundled references and path fallback strategy
+  1. 11 per-type reference docs exist under `references/germany/` each with coverage benchmarks, legal minimums, and field extraction schema
+  2. Profile schema `insurance.policies[]` array accepts type, provider, premium, coverage, and doc_path fields
+  3. Generic research agent can be parameterized with any insurance type and returns criteria-based comparison (never specific tariff names)
+  4. Portfolio agent and document reader agent are defined and callable from orchestrating skills
+  5. All advisory outputs include §34d GewO advisory-only disclaimer and use criteria-based language
+**Plans**: TBD
 
-### Phase 15: Pilot Skill
-**Goal**: `finyx-tax` is converted as a pilot to validate the full skill conversion pattern — SKILL.md frontmatter, scoped agents, bundled reference docs, portable paths — before bulk migration
-**Depends on**: Phase 14
-**Requirements**: SKILL-01, SKILL-02, SKILL-03, SKILL-04, SKILL-05
+### Phase 20: Portfolio Analysis
+**Goal**: Users can see their full insurance portfolio with cost summary, gaps, overlaps, and adequacy assessment
+**Depends on**: Phase 19
+**Requirements**: PORT-01, PORT-02, PORT-03, PORT-04, OPT-04
 **Success Criteria** (what must be TRUE):
-  1. `skills/tax/SKILL.md` exists with `disable-model-invocation: true` and a front-loaded trigger description under 250 chars
-  2. Tax skill agents exist under `skills/tax/agents/` — zero agents remain at project root for the tax domain
-  3. Tax reference docs (germany/tax-rules.md, brazil/tax-rules.md) bundled under `skills/tax/references/` and loaded via `${CLAUDE_SKILL_DIR}/references/`
-  4. Running `/finyx:tax` produces correct output with no broken path errors
-  5. Conversion pattern documented (checklist or template) so bulk migration in Phase 16 can proceed without re-deriving it
-**Plans:** 1/1 plans complete
-Plans:
-- [x] 15-01-PLAN.md — Convert tax command to full skill + document conversion checklist for Phase 16
+  1. User sees all entered policies in a tier-classified overview with total monthly cost
+  2. User sees which mandatory/essential insurance types are missing given their life situation
+  3. User sees any duplicate coverage detected across policies (e.g., Fahrrad covered by both Hausrat and standalone)
+  4. User sees per-type adequacy assessment against benchmarks (e.g., Hausrat sum below €650/m² threshold flagged)
+  5. Insurance total cost appears in `/finyx:insights` financial health report allocation section
+**Plans**: TBD
 
-### Phase 16: Bulk Migration
-**Goal**: All remaining 15 commands (profile and tax already done) are converted to skills following the validated pattern — every skill self-contained, every agent scoped, no shared root-level agents remain
-**Depends on**: Phase 15
-**Requirements**: SKILL-01, SKILL-02, SKILL-03, SKILL-04, SKILL-05
+### Phase 21: Per-Type Sub-skills (Tier 1-2)
+**Goal**: Users can get detailed analysis and market comparison for the six high-priority insurance types
+**Depends on**: Phase 19
+**Requirements**: TYPE-01, TYPE-02, TYPE-03, TYPE-04, TYPE-05, TYPE-06, OPT-01, OPT-03
 **Success Criteria** (what must be TRUE):
-  1. `skills/` directory contains a SKILL.md for every finyx command: invest, broker, pension, insurance, insights, scout, analyze, filter, compare, stress-test, report, init, and all remaining commands
-  2. Every skill has `disable-model-invocation: true` in its frontmatter
-  3. No agents exist at the project root `agents/` directory — all redistributed under their owning skill's `agents/` folder
-  4. Every skill's reference docs are bundled under `skills/<name>/references/` with no `@~/.claude/` path references
-**Plans:** 6/6 plans complete
-Plans:
-- [x] 16-01-PLAN.md — Convert invest + broker commands to invest skill
-- [x] 16-02-PLAN.md — Convert 7 real estate commands to realestate skill
-- [x] 16-03-PLAN.md — Convert pension command to pension skill
-- [x] 16-04-PLAN.md — Convert insurance command to insurance skill
-- [x] 16-05-PLAN.md — Convert insights command to insights skill
-- [x] 16-06-PLAN.md — Convert help + status + update commands to help skill
+  1. User can request analysis for Privathaftpflicht, Hausrat, Kfz, Rechtsschutz, Zahnzusatz, and Risikoleben individually
+  2. Each sub-skill shows current coverage vs benchmark and criteria-based market comparison (Stiftung Warentest/Finanztip sourced)
+  3. Kfz analysis covers all three coverage levels (Haftpflicht, Teilkasko, Vollkasko) including SF-Klasse impact
+  4. User sees cancellation deadlines (Kündigungsfrist) and any open Sonderkündigungsrecht windows for each policy
+**Plans**: TBD
+**UI hint**: no
 
-### Phase 17: Integration + Distribution
-**Goal**: Cross-skill wiring for `finyx-insights` works, the plugin installs cleanly via GitHub URL, legacy directories are removed, and `bin/install.js` is removed (plugin replaces npm distribution)
-**Depends on**: Phase 16
-**Requirements**: INTG-02, INTG-03, CLEAN-01, CLEAN-02, CLEAN-03
+### Phase 22: Per-Type Sub-skills (Tier 3-4) + Doc Reader
+**Goal**: Users can get analysis for situational/niche insurance types and have existing policy PDFs parsed automatically
+**Depends on**: Phase 21
+**Requirements**: TYPE-07, TYPE-08, TYPE-09, TYPE-10, OPT-02
 **Success Criteria** (what must be TRUE):
-  1. `claude plugin add <github-url>` installs Finyx and all `/finyx:*` commands are available with no errors
-  2. `/finyx:insights` produces a complete cross-skill report after plugin install (reads profile, references tax + investment + insurance data)
-  3. `commands/finyx/` directory no longer exists in the repository
-  4. `agents/` root directory no longer exists in the repository
-  5. `bin/install.js` removed — plugin system is the primary distribution mechanism
-**Plans:** 3/3 plans complete
-Plans:
-- [x] 17-01-PLAN.md — Migrate missing templates + remove legacy directories (commands/finyx/, agents/, finyx/)
-- [x] 17-02-PLAN.md — Remove bin/install.js + update package.json + rewrite README for plugin install
-- [x] 17-03-PLAN.md — Validate plugin structure + cross-skill insights wiring + final user verification
+  1. User can request analysis for Reiseversicherung, Fahrradversicherung, Kfz-Schutzbrief, and Mietkautionsversicherung
+  2. User can point the skill at a PDF policy document and receive extracted provider, coverage, premium, and key terms
+  3. Extracted PDF data populates the `insurance.policies[]` profile schema fields for use in portfolio analysis
+**Plans**: TBD
 
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 13. Plugin Foundation | v2.0 | 2/2 | Complete    | 2026-04-12 |
-| 14. Profile Skill | v2.0 | 1/1 | Complete    | 2026-04-12 |
-| 15. Pilot Skill | v2.0 | 1/1 | Complete    | 2026-04-12 |
-| 16. Bulk Migration | v2.0 | 6/6 | Complete    | 2026-04-12 |
-| 17. Integration + Distribution | v2.0 | 3/3 | Complete    | 2026-04-12 |
+| 1-5. MVP | v1.0 | 13/13 | Complete | 2026-04-06 |
+| 6-8. Insights | v1.1 | 5/5 | Complete | 2026-04-06 |
+| 9-12. Health Insurance | v1.2 | 5/5 | Complete | 2026-04-09 |
+| 13-17. Plugin Architecture | v2.0 | 13/13 | Complete | 2026-04-12 |
+| 18. Router + Sub-skill Migration | v2.1 | 0/TBD | Not started | - |
+| 19. Reference Docs + Profile Schema + Agents | v2.1 | 0/TBD | Not started | - |
+| 20. Portfolio Analysis | v2.1 | 0/TBD | Not started | - |
+| 21. Per-Type Sub-skills (Tier 1-2) | v2.1 | 0/TBD | Not started | - |
+| 22. Per-Type Sub-skills (Tier 3-4) + Doc Reader | v2.1 | 0/TBD | Not started | - |

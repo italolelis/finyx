@@ -68,38 +68,38 @@ Deferred to future release.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PORT-01 | — | Pending |
-| PORT-02 | — | Pending |
-| PORT-03 | — | Pending |
-| PORT-04 | — | Pending |
-| OPT-01 | — | Pending |
-| OPT-02 | — | Pending |
-| OPT-03 | — | Pending |
-| OPT-04 | — | Pending |
-| ARCH-01 | — | Pending |
-| ARCH-02 | — | Pending |
-| ARCH-03 | — | Pending |
-| ARCH-04 | — | Pending |
-| ARCH-05 | — | Pending |
-| TYPE-01 | — | Pending |
-| TYPE-02 | — | Pending |
-| TYPE-03 | — | Pending |
-| TYPE-04 | — | Pending |
-| TYPE-05 | — | Pending |
-| TYPE-06 | — | Pending |
-| TYPE-07 | — | Pending |
-| TYPE-08 | — | Pending |
-| TYPE-09 | — | Pending |
-| TYPE-10 | — | Pending |
-| INFRA-01 | — | Pending |
-| INFRA-02 | — | Pending |
-| INFRA-03 | — | Pending |
+| PORT-01 | Phase 20 | Pending |
+| PORT-02 | Phase 20 | Pending |
+| PORT-03 | Phase 20 | Pending |
+| PORT-04 | Phase 20 | Pending |
+| OPT-01 | Phase 21 | Pending |
+| OPT-02 | Phase 22 | Pending |
+| OPT-03 | Phase 21 | Pending |
+| OPT-04 | Phase 20 | Pending |
+| ARCH-01 | Phase 18 | Pending |
+| ARCH-02 | Phase 19 | Pending |
+| ARCH-03 | Phase 19 | Pending |
+| ARCH-04 | Phase 19 | Pending |
+| ARCH-05 | Phase 19 | Pending |
+| TYPE-01 | Phase 21 | Pending |
+| TYPE-02 | Phase 21 | Pending |
+| TYPE-03 | Phase 21 | Pending |
+| TYPE-04 | Phase 21 | Pending |
+| TYPE-05 | Phase 21 | Pending |
+| TYPE-06 | Phase 21 | Pending |
+| TYPE-07 | Phase 22 | Pending |
+| TYPE-08 | Phase 22 | Pending |
+| TYPE-09 | Phase 22 | Pending |
+| TYPE-10 | Phase 22 | Pending |
+| INFRA-01 | Phase 19 | Pending |
+| INFRA-02 | Phase 19 | Pending |
+| INFRA-03 | Phase 19 | Pending |
 
 **Coverage:**
 - v2.1 requirements: 26 total
-- Mapped to phases: 0
-- Unmapped: 26 ⚠️
+- Mapped to phases: 26
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-12*
-*Last updated: 2026-04-12 after initial definition*
+*Last updated: 2026-04-12 — traceability mapped after roadmap creation*
