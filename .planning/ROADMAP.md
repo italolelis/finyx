@@ -54,7 +54,7 @@ Phases 13-17 delivered full plugin architecture migration: 8 self-contained skil
   3. Existing health insurance flow works identically after migration to sub-skill
 **Plans**: 1 plan
 Plans:
-- [ ] 18-01-PLAN.md — Router + health sub-skill extraction
+- [x] 18-01-PLAN.md — Router + health sub-skill extraction
 
 ### Phase 19: Reference Docs + Profile Schema + Agents
 **Goal**: All supporting infrastructure (knowledge docs, data schema, specialist agents) is in place for per-type advisory
@@ -110,7 +110,7 @@ Plans:
 | 6-8. Insights | v1.1 | 5/5 | Complete | 2026-04-06 |
 | 9-12. Health Insurance | v1.2 | 5/5 | Complete | 2026-04-09 |
 | 13-17. Plugin Architecture | v2.0 | 13/13 | Complete | 2026-04-12 |
-| 18. Router + Sub-skill Migration | v2.1 | 0/1 | Not started | - |
+| 18. Router + Sub-skill Migration | v2.1 | 1/1 | Complete   | 2026-04-12 |
 | 19. Reference Docs + Profile Schema + Agents | v2.1 | 0/TBD | Not started | - |
 | 20. Portfolio Analysis | v2.1 | 0/TBD | Not started | - |
 | 21. Per-Type Sub-skills (Tier 1-2) | v2.1 | 0/TBD | Not started | - |
