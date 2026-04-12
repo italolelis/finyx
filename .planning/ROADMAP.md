@@ -100,7 +100,7 @@ Plans:
 Plans:
 - [ ] 21-01-PLAN.md — Haftpflicht, Hausrat, Rechtsschutz sub-skills (sum-based + module-based types)
 - [ ] 21-02-PLAN.md — Zahnzusatz, Risikoleben sub-skills (Staffelung + income-based benchmark types)
-- [ ] 21-03-PLAN.md — Kfz sub-skill (3-tier comparison, SF-Klasse, extended vehicle questions)
+- [x] 21-03-PLAN.md — Kfz sub-skill (3-tier comparison, SF-Klasse, extended vehicle questions)
 **UI hint**: no
 
 ### Phase 22: Per-Type Sub-skills (Tier 3-4) + Doc Reader
@@ -124,5 +124,5 @@ Plans:
 | 18. Router + Sub-skill Migration | v2.1 | 1/1 | Complete    | 2026-04-12 |
 | 19. Reference Docs + Profile Schema + Agents | v2.1 | 3/3 | Complete    | 2026-04-12 |
 | 20. Portfolio Analysis | v2.1 | 2/2 | Complete    | 2026-04-12 |
-| 21. Per-Type Sub-skills (Tier 1-2) | v2.1 | 0/3 | Not started | - |
+| 21. Per-Type Sub-skills (Tier 1-2) | v2.1 | 1/3 | In Progress|  |
 | 22. Per-Type Sub-skills (Tier 3-4) + Doc Reader | v2.1 | 0/TBD | Not started | - |

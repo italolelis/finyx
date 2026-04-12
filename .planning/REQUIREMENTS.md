@@ -16,9 +16,9 @@ Requirements for the Comprehensive Insurance Advisor milestone.
 
 ### Optimization
 
-- [ ] **OPT-01**: User can see market comparison per insurance type via WebSearch (criteria-based, not product-specific per §34d GewO)
+- [x] **OPT-01**: User can see market comparison per insurance type via WebSearch (criteria-based, not product-specific per §34d GewO)
 - [ ] **OPT-02**: User can have policy documents parsed from PDFs to extract provider, coverage, premium, terms
-- [ ] **OPT-03**: User can see cancellation deadline tracking (Kündigungsfrist + Sonderkündigungsrecht windows)
+- [x] **OPT-03**: User can see cancellation deadline tracking (Kündigungsfrist + Sonderkündigungsrecht windows)
 - [x] **OPT-04**: Insurance costs feed into `/finyx:insights` financial health report
 
 ### Architecture
@@ -33,7 +33,7 @@ Requirements for the Comprehensive Insurance Advisor milestone.
 
 - [ ] **TYPE-01**: Privathaftpflicht (personal liability)
 - [ ] **TYPE-02**: Hausratversicherung (household contents)
-- [ ] **TYPE-03**: Kfz-Versicherung (car: Haftpflicht + Teilkasko + Vollkasko)
+- [x] **TYPE-03**: Kfz-Versicherung (car: Haftpflicht + Teilkasko + Vollkasko)
 - [ ] **TYPE-04**: Rechtsschutzversicherung (legal protection)
 - [ ] **TYPE-05**: Zahnzusatzversicherung (dental supplement)
 - [ ] **TYPE-06**: Risikolebensversicherung (term life)
@@ -72,9 +72,9 @@ Deferred to future release.
 | PORT-02 | Phase 20 | Complete |
 | PORT-03 | Phase 20 | Complete |
 | PORT-04 | Phase 20 | Complete |
-| OPT-01 | Phase 21 | Pending |
+| OPT-01 | Phase 21 | Complete |
 | OPT-02 | Phase 22 | Pending |
-| OPT-03 | Phase 21 | Pending |
+| OPT-03 | Phase 21 | Complete |
 | OPT-04 | Phase 20 | Complete |
 | ARCH-01 | Phase 18 | Complete |
 | ARCH-02 | Phase 19 | Complete |
@@ -83,7 +83,7 @@ Deferred to future release.
 | ARCH-05 | Phase 19 | Complete |
 | TYPE-01 | Phase 21 | Pending |
 | TYPE-02 | Phase 21 | Pending |
-| TYPE-03 | Phase 21 | Pending |
+| TYPE-03 | Phase 21 | Complete |
 | TYPE-04 | Phase 21 | Pending |
 | TYPE-05 | Phase 21 | Pending |
 | TYPE-06 | Phase 21 | Pending |
