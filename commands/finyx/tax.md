@@ -25,10 +25,10 @@ Output is conversational advisory text — no files are written. All guidance in
 
 <execution_context>
 
-@~/.claude/finyx/references/disclaimer.md
-@~/.claude/finyx/references/germany/tax-investment.md
-@~/.claude/finyx/references/germany/health-insurance.md
-@~/.claude/finyx/references/brazil/tax-investment.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/germany/tax-investment.md
+${CLAUDE_SKILL_DIR}/references/germany/health-insurance.md
+${CLAUDE_SKILL_DIR}/references/brazil/tax-investment.md
 @.finyx/profile.json
 
 </execution_context>
@@ -308,7 +308,7 @@ If user does not hold accumulating ETFs, briefly explain the concept and confirm
 
 *Execute this subsection only if `insurance.type == "PKV"` in `.finyx/profile.json`. If insurance section is absent, null, or type is not "PKV": skip entirely.*
 
-Using health-insurance.md Section 5 (loaded via `@~/.claude/finyx/references/germany/health-insurance.md`), show the PKV tax deduction calculation:
+Using health-insurance.md Section 5 (loaded via `${CLAUDE_SKILL_DIR}/references/germany/health-insurance.md`), show the PKV tax deduction calculation:
 
 **Read from profile:**
 - `insurance.monthly_cost` — total PKV monthly premium

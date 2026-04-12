@@ -13,7 +13,7 @@ Output ONLY the reference content below. Do NOT add:
 </objective>
 
 <execution_context>
-@~/.claude/finyx/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
 </execution_context>
 
 <reference>

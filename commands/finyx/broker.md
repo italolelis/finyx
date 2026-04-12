@@ -31,9 +31,9 @@ Output is conversational advisory text — all guidance includes the legal discl
 
 <execution_context>
 
-@~/.claude/finyx/references/disclaimer.md
-@~/.claude/finyx/references/germany/brokers.md
-@~/.claude/finyx/references/brazil/brokers.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/germany/brokers.md
+${CLAUDE_SKILL_DIR}/references/brazil/brokers.md
 @.finyx/profile.json
 
 </execution_context>

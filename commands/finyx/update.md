@@ -15,7 +15,7 @@ Update FINYX to the latest version from npm and display changelog.
 
 <execution_context>
 
-@~/.claude/finyx/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
 @.finyx/profile.json
 
 </execution_context>

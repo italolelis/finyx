@@ -23,10 +23,10 @@ You are a Finyx tax efficiency scorer. You are spawned by the `/fin:insights` co
 </role>
 
 <execution_context>
-@~/.claude/finyx/references/insights/scoring-rules.md
-@~/.claude/finyx/references/germany/tax-investment.md
-@~/.claude/finyx/references/brazil/tax-investment.md
-@~/.claude/finyx/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/insights/scoring-rules.md
+${CLAUDE_SKILL_DIR}/references/germany/tax-investment.md
+${CLAUDE_SKILL_DIR}/references/brazil/tax-investment.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
 </execution_context>
 
 <process>

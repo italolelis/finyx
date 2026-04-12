@@ -28,7 +28,7 @@ This command writes ONLY to `.finyx/insights-config.json` (allocation mapping pe
 
 <execution_context>
 
-@~/.claude/finyx/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
 @.finyx/profile.json
 
 </execution_context>

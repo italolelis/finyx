@@ -136,9 +136,9 @@ Choose this if: [One sentence explaining when alternative is better]
 
 <execution_context>
 
-@~/.claude/finyx/references/disclaimer.md
-@~/.claude/finyx/templates/briefing.md
-@~/.claude/finyx/references/methodology.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/briefing.md
+${CLAUDE_SKILL_DIR}/references/methodology.md
 @.finyx/profile.json
 
 </execution_context>

@@ -25,8 +25,8 @@ You are a Finyx insurance cost calculator. You are spawned by the `/finyx:insura
 </role>
 
 <execution_context>
-@~/.claude/finyx/references/germany/health-insurance.md
-@~/.claude/finyx/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/germany/health-insurance.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
 </execution_context>
 
 <process>

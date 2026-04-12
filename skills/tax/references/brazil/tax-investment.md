@@ -202,6 +202,6 @@ The following topics are explicitly out of scope for this document and will be a
 
 ## Legal Disclaimer
 
-@~/.claude/finyx/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
 
 Tax rules, rates, and laws change frequently. This document applies to `tax_year: 2025`. Verify all rules against current Receita Federal guidance, particularly for Law 15,270/2025 which became effective 2026-01-01 and may have subsequent regulatory implementation guidance. Consult a contador before making decisions that depend on FII dividend exemption treatment under the new law.

@@ -21,7 +21,7 @@ This is the "where am I?" command for orientation.
 
 <execution_context>
 
-@~/.claude/finyx/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
 @.finyx/profile.json
 
 </execution_context>

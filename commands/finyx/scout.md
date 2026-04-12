@@ -29,10 +29,10 @@ Research a location for real estate investment, gathering critical data:
 
 <execution_context>
 
-@~/.claude/finyx/references/disclaimer.md
-@~/.claude/finyx/references/erbpacht-detection.md
-@~/.claude/finyx/references/transport-assessment.md
-@~/.claude/finyx/templates/location-research.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/erbpacht-detection.md
+${CLAUDE_SKILL_DIR}/references/transport-assessment.md
+${CLAUDE_SKILL_DIR}/references/location-research.md
 @.finyx/profile.json
 
 </execution_context>

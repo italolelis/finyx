@@ -30,10 +30,10 @@ Complete a structured financial profile interview that creates `.finyx/profile.j
 
 <execution_context>
 
-@~/.claude/finyx/references/disclaimer.md
-@~/.claude/finyx/references/germany/tax-rules.md
-@~/.claude/finyx/templates/profile.json
-@~/.claude/finyx/templates/state.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/germany/tax-rules.md
+${CLAUDE_SKILL_DIR}/references/profile.json
+${CLAUDE_SKILL_DIR}/references/state.md
 
 </execution_context>
 

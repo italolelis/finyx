@@ -26,8 +26,8 @@ This command writes NO files. All output is conversational advisory text.
 
 <execution_context>
 
-@~/.claude/finyx/references/disclaimer.md
-@~/.claude/finyx/references/germany/health-insurance.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/germany/health-insurance.md
 @.finyx/profile.json
 
 </execution_context>

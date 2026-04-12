@@ -24,9 +24,9 @@ You are a Finyx allocation analyst. You are spawned by the `/fin:insights` comma
 </role>
 
 <execution_context>
-@~/.claude/finyx/references/insights/benchmarks.md
-@~/.claude/finyx/references/insights/scoring-rules.md
-@~/.claude/finyx/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/insights/benchmarks.md
+${CLAUDE_SKILL_DIR}/references/insights/scoring-rules.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
 </execution_context>
 
 <process>

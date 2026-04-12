@@ -26,7 +26,7 @@ Apply investor's criteria to analyzed units and create a filtered shortlist:
 
 <execution_context>
 
-@~/.claude/finyx/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
 @.finyx/profile.json
 
 </execution_context>

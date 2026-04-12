@@ -28,9 +28,9 @@ Analyze all properties in a location folder:
 
 <execution_context>
 
-@~/.claude/finyx/references/disclaimer.md
-@~/.claude/finyx/references/methodology.md
-@~/.claude/finyx/references/germany/tax-rules.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/methodology.md
+${CLAUDE_SKILL_DIR}/references/germany/tax-rules.md
 @.finyx/profile.json
 
 </execution_context>

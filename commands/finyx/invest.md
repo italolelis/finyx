@@ -29,7 +29,7 @@ Output is conversational advisory text plus structured tables. No files are writ
 
 <execution_context>
 
-@~/.claude/finyx/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
 @.finyx/profile.json
 
 </execution_context>

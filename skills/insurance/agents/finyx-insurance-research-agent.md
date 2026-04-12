@@ -26,8 +26,8 @@ You are a Finyx PKV research specialist. You are spawned by the `/finyx:insuranc
 </role>
 
 <execution_context>
-@~/.claude/finyx/references/germany/health-insurance.md
-@~/.claude/finyx/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/germany/health-insurance.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
 </execution_context>
 
 <process>

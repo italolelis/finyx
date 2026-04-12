@@ -22,9 +22,9 @@ You are a Finyx projection analyst. You are spawned by the `/fin:insights` comma
 </role>
 
 <execution_context>
-@~/.claude/finyx/references/insights/benchmarks.md
-@~/.claude/finyx/references/insights/scoring-rules.md
-@~/.claude/finyx/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/insights/benchmarks.md
+${CLAUDE_SKILL_DIR}/references/insights/scoring-rules.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
 </execution_context>
 
 <process>
@@ -283,7 +283,7 @@ Planning reference: EUR 1,500/month (single earner minimum planning target)
 
 *[MEDIUM CONFIDENCE] — Portfolio at cost basis; net income derived from gross approximation; actual figures require payslip or broker statement data.*
 
-*See: @~/.claude/finyx/references/disclaimer.md*
+*See: ${CLAUDE_SKILL_DIR}/references/disclaimer.md*
 
 </projection_result>
 ```

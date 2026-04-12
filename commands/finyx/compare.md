@@ -24,7 +24,7 @@ Create comprehensive side-by-side comparison of all shortlisted properties:
 
 <execution_context>
 
-@~/.claude/finyx/references/disclaimer.md
+${CLAUDE_SKILL_DIR}/references/disclaimer.md
 @.finyx/profile.json
 
 </execution_context>
