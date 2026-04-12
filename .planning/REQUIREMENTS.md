@@ -54,26 +54,26 @@ Deferred to future release.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PLUG-01 | — | Pending |
-| PLUG-02 | — | Pending |
-| PLUG-03 | — | Pending |
-| SKILL-01 | — | Pending |
-| SKILL-02 | — | Pending |
-| SKILL-03 | — | Pending |
-| SKILL-04 | — | Pending |
-| SKILL-05 | — | Pending |
-| INTG-01 | — | Pending |
-| INTG-02 | — | Pending |
-| INTG-03 | — | Pending |
-| CLEAN-01 | — | Pending |
-| CLEAN-02 | — | Pending |
-| CLEAN-03 | — | Pending |
+| PLUG-01 | Phase 13 | Pending |
+| PLUG-02 | Phase 13 | Pending |
+| PLUG-03 | Phase 13 | Pending |
+| INTG-01 | Phase 14 | Pending |
+| SKILL-01 | Phase 15–16 | Pending |
+| SKILL-02 | Phase 15–16 | Pending |
+| SKILL-03 | Phase 15–16 | Pending |
+| SKILL-04 | Phase 15–16 | Pending |
+| SKILL-05 | Phase 15–16 | Pending |
+| INTG-02 | Phase 17 | Pending |
+| INTG-03 | Phase 17 | Pending |
+| CLEAN-01 | Phase 17 | Pending |
+| CLEAN-02 | Phase 17 | Pending |
+| CLEAN-03 | Phase 17 | Pending |
 
 **Coverage:**
 - v2.0 requirements: 14 total
-- Mapped to phases: 0
-- Unmapped: 14 ⚠️
+- Mapped to phases: 14
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-12*
-*Last updated: 2026-04-12 after initial definition*
+*Last updated: 2026-04-12 — traceability mapped after roadmap creation*
