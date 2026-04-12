@@ -1,0 +1,117 @@
+{
+  "$schema": "https://finyx.dev/schemas/profile.schema.json",
+  "version": "1.0.0",
+  "created": "ISO_DATE",
+  "updated": "ISO_DATE",
+
+  "_holdings_schema": {
+    "description": "Each broker in countries.{country}.brokers[] can contain a holdings[] array",
+    "holding_fields": {
+      "ticker": "Exchange ticker symbol (e.g., VWCE, BOVA11)",
+      "isin": "ISIN if available (e.g., IE00BK5BQT80), null for B3 assets",
+      "shares": "Number of shares/units held (decimal)",
+      "cost_basis": "Average cost per share in local currency",
+      "asset_class": "One of: equity-etf, bond-etf, reit-etf, stock, fii, fixed-income",
+      "geography": "One of: global, us, europe, emerging-markets, brazil, germany"
+    }
+  },
+
+  "identity": {
+    "residence_country": null,
+    "nationality": null,
+    "income_countries": [],
+    "has_income_in_multiple_countries": false,
+    "cross_border": false,
+    "family_status": null,
+    "children": 0
+  },
+
+  "countries": {
+    "germany": {
+      "tax_class": null,
+      "church_tax": false,
+      "gross_income": 0,
+      "marginal_rate": 0,
+      "brokers": []
+    },
+    "brazil": {
+      "ir_regime": null,
+      "gross_income": 0,
+      "cpf": null,
+      "brokers": []
+    }
+  },
+
+  "goals": {
+    "risk_tolerance": null,
+    "investment_horizon": 0,
+    "primary_goals": []
+  },
+
+  "pension": {
+    "de_rentenpunkte": null,
+    "expected_real_return_de": 1.5,
+    "br_inss_status": null,
+    "expected_real_return_br": 2.0,
+    "target_retirement_age": null
+  },
+
+  "project": {
+    "name": "",
+    "propertiesFolder": "properties",
+    "outputFolder": ".finyx/output",
+    "language": "en"
+  },
+
+  "investor": {
+    "country": "",
+    "taxClass": "",
+    "churchTax": false,
+    "children": 0,
+    "income": {
+      "primary": 0,
+      "spouse": 0,
+      "total": 0
+    },
+    "marginalRate": 0,
+    "liquidAssets": 0,
+    "monthlyCommitments": 0
+  },
+
+  "strategy": {
+    "type": "neubau-rent-sell",
+    "horizon": 10,
+    "financing": {
+      "ltv": 100,
+      "fixedPeriod": 10
+    },
+    "management": "professional",
+    "exitPlan": "sell-tax-free"
+  },
+
+  "criteria": {
+    "propertyType": "2-bedroom apartment",
+    "bedrooms": [2],
+    "minYield": 2.8,
+    "maxPrice": 450000,
+    "minSize": 45,
+    "maxSize": 80,
+    "parkingRequired": false,
+    "parkingPreferred": true,
+    "excludeErbpacht": true,
+    "excludeGroundFloor": false,
+    "topFloorPreferred": false,
+    "newConstructionOnly": true
+  },
+
+  "assumptions": {
+    "appreciation": 2.0,
+    "rentIncrease": 0,
+    "vacancy": 0,
+    "verwaltungPerSqm": 1.0,
+    "rucklagePerSqm": 0.6,
+    "saleCosts": 7.0,
+    "constructionPeriod": 18,
+    "constructionDraw": 50
+  }
+}
