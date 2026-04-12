@@ -1,168 +1,357 @@
-# Feature Landscape: PKV vs GKV Health Insurance Advisor
+# Feature Landscape: Plugin Architecture Migration (v2.0)
 
-**Domain:** German health insurance decision advisory (PKV vs GKV)
-**Researched:** 2026-04-06
-**Milestone:** v1.2 — `/finyx:insurance` command
+**Domain:** Claude Code plugin system — migrating Finyx from npm to plugin distribution
+**Researched:** 2026-04-12
+**Milestone:** v2.0 — Plugin Architecture
+**Confidence:** HIGH (sourced from official Claude Code docs, verified against live documentation)
+
+---
+
+## What the Plugin System Actually Unlocks
+
+These are confirmed capabilities from official Claude Code documentation, not aspirational.
+
+### Auto-Triggering (Skills fire on natural language)
+
+Skills with a `description` field in SKILL.md frontmatter load automatically when Claude detects relevant context. The description is the trigger — Claude reads all skill descriptions (always in context, ~30–50 tokens per skill) and loads the full skill content when there's a match.
+
+**What this means for Finyx:**
+- User types "what should I do with my taxes this year?" → `finyx:tax` skill activates without `/finyx:tax`
+- "Help me understand my pension options" → `finyx:pension` fires
+- "I'm thinking about PKV" → `finyx:insurance` fires
+- The description must be written for the model ("when should I invoke this?"), not for humans
+
+**Trigger quality determines auto-trigger quality.** The description is capped at 250 characters in the skill listing (truncated beyond that). Front-load the exact phrases users will naturally say.
+
+Good: `German and Brazilian investment tax guidance. Triggers on: capital gains, Abgeltungssteuer, DARF, Vorabpauschale, tax optimization questions, "what should I do with taxes"`
+
+Bad: `The finyx tax advisor provides comprehensive tax analysis for German and Brazilian investors`
+
+### Individual Skill Installation
+
+Users install specific skills via `/plugin install finyx@marketplace`. But the plugin is the distribution unit — individual skill selection happens at plugin level. Within a plugin, all skills load. The granularity is: install the plugin, get all skills in it.
+
+**What this means for Finyx:**
+- The plugin is the installable unit, not individual skills
+- Skills within the plugin are always co-installed
+- To allow partial installation, Finyx would need to be multiple separate plugins (e.g., `finyx-tax` as a standalone plugin, `finyx-invest` as another)
+- This is a design decision: one `finyx` plugin (all skills) vs. separate plugins per domain
+
+**Recommendation:** Single `finyx` plugin. Individual skill installation adds distribution complexity with minimal user benefit given the skills are small and interdependent.
+
+### Auto-Updates
+
+Marketplace plugins auto-update by default. Official Anthropic marketplace has auto-update enabled. Community marketplaces default to off. Users are notified when updates are available, then run `/reload-plugins`.
+
+**What this means for Finyx:**
+- No more `npx finyx-cc` re-runs to get new tax rules
+- Tax year reference doc updates (the highest-friction part of v1.x) auto-deploy
+- Version bumps in `plugin.json` are required for updates to propagate (cache-based)
+
+### Marketplace Discovery
+
+Two official distribution paths:
+1. **Anthropic official marketplace** (`claude-plugins-official`) — `claude.com/plugins`, submit via `claude.ai/settings/plugins/submit`
+2. **GitHub-based marketplace** — any repo with `.claude-plugin/marketplace.json` can be a marketplace
+
+**What this means for Finyx:**
+- Submit to `claude.com/plugins` for maximum discovery
+- Users find Finyx via `/plugin install finyx@claude-plugins-official`
+- No npm knowledge required from users
+- GitHub repo can be its own marketplace as fallback (`/plugin marketplace add italolelis/finyx`)
+
+### Skill Invocation Control
+
+Two fields control auto-trigger behavior:
+
+- `disable-model-invocation: true` — skill only fires when user explicitly types `/finyx:command`. Claude never auto-triggers it. Correct for: `/finyx:profile` (destructive questionnaire), `/finyx:insights` (explicit report request)
+- `user-invocable: false` — Claude can auto-trigger but it does not appear in `/` menu. Correct for: background knowledge skills (country reference docs)
+- Default (no field) — Claude auto-triggers AND user can invoke with `/`
+
+### Namespaced Skills
+
+Plugin skills are namespaced: `finyx` plugin provides `/finyx:tax`, `/finyx:invest`, etc. This prevents conflicts with other installed plugins. The namespace comes from the `name` field in `plugin.json`.
+
+### Subagent Integration
+
+Agents in `agents/` directory of the plugin are auto-discovered. They appear in `/agents`, Claude can invoke them automatically, and they can be invoked manually. Plugin agents support `name`, `description`, `model`, `effort`, `maxTurns`, `tools`, `disallowedTools`, `skills`, `memory`, `background`, `isolation` frontmatter.
+
+### Hooks (New Capability)
+
+Plugins can bundle hooks in `hooks/hooks.json`. Hooks fire on lifecycle events: `SessionStart`, `PreToolUse`, `PostToolUse`, `Stop`, `UserPromptSubmit`, etc.
+
+**What this means for Finyx:**
+- `SessionStart` hook: detect stale tax reference docs (check `tax_year` metadata, warn if > 6 months old)
+- `PostToolUse` hook: after `/finyx:profile` write, validate `profile.json` schema
+- `UserPromptSubmit` hook: not recommended (adds latency to every prompt)
+
+### User Configuration at Install Time
+
+`plugin.json` `userConfig` field prompts users for values when the plugin is enabled. Non-sensitive values go to `settings.json`, sensitive values to system keychain. Available as `${user_config.KEY}` in skill content and `CLAUDE_PLUGIN_OPTION_<KEY>` env vars.
+
+**What this means for Finyx:**
+- Prompt for `primary_country` (DE/BR/both) at install time — pre-populates profile context
+- Prompt for `currency_display` preference
+- Do NOT use for sensitive financial data — that stays in `.finyx/profile.json` (user-owned file)
 
 ---
 
 ## Table Stakes
 
-Features a PKV vs GKV decision tool must have. Missing any = advice is incomplete or wrong.
+Features a well-structured plugin must have. Missing any = the plugin fails quality bar for marketplace submission or creates poor UX.
 
-| Feature | Why Expected | Complexity | Profile Data Used |
-|---------|--------------|------------|-------------------|
-| Versicherungspflichtgrenze eligibility gate | First question: "can I even choose?" — 2026 threshold is €77,400 gross/year. Below it: stop, GKV is mandatory. | Low | `income.gross_annual` |
-| GKV cost calculation | Income × (14.6% + Zusatzbeitrag ~2.9%) / 2, capped at BBG (€69,750/yr in 2026). Employer pays half for employees. Self-employed pay full rate. | Low | `income.gross_annual`, `employment.type` |
-| PKV indicative cost range | Age + health status → base tariff estimate. Cannot be exact without insurer underwriting, but ballpark is required. Flag as estimate. | Medium | `personal.age`, `health.pre_existing_conditions` |
-| Break-even income point | At what gross income does PKV become net-cheaper than GKV after tax deduction? Critical for near-threshold earners. | Low | derived from above |
-| Family impact analysis | Familienversicherung: non-working spouse + children covered free in GKV. In PKV each person needs a separate contract. Families with one earner almost always better in GKV. | Medium | `family.partner_employed`, `family.children_count` |
-| Long-term cost projection | PKV premiums tied to age and medical inflation (avg +3.1%/yr historically). GKV tied to income + BBG growth (avg +3.8%/yr). 20–40 year horizon often reverses the answer. | High | `personal.age`, `personal.retirement_age` |
-| Tax deduction netting for PKV | Basisabsicherung portion is fully deductible as Sonderausgaben with no cap. 2026 change: insurers now transmit data to tax office via ELStAM. Net PKV cost materially lower than gross premium. | Medium | `tax.steuerklasse`, `income.gross_annual` |
-| Age-out lock-in warning | After 55, returning to GKV as an employee is nearly impossible by law. Users 50+ must see this risk prominently. | Low | `personal.age` |
-| Altersrückstellungen explanation | Mandatory PKV old-age reserves partially offset premium growth at retirement. Without this context, users systematically overestimate PKV retirement cost risk. | Low | narrative only |
-| Employer Arbeitgeberzuschuss cap | Employer subsidizes PKV up to the GKV equivalent contribution — not half the actual PKV premium. For expensive tariffs, the employer contribution gap matters. | Low | `employment.type` |
-| Beamter redirect | Civil servants use the Beihilfe system (state pays 50–80%) making PKV standard for them. Completely different decision logic. | Low | `employment.type` |
-| Pflegeversicherung inclusion | Long-term care insurance is mandatory and often omitted. GKV members pay ~3.4% of income; PKV members pay a separate private Pflegeversicherung tariff. | Low | add to both cost models |
+| Feature | Why Required | Notes |
+|---------|--------------|-------|
+| `plugin.json` manifest with `name`, `version`, `description` | Required for marketplace submission and namespacing | `name` becomes the skill namespace prefix |
+| `description` field in every SKILL.md | Without it, auto-triggering doesn't work; Claude can't decide when to load the skill | Front-loaded, ≤250 chars |
+| `disable-model-invocation: true` on destructive skills | Profile questionnaire, insights report generation — wrong to auto-trigger | Apply to `/finyx:profile` and `/finyx:insights` |
+| Legal disclaimer in all advisory skill output | Anthropic marketplace requirement and legal necessity | Already present in v1.x; must be preserved |
+| `SKILL.md` under 500 lines | Documented performance threshold; longer skills eat context disproportionately | Split reference material into supporting files |
+| Supporting files for reference docs | `references/germany/tax-rules.md` stays out of SKILL.md, loaded on demand | Reduces context cost until needed |
+| `allowed-tools` scoped to what each skill actually uses | Principle of least privilege; required for responsible plugin | Already enforced in v1.x |
+| `${CLAUDE_SKILL_DIR}` for referencing bundled files | Absolute paths break after installation; must use skill-relative variable | Replace all `~/.claude/finyx/references/` paths |
+| README with installation instructions | Marketplace requires documentation | Dual-path: plugin + npm fallback |
+| Semantic versioning in `plugin.json` | Required for auto-updates to propagate; cache is version-keyed | Bump version on every release |
 
 ---
 
 ## Differentiators
 
-Features that make `/finyx:insurance` better than a generic web calculator, enabled by Finyx's existing profile data and cross-advisor architecture.
+Features that make Finyx a great plugin, not just a ported npm package.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| Health questionnaire (simplified) | PKV underwriting applies Risikozuschlag (10–50%+ surcharge) or Risikoausschluss (coverage exclusion) for pre-existing conditions. Without this, PKV cost estimates are wrong. | Medium | Collect: chronic conditions flag, mental health treatment in last 5 years flag, BMI range, ongoing medications. Binary flags only — do NOT collect diagnoses. Always recommend Anonyme Risikovoranfrage via licensed broker. |
-| Beitragsrückerstattung modeling | PKV refunds 1–4 months of premiums if no claims filed. Healthy low-utilization users recover €500–2,000/yr. GKV has no equivalent. Directly affects effective PKV cost. | Low | Ask: healthcare usage (low/medium/high). Show premium with and without estimated refund. |
-| Selbstbeteiligung scenarios | Annual deductible options (€300–€2,000+) reduce PKV premiums 10–30%. Users willing to self-fund routine costs can substantially close the GKV/PKV price gap. | Low | Show delta: premium at €0 / €500 / €1,000 / €2,000 deductible. |
-| Anwartschaft advisory for expats | Users temporarily abroad can keep PKV dormant for ~€30–80/month (Anwartschaft) without new underwriting on return. GKV re-entry abroad requires qualifying income again. Critical for the DE+BR expat profile. | Medium | Trigger when `residence.primary_country != DE` or `profile.expat_status = true`. |
-| Cross-advisor tax integration | PKV Basisabsicherung deduction reduces taxable income → links to Finyx tax analysis (Sonderausgaben gap) and pension planning (headroom recalculation). | Medium | Reads existing `.finyx/profile.json`; no new data required. Pass finding to `/finyx:insights` as actionable item. |
-| Provider research agent | Web-search current tariffs from major providers (AXA, Allianz, Debeka, Ottonova, HUK-Coburg). Return indicative premium ranges, Beitragsrückerstattung terms, digital service quality. | High | Spawns sub-agent with web search. Mandatory disclaimer: not binding quotes. Recommend Anonyme Risikovoranfrage. |
+| Skill descriptions tuned for natural language triggers | Users get tax/pension/investment advice without knowing the command names | Low | Rewrite descriptions from "what it does" to "when to fire" |
+| `finyx-profile` foundation skill with `user-invocable: false` | Profile context loads silently for all sessions; other skills always have context | Low | Background knowledge skill: Claude knows profile structure without user action |
+| `SessionStart` hook for tax doc staleness check | Warn users proactively when reference docs are from last tax year | Medium | Compare `tax_year` in reference frontmatter to current date |
+| `context: fork` + `agent: Explore` for research skills | Insurance research agent, broker research — isolated execution, no conversation contamination | Low | Already spawning sub-agents via Task tool; `context: fork` is the plugin-native pattern |
+| `effort: high` on tax and pension skills | Complex calculations benefit from extended reasoning; user gets better advice | Low | Single frontmatter field — high ROI for no extra work |
+| `userConfig` for `primary_country` at install | First-run onboarding without needing `/finyx:profile` first | Low | Reduces time-to-value from install to first useful answer |
+| `${CLAUDE_PLUGIN_DATA}` for persistent profile cache | Profile JSON survives plugin updates (unlike `${CLAUDE_PLUGIN_ROOT}`) | Low | Store `.finyx/profile.json` path in data dir, not plugin dir |
+| `paths` frontmatter for context-aware skill loading | Tax skill only loads when working in finance-related directories | Low | `paths: ["**/*.finyx*", "**/.finyx/**"]` |
+| Hooks for profile schema validation | After profile write, validate required fields exist and types are correct | Medium | `PostToolUse` hook on Write targeting `.finyx/profile.json` |
 
 ---
 
 ## Anti-Features
 
+Features to explicitly NOT build in the migration.
+
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| Binding PKV premium quotes | Underwriting requires full Gesundheitsprüfung by a licensed broker. Presenting estimates as quotes creates liability and erodes trust. | Label all numbers as indicative ranges. Recommend Anonyme Risikovoranfrage via broker before any switch. |
-| PKV provider ranking / "best PKV" list | Highly context-dependent (age, health, region, tariff structure). Ranking implies claims processing quality assessment we cannot do. | Show 3–5 representative providers with key differentiators. No ranking. |
-| Check24-style full comparison table | Full insurance marketplace is explicitly out of scope (PROJECT.md). Requires live data feeds we do not have. | Single decision: GKV or PKV verdict + conditions + top 3 action items. |
-| Unqualified "switch to PKV" recommendation | Age-out lock-in, pre-existing condition exclusions, and family scenarios can make a PKV switch financially catastrophic. An unqualified recommendation creates real user harm. | Always qualify verdict with explicit conditions. Always recommend licensed broker consultation for final decision. |
-| GKV provider comparison | Zusatzbeitrag variance (2.18%–3.4% in 2026) is small; statutory benefits are identical by law. Comparison adds noise. | Mention Zusatzbeitrag range; link to GKV-Zusatzbeitrag.de for current rates. |
-| §204 VVG in-PKV tariff switching guidance | Complex broker-assisted process. Out of scope for v1.2. | Mention that in-PKV tariff optimization via §204 VVG exists; recommend broker. |
-| Manual premium quotes for specific conditions | Asking users to input their actual PKV quote creates liability when our model diverges. | Use age-bracket ranges. Acknowledge the estimate nature explicitly. |
+| Multiple separate plugins (finyx-tax, finyx-invest, etc.) | The plugin is the install unit; splitting adds distribution complexity, cross-skill integration breaks, `finyx-insights` can't orchestrate | Single `finyx` plugin, skills are internal structure |
+| Skill names without namespace prefix | Plugin skills are auto-namespaced by plugin `name`; adding manual prefix causes double-namespacing (`finyx:finyx-tax`) | Let the plugin manifest handle namespacing; skill dirs use plain names (`tax/`, `invest/`) |
+| Migrating CLAUDE.md content into skills | CLAUDE.md content is for persistent facts; skills are for procedures. Putting project conventions in a skill means they only load on demand | Keep CLAUDE.md for always-needed context; skills for invocable procedures |
+| `context: fork` on reference/knowledge skills | Forked context loses conversation history; advisory skills need user's financial context to give relevant advice | Only use `context: fork` for isolated research tasks (broker research, insurance provider lookup) |
+| Storing sensitive financial data in plugin files | Plugin files are in `~/.claude/plugins/cache/` — cache directory, not user-owned. Profile data must stay in user's project directory | Keep `.finyx/profile.json` in the user's project, reference via standard paths |
+| Hooks on `UserPromptSubmit` for financial context injection | Fires on EVERY message; severe latency and context pollution | Use skill descriptions for auto-loading; CLAUDE.md for persistent context |
+| Removing npm fallback (`bin/install.js`) immediately | Existing users on npm need migration path; marketplace submission takes time | Keep both; npm installer can detect plugin system and offer migration |
+| Auto-triggering `/finyx:insights` | Insights report is expensive and long; wrong to fire on ambiguous prompts | `disable-model-invocation: true` — explicit user intent required |
+
+---
+
+## What Makes a Great Skill vs a Mediocre One
+
+Based on official documentation and real financial skill patterns (finance_skills, financial-analyst SKILL.md).
+
+### Great skill characteristics
+
+**Specific, opinionated description:**
+- Bad: `Provides tax analysis for German and Brazilian investors`
+- Good: `German investment tax guidance. Use when asked about: Abgeltungssteuer, Sparerpauschbetrag, Vorabpauschale, capital gains tax, DARF, come-cotas, FII tax exemptions, or "optimize my taxes"`
+
+**Progressive disclosure via supporting files:**
+- SKILL.md < 500 lines with overview + section pointers
+- `references/germany/tax-rules.md` as supporting file loaded on demand
+- `references/brazil/tax-rules.md` as supporting file
+- Claude reads the overview; deep reference loads only when needed
+
+**Correct invocation control:**
+- Advisory skills: default (auto-trigger enabled) — users benefit from skills activating without knowing command names
+- Destructive/long workflows: `disable-model-invocation: true` — user explicitly types the command
+- Background knowledge: `user-invocable: false` — Claude loads silently, not in `/` menu
+
+**Tool pre-approval scoped tightly:**
+- `allowed-tools: Read Bash(cat *) WebSearch` not `allowed-tools: *`
+- Already enforced in v1.x; preserve in migration
+
+**Effort level set explicitly:**
+- Tax skill: `effort: high` (complex calculations, extended reasoning worthwhile)
+- Profile skill: `effort: medium` (conversational questionnaire)
+- Quick lookups: `effort: low`
+
+**5-phase workflow structure** (validated by financial-analyst SKILL.md pattern):
+1. Scoping (what does the user actually want?)
+2. Data validation (does profile.json have required fields?)
+3. Analysis (the actual computation/advice)
+4. Output (structured, country-aware, with € amounts)
+5. Next actions (actionable items, cross-advisor links)
+
+### Mediocre skill characteristics
+
+- Description is a title, not a trigger
+- All logic crammed in SKILL.md (hits context limits, slow to load)
+- No `disable-model-invocation` on side-effecting skills
+- Generic `allowed-tools: *`
+- No supporting files — reference material always in context
+- Single-phase "do everything" instruction
+
+---
+
+## Skill Structure for Finyx
+
+Based on what the plugin system enables, the correct structure for each skill:
+
+```
+skills/
+├── tax/
+│   ├── SKILL.md                    # ≤500 lines, auto-trigger enabled, effort: high
+│   ├── references/
+│   │   ├── germany/
+│   │   │   └── tax-investment.md   # loaded on demand
+│   │   └── brazil/
+│   │       └── tax-investment.md
+│   └── examples/
+│       └── tax-output-example.md
+├── invest/
+│   ├── SKILL.md                    # auto-trigger enabled
+│   └── references/
+│       ├── germany/etf-universe.md
+│       └── brazil/b3-funds.md
+├── insurance/
+│   ├── SKILL.md                    # auto-trigger enabled
+│   ├── agents/
+│   │   ├── finyx-insurance-calc-agent.md
+│   │   └── finyx-insurance-research-agent.md
+│   └── references/
+│       └── germany/health-insurance.md
+├── pension/
+│   ├── SKILL.md                    # auto-trigger enabled, effort: high
+│   └── references/
+│       ├── germany/pension-types.md
+│       └── brazil/pension-types.md
+├── broker/
+│   ├── SKILL.md                    # auto-trigger enabled
+│   └── references/
+│       ├── germany/brokers.md
+│       └── brazil/brokers.md
+├── profile/
+│   ├── SKILL.md                    # disable-model-invocation: true (destructive questionnaire)
+│   └── profile-schema.md
+├── insights/
+│   ├── SKILL.md                    # disable-model-invocation: true (long report)
+│   ├── agents/
+│   │   ├── finyx-allocation-agent.md
+│   │   ├── finyx-tax-scoring-agent.md
+│   │   └── finyx-projection-agent.md
+│   └── references/
+│       └── insights/benchmarks.md
+└── realestate/
+    ├── SKILL.md                    # auto-trigger enabled
+    └── references/
+        └── germany/tax-rules.md
+```
 
 ---
 
 ## Feature Dependencies
 
 ```
-income.gross_annual
-    → Versicherungspflichtgrenze gate (hard stop if below €77,400)
-    → GKV cost calculation (× combined rate, capped at BBG)
-    → Tax deduction value (marginal rate × Basisabsicherung portion)
+plugin.json (name: "finyx")
+    → all skills namespaced as finyx:*
+    → userConfig.primary_country prompts at install
 
-employment.type
-    → Beamter? → redirect to Beihilfe explanation (different system)
-    → Selbständig? → full GKV rate (no employer split), different GKV entry rules
-    → Employee? → employer Arbeitgeberzuschuss applies
+finyx:profile skill (disable-model-invocation: true)
+    → writes .finyx/profile.json
+    → all other skills depend on profile.json existing
 
-personal.age
-    → PKV indicative premium (age-rated)
-    → Long-term projection (years to retirement)
-    → Age-out lock-in warning trigger (50+)
-    → Altersrückstellungen accumulation estimate
+finyx:tax skill (auto-trigger)
+    → reads profile.json (income, tax class, investment portfolio)
+    → loads references/germany/tax-rules.md or brazil/tax-rules.md on demand
+    → output feeds finyx:insights
 
-health.pre_existing_conditions / health.chronic_medication
-    → Risikozuschlag flag → adjust PKV estimate upward
-    → Severe cases: recommend checking PKV feasibility via Anonyme Risikovoranfrage before analysis
+finyx:invest skill (auto-trigger)
+    → reads profile.json (risk profile, portfolio, broker)
+    → calls WebSearch for live market data
+    → output feeds finyx:insights
 
-family.partner_employed + family.children_count
-    → Familienversicherung benefit calculation (per non-working dependent: ~€300–500/month saved in GKV vs PKV)
+finyx:insurance skill (auto-trigger)
+    → reads profile.json
+    → spawns calc agent + research agent (context: fork)
+    → output feeds finyx:insights + finyx:tax (PKV deduction)
 
-residence.primary_country / expat_status
-    → Anwartschaft advisory (expat edge case)
+finyx:pension skill (auto-trigger, effort: high)
+    → reads profile.json
+    → cross-references tax headroom from finyx:tax output
+    → output feeds finyx:insights
 
-health.healthcare_usage
-    → Beitragsrückerstattung estimate
-    → Selbstbeteiligung recommendation
+finyx:insights skill (disable-model-invocation: true)
+    → reads profile.json
+    → spawns allocation, tax-scoring, projection agents
+    → synthesizes all domain outputs into unified report
+    → does NOT invoke other skills (profile-only data source)
 
-Basisabsicherung deduction (output)
-    → feeds /finyx:tax (Sonderausgaben unused gap)
-    → feeds /finyx:insights (net insurance cost after tax)
+SessionStart hook
+    → checks tax_year metadata in reference docs
+    → warns if stale (> 6 months from current date)
 ```
 
 ---
 
-## New Profile Fields Required
+## Plugin.json Manifest — Required Fields
 
-Confirm existence of these fields in `.finyx/profile.json`; collect missing ones at command start.
+Confirmed from official docs (`plugins-reference`). Only `name` is required; all others recommended for marketplace submission.
 
-| Field | Type | Notes |
-|-------|------|-------|
-| `health.current_insurance` | enum: `GKV` / `PKV` | Are they already in PKV? Changes the advice direction. |
-| `health.pre_existing_conditions` | boolean | Binary only. Do not collect diagnoses. |
-| `health.chronic_medication` | boolean | Proxy for underwriting risk. |
-| `health.healthcare_usage` | enum: `low` / `medium` / `high` | For Beitragsrückerstattung estimate. |
-| `employment.type` | enum: `employee` / `self_employed` / `beamter` / `student` | Beamter is a completely separate path. |
-| `family.partner_employed` | boolean | Familienversicherung gate. |
-| `family.children_count` | integer | Per-child PKV cost multiplier vs GKV zero marginal cost. |
-| `personal.retirement_age` | integer | Long-term projection endpoint. |
-
----
-
-## MVP Build Order for v1.2
-
-1. Eligibility gate — Versicherungspflichtgrenze with 2026 threshold (€77,400)
-2. GKV cost calculation — BBG cap, Zusatzbeitrag, employer split, Pflegeversicherung included
-3. PKV indicative range — age-bracket base with health-flag surcharge
-4. Family impact — Familienversicherung zero-cost vs per-head PKV premium
-5. Tax deduction netting — Basisabsicherung as Sonderausgaben; show gross vs net PKV cost
-6. Long-term projection — 10/20/30-year cost trajectory
-7. Beamter detection — immediately redirect to Beihilfe explanation
-
-Defer to future milestone:
-- Provider research agent (web search freshness risk, high complexity)
-- Anwartschaft advisory (expat edge case, lower frequency)
-- §204 in-PKV tariff optimization
+```json
+{
+  "name": "finyx",
+  "version": "2.0.0",
+  "description": "AI-powered personal finance advisor for Germany and Brazil — tax, investments, insurance, pension, real estate",
+  "author": {
+    "name": "italolelis",
+    "url": "https://github.com/italolelis/finyx"
+  },
+  "homepage": "https://github.com/italolelis/finyx",
+  "repository": "https://github.com/italolelis/finyx",
+  "license": "MIT",
+  "keywords": ["finance", "tax", "germany", "brazil", "investment", "pension", "insurance"],
+  "userConfig": {
+    "primary_country": {
+      "description": "Your primary tax residence (DE, BR, or BOTH)",
+      "sensitive": false
+    }
+  }
+}
+```
 
 ---
 
-## German Insurance Terminology Reference
+## Migration Delta from v1.x to v2.0
 
-| Term | Meaning | 2026 Value |
-|------|---------|------------|
-| Versicherungspflichtgrenze / JAEG | Income threshold above which employees may choose PKV | €77,400 gross/yr |
-| Beitragsbemessungsgrenze (BBG) | GKV contribution calculated on income up to this cap | €69,750/yr |
-| Allgemeiner Beitragssatz | Statutory GKV rate split equally between employee and employer | 14.6% |
-| Zusatzbeitrag | Provider-specific GKV surcharge; varies by fund | Avg 2.9%, range 2.18%–3.4% |
-| Familienversicherung | Free GKV co-insurance for non-working spouse and children | Zero marginal cost in GKV |
-| Altersrückstellungen | Mandatory PKV reserves accumulating during working years to subsidize retirement premiums | Structural PKV advantage |
-| Beitragsrückerstattung | PKV premium refund for claim-free years | Typically 1–4 months |
-| Selbstbeteiligung | Annual deductible; reduces premium 10–30% | €300–€2,000+ options |
-| Risikozuschlag | Premium surcharge for pre-existing conditions | Typically 10–50%+ |
-| Risikoausschluss | Coverage exclusion for a specific condition | Eliminates PKV benefit for that condition |
-| Anwartschaft | Dormant PKV policy preserving underwriting status during absence from Germany | ~€30–80/month |
-| Gesundheitsprüfung | Health questionnaire required for PKV enrollment | Mandatory underwriting |
-| Anonyme Risikovoranfrage | Anonymous pre-check with insurer to assess underwriting outcome without creating an official record | Risk mitigation strategy |
-| Beihilfe | State subsidy for civil servants covering 50–80% of healthcare costs | Separate system entirely |
-| Pflegeversicherung | Mandatory long-term care insurance | GKV ~3.4% of income |
-| §204 VVG | Legal right to switch to comparable tariff within same PKV insurer without new health check | In-PKV optimization |
+What changes and what stays:
+
+| v1.x (npm) | v2.0 (plugin) |
+|------------|----------------|
+| `commands/finyx/*.md` | `skills/<name>/SKILL.md` (same logic, new location) |
+| `agents/*.md` at repo root | `skills/<domain>/agents/*.md` (co-located) |
+| `finyx/references/*.md` | `skills/<domain>/references/*.md` (per-skill, loaded on demand) |
+| `@~/.claude/finyx/references/` path includes | `${CLAUDE_SKILL_DIR}/references/` path includes |
+| `name: finyx:[verb]` in frontmatter | `name` field optional (derived from dir name); plugin adds `finyx:` namespace |
+| `allowed-tools` in commands | `allowed-tools` in SKILL.md frontmatter (identical syntax) |
+| No auto-trigger | `description` field enables auto-trigger |
+| No invocation control | `disable-model-invocation: true` for profile + insights |
+| `bin/install.js` required | Optional (fallback only); plugin system handles distribution |
+| `package.json` npm manifest | `plugin.json` plugin manifest (both coexist) |
+| No hooks | `hooks/hooks.json` for SessionStart staleness check |
 
 ---
 
 ## Sources
 
-- Versicherungspflichtgrenze 2026: https://www.myhealthcarebroker.com/blog/jahresarbeitsentgeltgrenze-2026-private-health-insurance
-- BBG / Zusatzbeitrag 2026: https://www.thegoodbroker.de/post/changes-in-gkv-contributions-2026
-- Familienversicherung impact: https://www.how-to-germany.com/health-insurance/private-health-insurance/families-children/
-- PKV long-term cost trajectory: https://germanpedia.com/private-health-insurance-cost-development/
-- Altersrückstellungen mechanics: https://www.ottonova.de/en/v/private-health-insurance/private-health-insurance-premiums-in-old-age
-- Tax deductibility 2026 ELStAM change: https://die-finanzpruefer.de/steuern/steuererleichterung-pkv-arbeitnehmer/
-- Risikozuschlag / Gesundheitsprüfung: https://pkv-welt.de/risikozuschlag/
-- Anwartschaft for expats: https://www.privat-patienten.de/lexikon/begriff/auslandsaufenthalt-dauerhaft/
-- Beitragsrückerstattung: https://www.versicherungsantrag24.de/pkv-beitragsrueckerstattung-fluch-oder-segen/
-- Age-out lock-in risk: https://financeforexpats.de/news/why-you-should-not-switch-to-private-health-insurance-in-germany
-- Is PKV worth it 2026: https://feather-insurance.com/blog/private-health-worth-it
+- Claude Code Skills documentation: https://code.claude.com/docs/en/skills (HIGH confidence — official docs)
+- Claude Code Plugins documentation: https://code.claude.com/docs/en/plugins (HIGH confidence — official docs)
+- Claude Code Plugin Discovery: https://code.claude.com/docs/en/discover-plugins (HIGH confidence — official docs)
+- Claude Code Plugins Reference: https://code.claude.com/docs/en/plugins-reference (HIGH confidence — official docs)
+- Financial analyst SKILL.md pattern: https://github.com/alirezarezvani/claude-skills/blob/main/finance/financial-analyst/SKILL.md (MEDIUM confidence — community source)
+- Skills best practices 2026: https://dev.to/raxxostudios/best-claude-code-skills-plugins-2026-guide-4ak4 (MEDIUM confidence — community source, consistent with official docs)
+- Finance skills repo: https://github.com/JoelLewis/finance_skills (MEDIUM confidence — community source)

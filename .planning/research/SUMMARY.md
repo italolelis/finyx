@@ -1,48 +1,49 @@
-# Research Summary — v1.2 Health Insurance Advisor
+# Research Summary — v2.0 Plugin Architecture
 
-**Researched:** 2026-04-08
-**Confidence:** HIGH
+**Researched:** 2026-04-12
+**Confidence:** HIGH (verified from actual installed plugins on disk)
 
 ## Executive Summary
 
-Finyx v1.2 adds `/finyx:insurance` — a PKV vs GKV decision advisor for Germany. No API exists for PKV tariffs; provider research uses WebSearch. GKV is fully computable from statutory constants. The critical design decisions: health data is ephemeral only (GDPR Art. 9), two agents (calculation + research), and four distinct calculation paths (single employee, family, self-employed, Beamter).
+Finyx v2.0 migrates from npm-only slash-command distribution to the Claude Code plugin system. The plugin format is minimal (`plugin.json` + `skills/` + `agents/`), the marketplace is live, and the migration is mostly structural — rewriting frontmatter and path references, not logic. The highest-risk step is replacing all `@~/.claude/finyx/references/` includes with `${CLAUDE_SKILL_DIR}/references/`.
 
 ## Key Findings
 
 ### Stack
-- No new dependencies. GKV formula is pure arithmetic from statutory constants. PKV estimates from web search.
-- New reference doc: `finyx/references/germany/health-insurance.md` — encodes 2026 constants (JAEG €77,400, BBG €62,100, base rate 14.6%, PV rates, employer caps)
-- PKV provider data via WebSearch — no API, Check24/krankenkasseninfo.de as sources
-- Long-term projection: two competing curves computed inline
+- `plugin.json` requires only `name` — auto-discovery handles skills, agents, commands
+- SKILL.md frontmatter: `name`, `description` (trigger text), `allowed-tools`, `disable-model-invocation`
+- `${CLAUDE_SKILL_DIR}` replaces `@~/.claude/` for reference doc paths
+- Agents at plugin root `agents/` (globally available) or per-skill `skills/<name>/agents/`
+- Marketplace: `claude.ai/settings/plugins/submit` (official) or PR to `parloa/claudes-kitchen`
+- Auto-updates enabled by default
 
 ### Features
-
-**Table stakes:** Eligibility check (Versicherungspflichtgrenze gate), GKV cost calculation, PKV cost estimate with health surcharge, family impact (Familienversicherung), tax deduction netting, age-55 lock-in warning.
-
-**Differentiators:** Health questionnaire with risk tier scoring, long-term 10/20/30-year projection with scenarios, Beamter/Beihilfe redirect, expat Anwartschaft guidance, Beitragsrückerstattung and Selbstbeteiligung modeling, cross-advisor integration with /finyx:tax and /finyx:insights.
-
-**Anti-features:** Binding quote generation, storing health diagnoses, recommending specific providers as "best."
+- **Auto-triggering** via description field (but finance vocab over-triggers → use `disable-model-invocation: true`)
+- **Progressive disclosure** — reference docs load on demand, not all at context start
+- **SessionStart hooks** — can detect stale tax year docs proactively
+- **Plugin is the install unit** — users get all skills at once, not individually
 
 ### Architecture
-- Two agents: `finyx-insurance-calc-agent.md` (deterministic, Read/Grep/Glob) + `finyx-insurance-research-agent.md` (WebSearch/WebFetch for live tariffs)
-- Health data: session-only, never persisted. Only non-sensitive fields (employment type, family count) stored in `.finyx/insurance-config.json` on user consent.
-- Build order: reference doc → both agents (parallel) → command → profile integration
+- Skill dir naming determines command syntax: `skills/tax/` → `/finyx:tax`
+- Shared agents (tax-scoring used by both tax + insights) go to plugin root `agents/`
+- Profile stays at `.finyx/profile.json` — add `~/.finyx/` as global fallback
+- No `finyx-core` package needed — insights reads profile, not other skills' ref docs
+- `bin/install.js` updated to target skills layout as npm fallback
 
 ### Top Pitfalls
-1. **Family cost underestimation** — GKV Familienversicherung is free; PKV charges per person
-2. **Age-55 lock-in** — §6 Abs. 3a SGB V blocks GKV return permanently
-3. **JAEG ≠ BBG confusion** — Eligibility threshold vs contribution ceiling are different numbers
-4. **Beamte need separate model** — Beihilfe covers 50-80%, standard PKV model overstates cost
-5. **Health data privacy** — GDPR Art. 9 special category, session-only mandatory
-6. **Stale tariff data** — PKV premiums change annually, all figures must be live-searched
-7. **Linear projection fallacy** — PKV grew 10-20% in 2026 due to Krankenhausreform; use scenarios not single lines
+1. **`@~/.claude/` paths silently break** — skills load from model training data with no error
+2. **Finance vocab over-triggers** — set `disable-model-invocation: true` on all advisory skills
+3. **Skill dir naming trap** — `finyx-tax/` → `/finyx:finyx-tax`; use `tax/` → `/finyx:tax`
+4. **Profile path assumption** — `.finyx/profile.json` needs `~/.finyx/` global fallback
+5. **Marketplace validator bugs** — `claude plugin validate` must pass zero warnings
 
-## Suggested Phases (4)
+## Suggested Phases (5)
 
-1. **Reference Foundation** — `health-insurance.md` with 2026 constants, formulas, 4 calculation paths
-2. **Specialist Agents** — Calc agent (deterministic) + Research agent (WebSearch) in parallel
-3. **Command + Questionnaire** — `/finyx:insurance` with eligibility gate, health questionnaire, cost comparison, projection, disclaimers
-4. **Cross-Advisor Integration** — Feed insurance costs to `/finyx:insights` and `/finyx:tax`, profile schema extension
+1. **Plugin Foundation** — Create `plugin.json`, restructure dirs, update `bin/install.js`
+2. **Profile Skill** — Convert `finyx-profile` as foundation (profile path strategy)
+3. **Pilot Skill** — Convert `finyx-tax` to validate the pattern (path refs, frontmatter, agents)
+4. **Bulk Migration** — Convert remaining 14 commands to skills in parallel
+5. **Integration + Submission** — `finyx-insights` cross-skill wiring, marketplace submission, backward compat testing
 
 ---
-*Research completed: 2026-04-08*
+*Research completed: 2026-04-12*
