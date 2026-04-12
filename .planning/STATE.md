@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: Comprehensive Insurance Advisor
 status: executing
-stopped_at: Completed 19-01-PLAN.md
-last_updated: "2026-04-12T19:49:49.633Z"
+stopped_at: Completed 19-02-PLAN.md
+last_updated: "2026-04-12T19:56:00.155Z"
 last_activity: 2026-04-12
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 4
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 ## Current Position
 
 Phase: 19 (reference-docs-profile-schema-agents) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-04-12
 
@@ -56,6 +56,8 @@ v2.1 key context:
 - [Phase 18-router-sub-skill-migration]: Router SKILL.md is a pure dispatcher (~96 lines) with zero health-specific logic; all advisory content lives in sub-skill files
 - [Phase 18-router-sub-skill-migration]: Sub-skill files are plain Markdown (no YAML frontmatter, no execution_context block) loaded by Read tool at dispatch time
 - [Phase 19-01]: Use short slugs (hausrat, haftpflicht, kfz) as type enum for insurance.policies — matches reference doc filenames and enables direct path construction in agents
+- [Phase 19-reference-docs-profile-schema-agents]: coverage_type annotation on every reference doc prevents portfolio agent from comparing sum-based and service-based coverage monetarily
+- [Phase 19-reference-docs-profile-schema-agents]: kfz.md: one policy entry per Kfz contract; three coverage tiers captured in coverage_components field, not separate entries
 
 ### Pending Todos
 
@@ -67,6 +69,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-12T19:49:49.630Z
-Stopped at: Completed 19-01-PLAN.md
+Last session: 2026-04-12T19:56:00.152Z
+Stopped at: Completed 19-02-PLAN.md
 Resume file: None
