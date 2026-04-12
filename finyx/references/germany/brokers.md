@@ -13,6 +13,16 @@ This document covers the main German and foreign brokers available to German-res
 
 ---
 
+## Note on Coverage
+
+This reference document covers commonly-used German and foreign brokers. It is NOT exhaustive.
+If the user's broker is not listed here, the `/finyx:broker` command will research it live
+via WebSearch. The absence of a broker from this document does not indicate it is unsuitable.
+
+Brokers change fees frequently. Always verify current fees on the broker's website.
+
+---
+
 ## 1. German Brokers
 
 ### Trade Republic
