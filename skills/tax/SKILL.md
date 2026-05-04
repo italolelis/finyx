@@ -6,7 +6,6 @@ allowed-tools:
   - Write
   - Bash
   - AskUserQuestion
-disable-model-invocation: true
 ---
 
 <objective>

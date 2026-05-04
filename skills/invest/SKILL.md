@@ -8,7 +8,6 @@ allowed-tools:
   - WebFetch
   - WebSearch
   - AskUserQuestion
-disable-model-invocation: true
 ---
 
 <objective>

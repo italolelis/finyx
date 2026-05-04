@@ -7,7 +7,6 @@ allowed-tools:
   - Write
   - Task
   - AskUserQuestion
-disable-model-invocation: true
 ---
 
 <objective>
