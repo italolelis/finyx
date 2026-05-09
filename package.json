@@ -1,9 +1,10 @@
 {
   "name": "finyx",
-  "version": "2.0.0",
+  "version": "2.2.0",
   "description": "A comprehensive AI-powered personal finance advisor for Claude Code — covering tax, investments, insurance, pensions, and real estate.",
   "files": [
     "skills",
+    "scripts",
     ".claude-plugin"
   ],
   "keywords": [
