@@ -30,6 +30,7 @@ ${CLAUDE_SKILL_DIR}/references/disclaimer.md
 ${CLAUDE_SKILL_DIR}/references/germany/tax-investment.md
 ${CLAUDE_SKILL_DIR}/references/brazil/tax-investment.md
 @.finyx/profile.json
+<!-- Project-local fast-path. Authoritative profile path is resolved at runtime via scripts/resolve-profile.sh. See scripts/README.md. -->
 
 </execution_context>
 
@@ -39,10 +40,10 @@ ${CLAUDE_SKILL_DIR}/references/brazil/tax-investment.md
 
 **Check profile exists:**
 ```bash
-[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+PROFILE_PATH=$("${CLAUDE_SKILL_DIR}/../../scripts/resolve-profile.sh") || exit $?
 ```
 
-**Read `.finyx/profile.json`** and extract:
+**Read `$PROFILE_PATH`** (the @-include is a project-local fast-path; `$PROFILE_PATH` from the gate check is authoritative) and extract:
 - `identity.cross_border` — cross-border flag
 - `identity.family_status` — "single" or "married" (determines Sparerpauschbetrag allowance)
 - `countries.germany.tax_class` — null means Germany not active

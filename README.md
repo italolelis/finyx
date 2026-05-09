@@ -51,6 +51,57 @@ Requires [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installed
 /finyx:broker       # Broker comparison
 ```
 
+## Configuration
+
+By default, Finyx reads your financial profile from `./.finyx/profile.json` (project-local) or `~/.finyx/profile.json` (global fallback). You can override this via either an environment variable or a user-level config file.
+
+### Profile path precedence
+
+Finyx resolves `profile.json` using this 4-tier precedence (first match wins):
+
+| # | Source | Notes |
+|---|--------|-------|
+| 1 | `$FINYX_PROFILE` env var | Highest priority. Must point to an existing file. |
+| 2 | `~/.config/finyx/config.json` `profile_path` key | User-level default. |
+| 3 | `./.finyx/profile.json` | Project-local profile in current working directory. |
+| 4 | `~/.finyx/profile.json` | Global fallback. Used when none of the above exist. |
+
+If `$FINYX_PROFILE` or the `config.json` `profile_path` is set but the file does not exist, Finyx fails loudly with a clear error rather than silently falling through to the next tier. This prevents silent desync.
+
+### Example: per-shell override
+
+```bash
+export FINYX_PROFILE="$HOME/Documents/finances/personal-profile.json"
+# All /finyx:* commands in this shell now use the file above.
+```
+
+### Example: user-level default
+
+```bash
+mkdir -p ~/.config/finyx
+cat > ~/.config/finyx/config.json <<'JSON'
+{
+  "profile_path": "/Users/me/Documents/finances/personal-profile.json"
+}
+JSON
+```
+
+### Working artifacts stay project-local
+
+Only `profile.json` is relocatable. Per-project working artifacts continue to live under `./.finyx/` of the current working directory regardless of where `profile.json` is stored:
+
+| Path | Purpose |
+|------|---------|
+| `./.finyx/insights-config.json` | Allocation mapping persisted by `/finyx:insights` |
+| `./.finyx/research/` | Location and market research output |
+| `./.finyx/analysis/` | Per-location analysis (UNITS, RANKED, SHORTLIST) |
+| `./.finyx/output/` | Generated briefings |
+| `./.finyx/STATE.md` | Per-project workflow state |
+
+This keeps multiple investment projects independent while letting you share one financial profile across all of them.
+
+For implementation details, see [`scripts/README.md`](scripts/README.md).
+
 ## Commands
 
 ### Financial advisors

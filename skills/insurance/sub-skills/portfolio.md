@@ -1,6 +1,7 @@
 # Portfolio Insurance Sub-skill
 
 <!-- Sub-skill loaded by router SKILL.md. All CLAUDE_SKILL_DIR paths resolve to skills/insurance/ -->
+<!-- TODO: migrate to $PROFILE_PATH from scripts/resolve-profile.sh in a follow-up iteration. -->
 
 <objective>
 

@@ -50,10 +50,10 @@ user_preferences = {
 
 **Check profile exists:**
 ```bash
-[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+PROFILE_PATH=$("${CLAUDE_SKILL_DIR}/../../scripts/resolve-profile.sh") || exit $?
 ```
 
-**Read `.finyx/profile.json`** (already loaded by the router at startup) and extract:
+**Read `$PROFILE_PATH`** (resolved by the gate check above; the @-include is a project-local fast-path) and extract:
 - Type slug: `"zahnzusatz"` — search `insurance.policies[]` for entries where `type == "zahnzusatz"`
 - If found, extract:
   - `coverage_amount` — year-1 Staffelung cap in EUR; null means unlimited or not recorded

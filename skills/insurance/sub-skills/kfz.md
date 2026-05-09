@@ -90,10 +90,10 @@ vehicle_data = {
 
 **Check profile exists:**
 ```bash
-[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+PROFILE_PATH=$("${CLAUDE_SKILL_DIR}/../../scripts/resolve-profile.sh") || exit $?
 ```
 
-**Read `.finyx/profile.json`** (already loaded by the router at startup) and extract:
+**Read `$PROFILE_PATH`** (resolved by the gate check above; the @-include is a project-local fast-path) and extract:
 - `insurance.policies[]` — search for the entry where `type == "kfz"`
 - From the matching entry (if found):
   - `coverage_components` — string array of active tiers (e.g., `["Haftpflicht", "Teilkasko"]`)

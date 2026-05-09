@@ -54,10 +54,10 @@ Pass `user_preferences` to the research agent in Phase 5.
 
 **Check profile exists:**
 ```bash
-[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+PROFILE_PATH=$("${CLAUDE_SKILL_DIR}/../../scripts/resolve-profile.sh") || exit $?
 ```
 
-Read `.finyx/profile.json` (already loaded by the router). Find the entry in `insurance.policies[]` where `type == "fahrrad"`.
+Read `$PROFILE_PATH` (resolved by the gate check above; the @-include is a project-local fast-path). Find the entry in `insurance.policies[]` where `type == "fahrrad"`.
 
 Extract:
 - `coverage_amount` — insured bicycle value in EUR (Neuwert)

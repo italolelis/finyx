@@ -45,6 +45,7 @@ ${CLAUDE_SKILL_DIR}/references/methodology.md
 ${CLAUDE_SKILL_DIR}/references/erbpacht-detection.md
 ${CLAUDE_SKILL_DIR}/references/transport-assessment.md
 @.finyx/profile.json
+<!-- Project-local fast-path. Authoritative profile path is resolved at runtime via scripts/resolve-profile.sh. See scripts/README.md. -->
 
 </execution_context>
 
@@ -93,7 +94,7 @@ Research a location for real estate investment, gathering critical data:
 
 **Check profile exists:**
 ```bash
-[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+PROFILE_PATH=$("${CLAUDE_SKILL_DIR}/../../scripts/resolve-profile.sh") || exit $?
 ```
 
 **Parse location argument:**
@@ -414,12 +415,12 @@ Analyze all properties in a location folder:
 
 **Check profile and location:**
 ```bash
-[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+PROFILE_PATH=$("${CLAUDE_SKILL_DIR}/../../scripts/resolve-profile.sh") || exit $?
 [ -d "properties/$LOCATION" ] || echo "NO_LOCATION"
 ```
 
 **Load investor profile:**
-Read `.finyx/profile.json` to get:
+Read `$PROFILE_PATH` to get:
 - `investor.marginalRate` — For tax benefit calculations
 - `investor.country` — For country-specific rules
 - `criteria.*` — For later filtering
@@ -757,11 +758,11 @@ Apply investor's criteria to analyzed units and create a filtered shortlist:
 
 **Check profile exists:**
 ```bash
-[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+PROFILE_PATH=$("${CLAUDE_SKILL_DIR}/../../scripts/resolve-profile.sh") || exit $?
 ```
 
 **Load profile:**
-Read `.finyx/profile.json` for criteria:
+Read `$PROFILE_PATH` for criteria:
 - `criteria.minYield`
 - `criteria.maxPrice`
 - `criteria.minSize` / `criteria.maxSize`
@@ -987,7 +988,7 @@ Create comprehensive side-by-side comparison of all shortlisted properties:
 
 **Check profile exists:**
 ```bash
-[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+PROFILE_PATH=$("${CLAUDE_SKILL_DIR}/../../scripts/resolve-profile.sh") || exit $?
 ```
 
 **Find all shortlist files:**
@@ -1004,7 +1005,7 @@ find .finyx/analysis -name "SHORTLIST.md" 2>/dev/null
 
 ## Phase 2: Load Investor Profile
 
-Read `.finyx/profile.json` for:
+Read `$PROFILE_PATH` for:
 - Liquid assets (for buffer calculation)
 - Criteria (for highlighting matches)
 - Preferences (parking, floor, etc.)
@@ -1172,11 +1173,11 @@ Run stress test scenarios on shortlisted properties:
 
 **Check profile exists:**
 ```bash
-[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+PROFILE_PATH=$("${CLAUDE_SKILL_DIR}/../../scripts/resolve-profile.sh") || exit $?
 ```
 
 **Load profile:**
-Read `.finyx/profile.json` for:
+Read `$PROFILE_PATH` for:
 - Investor profile
 - Current assumptions (interest rate, appreciation)
 
@@ -1587,11 +1588,11 @@ Choose this if: [One sentence explaining when alternative is better]
 
 **Check profile exists:**
 ```bash
-[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+PROFILE_PATH=$("${CLAUDE_SKILL_DIR}/../../scripts/resolve-profile.sh") || exit $?
 ```
 
 **Load investor profile:**
-Read `.finyx/profile.json`
+Read `$PROFILE_PATH`
 
 **Load location research:**
 Read all `.finyx/research/locations/*.md`
@@ -1939,7 +1940,7 @@ Research current mortgage interest rates in Germany:
 ## Phase 0: Pre-flight Check
 
 ```bash
-[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+PROFILE_PATH=$("${CLAUDE_SKILL_DIR}/../../scripts/resolve-profile.sh") || exit $?
 ```
 
 ## Phase 1: Web Research

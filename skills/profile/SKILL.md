@@ -41,15 +41,17 @@ ${CLAUDE_SKILL_DIR}/references/state.md
 
 ## Phase 1: Setup Check
 
-**Verify no existing profile (project-local primary, global fallback):**
+**Verify no existing profile (4-tier shared resolver):**
 ```bash
-# Profile path resolution: project-local primary, global fallback
-if [ -f .finyx/profile.json ]; then
-  PROFILE_PATH=".finyx/profile.json"
-  echo "PROFILE_EXISTS_LOCAL"
-elif [ -f ~/.finyx/profile.json ]; then
-  PROFILE_PATH="$HOME/.finyx/profile.json"
-  echo "PROFILE_EXISTS_GLOBAL"
+# Profile path resolution: shared resolver (4-tier precedence)
+# See scripts/README.md for full precedence rules.
+if PROFILE_PATH=$("${CLAUDE_SKILL_DIR}/../../scripts/resolve-profile.sh" 2>/dev/null); then
+  # Determine which tier resolved (for the user-facing "PROFILE_EXISTS_*" banner)
+  case "$PROFILE_PATH" in
+    "$(pwd)/.finyx/profile.json") echo "PROFILE_EXISTS_LOCAL" ;;
+    "$HOME/.finyx/profile.json")    echo "PROFILE_EXISTS_GLOBAL" ;;
+    *)                              echo "PROFILE_EXISTS_OVERRIDE" ;;
+  esac
 else
   echo "OK"
 fi
@@ -65,6 +67,19 @@ A financial profile already exists at [PROFILE_PATH].
 
 Use /finyx:status to see your current profile summary.
 To start fresh, delete the profile and run /finyx:profile again.
+```
+Exit without making changes.
+
+If PROFILE_EXISTS_OVERRIDE (resolved via `$FINYX_PROFILE` or `~/.config/finyx/config.json` `profile_path`):
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ FINYX > PROFILE ALREADY EXISTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+A financial profile already exists at [PROFILE_PATH] (resolved via $FINYX_PROFILE or ~/.config/finyx/config.json).
+
+Use /finyx:status to see your current profile summary.
+To start fresh, delete the profile and run /finyx:profile again, or unset the override.
 ```
 Exit without making changes.
 
@@ -279,28 +294,31 @@ Store as `monthly_commitments` (integer).
 
 ```
 Profile write location:
-- If `.finyx/` directory already exists OR we are in a project directory (has .git, package.json, or similar): write to `.finyx/profile.json` (project-local)
-- Otherwise: write to `~/.finyx/profile.json` (global fallback)
-- Create the target directory (`.finyx/` or `~/.finyx/`) if it does not exist
+- profile.json target is determined by `scripts/resolve-profile.sh --write-target` (see scripts/README.md).
+  Precedence: `$FINYX_PROFILE` env var → `~/.config/finyx/config.json` `profile_path` key → `./.finyx/profile.json` (when in a project dir) → `~/.finyx/profile.json` (global fallback).
+- Create the target directory if it does not exist.
+- IMPORTANT: only profile.json is relocatable. Working artifacts (`research/`, `analysis/`, `output/`, `STATE.md`, `insights-config.json`) are always written under `./.finyx/` of the current working directory — they are NOT placed alongside a relocated profile.json.
 ```
 
 **Create directory structure:**
 ```bash
-# Determine target base directory
-if [ -d .finyx ] || [ -f .git ] || [ -f package.json ] || [ -f Makefile ]; then
-  BASE_DIR=".finyx"
-else
-  BASE_DIR="$HOME/.finyx"
-fi
+# Resolve write target via shared resolver (--write-target mode).
+# This honors $FINYX_PROFILE / ~/.config/finyx/config.json if set,
+# else falls through to project-local .finyx/ or ~/.finyx/.
+PROFILE_TARGET=$("${CLAUDE_SKILL_DIR}/../../scripts/resolve-profile.sh" --write-target) || {
+  echo "ERROR: cannot determine where to write profile.json. See stderr above." >&2
+  exit 1
+}
 
-mkdir -p "${BASE_DIR}/research/market"
-mkdir -p "${BASE_DIR}/research/locations"
-mkdir -p "${BASE_DIR}/analysis"
-mkdir -p "${BASE_DIR}/output"
+mkdir -p "$(dirname "$PROFILE_TARGET")"   # ensure profile dir exists
+mkdir -p .finyx/research/market           # working artifacts always project-local
+mkdir -p .finyx/research/locations
+mkdir -p .finyx/analysis
+mkdir -p .finyx/output
 mkdir -p properties
 ```
 
-**Write `${BASE_DIR}/profile.json`** using all interview answers:
+**Write `$PROFILE_TARGET`** (the resolver-determined profile.json location) using all interview answers:
 
 ```json
 {
@@ -424,7 +442,7 @@ mkdir -p properties
 
 **Populate only the countries that are relevant** — if Germany is not in scope, set all germany fields to null/0/false. Same for Brazil.
 
-**Write `${BASE_DIR}/STATE.md`** using the state template, updated for Finyx:
+**Write `.finyx/STATE.md`** (always project-local — STATE.md is a working artifact, not relocatable) using the state template, updated for Finyx:
 
 ```markdown
 # FINYX Project State
@@ -509,8 +527,8 @@ Profile Summary:
   Commitments:     €[monthly_commitments]/month
 
 Files created:
-  [BASE_DIR]/profile.json
-  [BASE_DIR]/STATE.md
+  $PROFILE_TARGET
+  .finyx/STATE.md
   FINYX.md
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -575,15 +593,20 @@ Example: German national living in Germany with Brazilian rental income → cros
 
 ## Profile Path Resolution
 
-The skill uses a two-path strategy for profile storage:
+The skill delegates profile-path resolution to the shared resolver at `scripts/resolve-profile.sh`. See `scripts/README.md` for the full contract.
 
-1. **Project-local (primary):** `.finyx/profile.json` — used when the user is working inside a project directory (detected by presence of `.finyx/`, `.git`, `package.json`, or `Makefile`)
-2. **Global fallback:** `~/.finyx/profile.json` — used when no project context is detected
+Brief recap — the resolver uses a 4-tier precedence chain (first match wins):
 
-**At startup (Phase 1):** The existence check checks both paths. If either exists, the command aborts to prevent overwriting.
-**At write time (Phase 5):** The write path is determined by project context detection. The `BASE_DIR` variable controls where all files are written.
+1. **`$FINYX_PROFILE`** env var — per-shell override
+2. **`~/.config/finyx/config.json`** `profile_path` key — user-level default
+3. **`./.finyx/profile.json`** — project-local (when CWD looks like a project: has `.finyx/`, `.git`, `package.json`, or `Makefile`)
+4. **`~/.finyx/profile.json`** — global fallback
 
-This allows users who work on multiple financial projects to keep profiles scoped per project, while users who want a single global profile can run the command from a non-project directory.
+**At startup (Phase 1):** the resolver runs in read mode. If it succeeds, a profile already exists and the skill aborts to prevent overwriting. The PROFILE_EXISTS_LOCAL / PROFILE_EXISTS_GLOBAL / PROFILE_EXISTS_OVERRIDE banner reflects which tier resolved.
+
+**At write time (Phase 5):** the resolver runs in `--write-target` mode (which never errors when no override is configured — it always falls through to project-local or global). The returned path is stored in `$PROFILE_TARGET`, and `BASE_DIR=$(dirname "$PROFILE_TARGET")` is used for the profile file only. Working artifacts (`research/`, `analysis/`, `output/`, `STATE.md`, `insights-config.json`) are always written under `./.finyx/` of the current working directory regardless of where profile.json lands.
+
+This separation lets users keep a single financial profile across multiple investment projects (each with its own `.finyx/` working directory) without copying or symlinking.
 
 ## Backward Compatibility
 

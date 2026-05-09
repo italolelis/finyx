@@ -23,6 +23,7 @@ This skill:
 <execution_context>
 ${CLAUDE_SKILL_DIR}/references/disclaimer.md
 @.finyx/profile.json
+<!-- Project-local fast-path. Authoritative profile path is resolved at runtime via scripts/resolve-profile.sh. See scripts/README.md. -->
 </execution_context>
 
 <process>

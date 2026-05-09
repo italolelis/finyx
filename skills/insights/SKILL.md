@@ -31,6 +31,7 @@ This skill writes ONLY to `.finyx/insights-config.json` (allocation mapping pers
 
 ${CLAUDE_SKILL_DIR}/references/disclaimer.md
 @.finyx/profile.json
+<!-- Project-local fast-path. Authoritative profile path is resolved at runtime via scripts/resolve-profile.sh. See scripts/README.md. -->
 
 </execution_context>
 
@@ -40,10 +41,10 @@ ${CLAUDE_SKILL_DIR}/references/disclaimer.md
 
 **Check profile exists:**
 ```bash
-[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+PROFILE_PATH=$("${CLAUDE_SKILL_DIR}/../../scripts/resolve-profile.sh") || exit $?
 ```
 
-**Read `.finyx/profile.json`** (already loaded in execution_context) and check required fields per agent.
+**Read `$PROFILE_PATH`** (the @-include is a project-local fast-path; `$PROFILE_PATH` from the gate check is authoritative) and check required fields per agent.
 
 **Check for existing allocation mapping:**
 ```bash
