@@ -4,8 +4,8 @@ milestone: v2.1
 milestone_name: Comprehensive Insurance Advisor
 status: milestone_complete
 stopped_at: v2.1 shipped
-last_updated: "2026-04-12T21:25:05.924Z"
-last_activity: 2026-04-12
+last_updated: "2026-05-09T09:55:00.000Z"
+last_activity: 2026-05-09
 progress:
   total_phases: 5
   completed_phases: 5
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 Phase: 22
 Plan: Not started
 Status: Phase complete — ready for verification
-Last activity: 2026-04-12
+Last activity: 2026-05-09 - Completed quick task 260509-g7z: Add configurable profile path resolution to all 8 Finyx skills
 
 ```
 Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (0/5 phases)
@@ -82,6 +82,12 @@ None.
 ### Blockers/Concerns
 
 None.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260509-g7z | Add configurable profile path resolution to all 8 Finyx skills | 2026-05-09 | 3a86024 | [260509-g7z-add-configurable-profile-path-resolution](./quick/260509-g7z-add-configurable-profile-path-resolution/) |
 
 ## Session Continuity
 
