@@ -30,6 +30,7 @@ Output is reference/status text only. No advisory analysis is performed. No file
 
 ${CLAUDE_SKILL_DIR}/references/disclaimer.md
 @.finyx/profile.json
+<!-- Project-local fast-path. Authoritative profile path is resolved at runtime via scripts/resolve-profile.sh. See scripts/README.md. -->
 
 </execution_context>
 
@@ -602,7 +603,7 @@ Finyx follows 10 mandatory rules for real estate analysis:
 ### Step 1: Check Project Exists
 
 ```bash
-[ -f .finyx/profile.json ] || { echo "NO_PROFILE"; }
+PROFILE_PATH=$("${CLAUDE_SKILL_DIR}/../../scripts/resolve-profile.sh" 2>/dev/null) || { echo "NO_PROFILE"; }
 ```
 
 **If NO_PROFILE:**
@@ -620,7 +621,7 @@ Exit.
 ### Step 2: Read State Files
 
 Read:
-- `.finyx/profile.json` — Financial profile
+- `$PROFILE_PATH` — Financial profile (resolved by gate check; @-include is a project-local fast-path only)
 - `.finyx/STATE.md` — Current state
 
 ### Step 3: Scan Locations
@@ -705,7 +706,7 @@ Append the legal disclaimer from the loaded disclaimer.md reference at the end o
 ### Step 0: Check Profile Exists
 
 ```bash
-[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+PROFILE_PATH=$("${CLAUDE_SKILL_DIR}/../../scripts/resolve-profile.sh") || exit $?
 ```
 
 ### Step 1: Check Current Version

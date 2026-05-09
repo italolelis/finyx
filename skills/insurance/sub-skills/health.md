@@ -72,10 +72,10 @@ lifestyle_needs: [comma-separated list of selected items, or "none"]
 
 **Check profile exists:**
 ```bash
-[ -f .finyx/profile.json ] || { echo "ERROR: No financial profile found. Run /finyx:profile first to set up your profile."; exit 1; }
+PROFILE_PATH=$("${CLAUDE_SKILL_DIR}/../../scripts/resolve-profile.sh") || exit $?
 ```
 
-**Read `.finyx/profile.json`** (already loaded by the router at startup) and extract:
+**Read `$PROFILE_PATH`** (resolved by the gate check above; the @-include is a project-local fast-path) and extract:
 - `identity.residence_country` — confirm Germany is in scope
 - `identity.family_status` — "single" or "married"
 - `identity.children` (or `investor.children`) — number of dependent children
