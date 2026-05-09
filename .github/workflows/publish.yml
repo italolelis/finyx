@@ -23,7 +23,9 @@ jobs:
           node-version: '22'
 
       - name: Install npm 11.5+ for OIDC support
-        run: npm install -g npm@latest
+        # Pinned to 11.5.2 — npm@latest currently breaks on bootstrap with
+        # "Cannot find module 'promise-retry'" on top of Node 22's bundled npm.
+        run: npm install -g npm@11.5.2
 
       - name: Check versions
         run: |
